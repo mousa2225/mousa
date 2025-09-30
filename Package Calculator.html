@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>حاسبة تحويل الباقات</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+      direction: rtl;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .results {
+      margin-top: 20px;
+      background: #e7f1ff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>حاسبة تحويل الباقات</h2>
+    <label>سعر الباقة السابقة:
+      <input type="number" id="oldPrice" value="350">
+    </label>
+    <label>عدد أيام الباقة السابقة:
+      <input type="number" id="oldDays" value="6">
+    </label>
+    <label>سعر الباقة الجديدة:
+      <input type="number" id="newPrice" value="1925">
+    </label>
+    <label>عدد أيام الباقة الجديدة:
+      <input type="number" id="newDays" value="24">
+    </label>
+    <label>عدد الأيام المستخدمة من الباقة السابقة:
+      <input type="number" id="usedOld" value="6">
+    </label>
+    <label>عدد الأيام المستخدمة من الباقة الجديدة:
+      <input type="number" id="usedNew" value="18">
+    </label>
+    <button onclick="calculate()">احسب</button>
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const oldPrice = parseFloat(document.getElementById('oldPrice').value);
+      const oldDays = parseFloat(document.getElementById('oldDays').value);
+      const newPrice = parseFloat(document.getElementById('newPrice').value);
+      const newDays = parseFloat(document.getElementById('newDays').value);
+      const usedOld = parseFloat(document.getElementById('usedOld').value);
+      const usedNew = parseFloat(document.getElementById('usedNew').value);
+
+      const oldDayRate = oldPrice / oldDays;
+      const newDayRate = newPrice / newDays;
+      const costOld = oldDayRate * usedOld;
+      const costNew = newDayRate * usedNew;
+      const totalCost = costOld + costNew;
+      const paid = oldPrice;
+      const remaining = paid - totalCost;
+
+      document.getElementById('results').innerHTML = `
+        <strong>سعر اليوم في الباقة الأولى:</strong> ${oldDayRate.toFixed(2)} ريال<br>
+        <strong>سعر اليوم في الباقة الثانية:</strong> ${newDayRate.toFixed(2)} ريال<br>
+        <strong>التكلفة من الباقة الأولى:</strong> ${costOld.toFixed(2)} ريال<br>
+        <strong>التكلفة من الباقة الثانية:</strong> ${costNew.toFixed(2)} ريال<br>
+        <strong>إجمالي التكلفة:</strong> ${totalCost.toFixed(2)} ريال<br>
+        <strong>المبلغ المدفوع:</strong> ${paid.toFixed(2)} ريال<br>
+        <strong>${remaining < 0 ? 'المتبقي على العميل' : 'المتبقي للعميل'}:</strong> ${Math.abs(remaining).toFixed(2)} ريال
+      `;
+    }
+  </script>
+</body>
+</html>
