@@ -62,6 +62,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 10px;
     }
     table, th, td {
       border: 1px solid #ccc;
@@ -69,6 +70,34 @@
     th, td {
       padding: 10px;
       text-align: center;
+    }
+    .signature {
+      margin-top: 40px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    /* CSS خاص بالطباعة */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .results, .results * {
+        visibility: visible;
+      }
+      .results {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 0;
+        box-shadow: none;
+      }
+      button {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -127,6 +156,7 @@
       const remainingText = remaining < 0 ? 'المتبقي على العميل' : 'المتبقي للعميل';
 
       document.getElementById('results').innerHTML = `
+        <h3 style="text-align:center;">ملخص تحويل الباقات</h3>
         <table>
           <tr>
             <th>الوصف</th>
@@ -161,7 +191,8 @@
             <td style="color:${remainingColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)} ريال</td>
           </tr>
         </table>
-        <button onclick="window.print()" style="margin-top:15px; width:100%; padding:10px; font-size:16px;">طباعة النتائج</button>
+        <div class="signature">التوقيع: Accountant Mousa</div>
+        <button onclick="window.print()" style="margin-top:15px; width:100%; padding:10px; font-size:16px;">طباعة الملخص</button>
       `;
     }
 
