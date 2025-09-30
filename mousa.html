@@ -2,9 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>حاسبة تحويل الباقات — مع توقيع</title>
+  <title>حاسبة تحويل الباقات</title>
 
-  <!-- استدعاء خط عربي زخرفي قريب من خط الرقعة (Rakkas) -->
+  <!-- استدعاء خط زخرفي عربي قريب من خط الرقعة -->
   <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
 
   <style>
@@ -18,86 +18,47 @@
       background: white;
       padding: 20px;
       border-radius: 12px;
-      max-width: 780px;
+      max-width: 700px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h2 { text-align:center; margin-bottom:20px; }
-    label { display:block; margin-top:10px; }
+    h2 { text-align: center; margin-bottom: 20px; }
+    label { display: block; margin-top: 10px; }
     input[type="number"] {
-      width:100%; padding:8px; margin-top:5px;
-      border:1px solid #ccc; border-radius:8px;
+      width: 100%; padding: 8px; margin-top: 5px;
+      border: 1px solid #ccc; border-radius: 8px;
     }
-    .controls { display:flex; justify-content:space-between; gap:10px; margin-top:15px; }
     button {
-      padding:10px 14px; border:none; border-radius:8px;
-      background:#007BFF; color:white; cursor:pointer; font-size:16px;
+      width: 48%; margin-top: 20px; padding: 10px;
+      background: #007BFF; color: white; border: none;
+      border-radius: 8px; font-size: 16px; cursor: pointer;
     }
-    #resetBtn { background:#6c757d; }
-    .results { margin-top:20px; background:#e7f1ff; padding:15px; border-radius:8px; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    table, th, td { border:1px solid #ccc; }
-    th, td { padding:10px; text-align:center; }
+    #resetBtn { background: #6c757d; margin-left: 10px; }
+    .results { margin-top: 20px; background: #e7f1ff; padding: 15px; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 10px; text-align: center; }
 
-    /* ---------- توقيع ---------- */
-    .signature-wrapper {
-      margin-top:28px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
-
-    /* 1) شكل سطر التوقيع: اسم تحت سطر */
-    .sig-line {
-      display:inline-block;
-      text-align:left; /* الاسم يظهر تحت السطر على اليسار (للمستندات R->L اختر left ليكون السطر أعلى الاسم) */
-      min-width:260px;
-    }
-    .sig-line .line {
-      border-bottom:2px solid #000;
-      display:block;
-      width:100%;
-      height:18px; /* مساحة التوقيع فوق السطر */
-      margin-bottom:6px;
-    }
-    .sig-line .name {
-      font-family: 'Rakkas', 'Arial', cursive; /* خط يشبه الرقعة */
-      font-size:20px;
-      letter-spacing:1px;
-    }
-
-    /* 2) شكل الدائرة حول التوقيع */
-    .sig-circle {
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border:2px solid #000;
-      border-radius:50%;
-      padding:18px 28px;
-      min-width:140px;
-      min-height:140px;
-      box-sizing:border-box;
-      transform: rotate(-6deg); /* إمالة خفيفة للتأثير الواقعي */
-      background: #fff;
-    }
-    .sig-circle .name {
+    /* توقيع */
+    .signature {
+      margin-top: 40px;
+      text-align: left;
       font-family: 'Rakkas', 'Arial', cursive;
-      font-size:20px;
-      transform: rotate(6deg); /* عكس الإمالة داخل الدائرة ليبدو طبيعي */
+      font-size: 20px;
+    }
+    .signature .line {
+      border-bottom: 2px solid #000;
+      display: block;
+      width: 300px;
+      height: 20px;
+      margin-bottom: 6px;
     }
 
-    /* اختيارات التحكم الصغيرة */
-    .sig-options { display:flex; gap:8px; align-items:center; }
-
-    /* CSS للطباعة: طباعة الملخص فقط + التوقيع */
     @media print {
-      body * { visibility:hidden; }
-      .results, .results * { visibility:visible; }
-      .results { position: absolute; top:0; left:0; width:100%; background:#fff; padding:0; box-shadow:none; }
-      /* إظهار التوقيع جيداً في الطباعة */
-      .sig-circle { transform:none; }
-      button { display:none; }
+      body * { visibility: hidden; }
+      .results, .results * { visibility: visible; }
+      .results { position: absolute; top: 0; left: 0; width: 100%; background: white; padding: 0; box-shadow: none; }
+      button { display: none; }
     }
   </style>
 </head>
@@ -124,18 +85,9 @@
       <input type="number" id="usedNew" placeholder="19" min="0">
     </label>
 
-    <div class="controls">
-      <div style="flex:1">
-        <button onclick="calculate()">احسب</button>
-        <button id="resetBtn" onclick="resetFields()" style="margin-left:10px">إعادة التعيين</button>
-      </div>
-
-      <!-- اختيار نوع التوقيع: سطر أو دائرة -->
-      <div class="sig-options">
-        <label style="font-size:14px;">شكل التوقيع:</label>
-        <label><input type="radio" name="sigType" value="line" checked> سطر</label>
-        <label><input type="radio" name="sigType" value="circle"> دائرة</label>
-      </div>
+    <div style="display:flex; justify-content:space-between;">
+      <button onclick="calculate()">احسب</button>
+      <button id="resetBtn" onclick="resetFields()">إعادة التعيين</button>
     </div>
 
     <div class="results" id="results"></div>
@@ -150,7 +102,6 @@
       const usedOld = parseFloat(document.getElementById('usedOld').value);
       const usedNew = parseFloat(document.getElementById('usedNew').value);
 
-      // التحقق من القيم
       if ([oldPrice, oldDays, newPrice, newDays, usedOld, usedNew].some(v => isNaN(v) || v < 0)) {
         alert("يرجى إدخال قيم صحيحة وغير سالبة لجميع الحقول.");
         return;
@@ -167,11 +118,32 @@
       const remainingColor = remaining < 0 ? "red" : "green";
       const remainingText = remaining < 0 ? 'المتبقي على العميل' : 'المتبقي للعميل';
 
-      // بناء html للنتائج
-      let html = `
-        <h3 style="text-align:center; margin-top:8px;">ملخص تحويل الباقات</h3>
+      document.getElementById('results').innerHTML = `
+        <h3 style="text-align:center;">ملخص تحويل الباقات</h3>
         <table>
           <tr><th>الوصف</th><th>القيمة</th></tr>
           <tr><td>سعر اليوم في الباقة الأولى</td><td>${oldDayRate.toFixed(2)} ريال</td></tr>
           <tr><td>سعر اليوم في الباقة الثانية</td><td>${newDayRate.toFixed(2)} ريال</td></tr>
-          <tr><td>التكلفة من الباقة الأولى</td><
+          <tr><td>التكلفة من الباقة الأولى</td><td>${costOld.toFixed(2)} ريال</td></tr>
+          <tr><td>التكلفة من الباقة الثانية</td><td>${costNew.toFixed(2)} ريال</td></tr>
+          <tr><td>إجمالي التكلفة</td><td>${totalCost.toFixed(2)} ريال</td></tr>
+          <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
+          <tr><td>${remainingText}</td><td style="color:${remainingColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)} ريال</td></tr>
+        </table>
+
+        <div class="signature">
+          <span class="line"></span>
+          Accountant Mousa
+        </div>
+
+        <button onclick="window.print()" style="margin-top:15px; width:100%; padding:10px; font-size:16px;">طباعة الملخص</button>
+      `;
+    }
+
+    function resetFields() {
+      ['oldPrice','oldDays','newPrice','newDays','usedOld','usedNew'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('results').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
