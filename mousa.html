@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>حاسبة تحويل الباقات</title>
 
-  <!-- خط زخرفي -->
   <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
 
   <style>
@@ -70,6 +69,16 @@
       color: #000;
     }
 
+    /* شعار للطباعة */
+    .printLogo {
+      display: none;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .printLogo img {
+      max-width: 150px;
+    }
+
     /* توقيع */
     .signature {
       margin-top: 40px;
@@ -95,6 +104,7 @@
         background: white; padding: 0; box-shadow: none; 
       }
       .clientInfoPrint { display: block; }
+      .printLogo { display: block; }
       .results h3 { color: black !important; }
       .results td, .results th { color: black !important; border: 1px solid #000; }
       button { display: none; }
@@ -177,7 +187,15 @@
         `;
       }
 
+      // الشعار يظهر فقط وقت الطباعة
+      let logoHTML = `
+        <div class="printLogo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo-placeholder.png" alt="شعار الشركة">
+        </div>
+      `;
+
       document.getElementById('results').innerHTML = `
+        ${logoHTML}
         ${clientInfoHTML}
         <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3>
         <table>
