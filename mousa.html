@@ -10,7 +10,7 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: #e0f7fa; /* خلفية سماوية فاتحة */
+      background: #e0f7fa;
       padding: 30px;
       direction: rtl;
     }
@@ -25,15 +25,15 @@
     h2 { 
       text-align: center; 
       margin-bottom: 20px; 
-      color: #00796b; /* أخضر تركوازي غامق */
+      color: #00796b; 
     }
     label { display: block; margin-top: 10px; color:#37474f; font-weight:bold; }
-    input[type="number"] {
+    input[type="number"], input[type="text"] {
       width: 100%; padding: 10px; margin-top: 5px;
       border: 1px solid #b0bec5; border-radius: 10px;
       transition: 0.3s;
     }
-    input[type="number"]:focus {
+    input:focus {
       border-color: #00796b; box-shadow: 0 0 5px rgba(0,121,107,0.5);
       outline: none;
     }
@@ -75,10 +75,16 @@
       margin-bottom: 6px;
     }
 
+    /* ألوان الطباعة */
     @media print {
       body * { visibility: hidden; }
       .results, .results * { visibility: visible; }
-      .results { position: absolute; top: 0; left: 0; width: 100%; background: white; padding: 0; box-shadow: none; }
+      .results { 
+        position: absolute; top: 0; left: 0; width: 100%; 
+        background: white; padding: 0; box-shadow: none; 
+      }
+      .results h3 { color: black !important; }
+      .results td, .results th { color: black !important; border: 1px solid #000; }
       button { display: none; }
     }
   </style>
@@ -86,6 +92,13 @@
 <body>
   <div class="container">
     <h2>حاسبة تحويل الباقات</h2>
+
+    <label>اسم العميل (اختياري):
+      <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
+    </label>
+    <label>رقم العميل (اختياري):
+      <input type="text" id="clientNumber" placeholder="مثال: 0551234567">
+    </label>
 
     <label>سعر الباقة السابقة:
       <input type="number" id="oldPrice" placeholder="795" min="0">
@@ -116,6 +129,8 @@
 
   <script>
     function calculate() {
+      const clientName = document.getElementById('clientName').value.trim();
+      const clientNumber = document.getElementById('clientNumber').value.trim();
       const oldPrice = parseFloat(document.getElementById('oldPrice').value);
       const oldDays = parseFloat(document.getElementById('oldDays').value);
       const newPrice = parseFloat(document.getElementById('newPrice').value);
@@ -139,10 +154,19 @@
       const remainingColor = remaining < 0 ? "#d32f2f" : "#388e3c";
       const remainingText = remaining < 0 ? 'المتبقي على العميل' : 'المتبقي للعميل';
 
+      let clientInfo = "";
+      if (clientName || clientNumber) {
+        clientInfo = `
+          <tr><td>اسم العميل</td><td>${clientName || '-'}</td></tr>
+          <tr><td>رقم العميل</td><td>${clientNumber || '-'}</td></tr>
+        `;
+      }
+
       document.getElementById('results').innerHTML = `
         <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3>
         <table>
           <tr><th>الوصف</th><th>القيمة</th></tr>
+          ${clientInfo}
           <tr><td>سعر اليوم في الباقة الأولى</td><td>${oldDayRate.toFixed(2)} ريال</td></tr>
           <tr><td>سعر اليوم في الباقة الثانية</td><td>${newDayRate.toFixed(2)} ريال</td></tr>
           <tr><td>التكلفة من الباقة الأولى</td><td>${costOld.toFixed(2)} ريال</td></tr>
@@ -157,12 +181,16 @@
           Accountant Mousa
         </div>
 
-        <button onclick="window.print()" style="margin-top:15px; width:100%; padding:10px; font-size:16px; background:#00796b; color:white; border:none; border-radius:10px;">طباعة الملخص</button>
+        <button onclick="window.print()" 
+          style="margin-top:15px; width:100%; padding:12px; font-size:16px; 
+                 background:#ff7043; color:white; border:none; border-radius:10px; cursor:pointer;">
+          🖨️ طباعة الملخص
+        </button>
       `;
     }
 
     function resetFields() {
-      ['oldPrice','oldDays','newPrice','newDays','usedOld','usedNew'].forEach(id => document.getElementById(id).value = '');
+      ['clientName','clientNumber','oldPrice','oldDays','newPrice','newDays','usedOld','usedNew'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('results').innerHTML = '';
     }
   </script>
