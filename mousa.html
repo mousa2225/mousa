@@ -123,12 +123,8 @@
     }
     /* ألوان الطباعة */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      .results, .results * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      .results, .results * { visibility: visible; }
       .results {
         position: absolute;
         top: 20px;
@@ -141,16 +137,8 @@
         border: 2px solid #0288d1;
         font-size: 16px;
       }
-      .clientInfoPrint {
-        display: block;
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      .printLogo {
-        display: block;
-        text-align: center;
-        margin-bottom: 15px;
-      }
+      .clientInfoPrint { display: block; margin-bottom: 20px; }
+      .printLogo { display: block; margin-bottom: 15px; }
       .results h3 {
         color: #00796b !important;
         text-align: center;
@@ -163,23 +151,32 @@
         margin-top: 10px;
         font-size: 16px;
       }
-      table, th, td {
-        border: 1px solid #0288d1;
-      }
-      th {
-        background: #0288d1;
-        color: white;
-      }
-      td {
-        color: #37474f;
-      }
-      td:last-child {
-        font-weight: bold;
+      table, th, td { border: 1px solid #0288d1; }
+      th { background: #0288d1; color: white; }
+      td { color: #37474f; }
+      td:last-child { font-weight: bold; }
+      button { display: none; }
+    }
+
+    /* استجابة الشاشة */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        width: 95%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       }
       button {
-        display: none;
+        width: 100%;
+        margin-top: 10px;
       }
+      .results {
+        padding: 10px;
+        font-size: 14px;
+      }
+      table, th, td { font-size: 14px; }
+      .signature { font-size: 18px; }
     }
+
   </style>
 </head>
 <body>
@@ -211,7 +208,7 @@
       <input type="number" id="usedNew" placeholder="19" min="0">
     </label>
 
-    <div style="display:flex; justify-content:space-between;">
+    <div style="display:flex; justify-content:space-between; flex-wrap: wrap;">
       <button onclick="calculate()">احسب</button>
       <button id="resetBtn" onclick="resetFields()">إعادة التعيين</button>
     </div>
