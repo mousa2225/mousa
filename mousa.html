@@ -22,20 +22,12 @@
     table, th, td { border: 1px solid #cfd8dc; }
     th { background:#0288d1; color:white; }
     th, td { padding: 10px; text-align: center; }
-    .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
+    .clientInfoPrint { text-align: center; margin-bottom: 15px; }
     .clientInfoPrint h3 { margin: 5px 0; color: #000; }
-    .printLogo { display: none; text-align: center; margin-bottom: 15px; }
+    .printLogo { text-align: center; margin-bottom: 15px; }
     .printLogo img { max-width: 150px; }
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
-
-    @media print {
-      body * { visibility: hidden; }
-      .results, .results * { visibility: visible; }
-      .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.2); border: 2px solid #0288d1; }
-      .clientInfoPrint, .printLogo { display: block; }
-      button { display:none; }
-    }
   </style>
 </head>
 <body>
@@ -80,7 +72,6 @@
   </div>
 </div>
 
-<!-- مكتبة html2pdf.js جاهزة عبر CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function calculate() {
@@ -142,15 +133,17 @@ function resetFields(){
 
 function downloadPDF(){
   const element = document.getElementById("results");
-  setTimeout(()=>{ // تأخير بسيط للصور والجدول
-    html2pdf().set({
-      margin:0.5,
-      filename:'ملخص_تحويل_الباقات.pdf',
-      image:{type:'jpeg', quality:0.98},
-      html2canvas:{scale:2},
-      jsPDF:{unit:'cm', format:'a4', orientation:'portrait'}
-    }).from(element).save();
-  },200);
+
+  // عرض كل العناصر المخفية قبل PDF
+  document.querySelectorAll('.printLogo, .clientInfoPrint').forEach(el=>el.style.display='block');
+
+  html2pdf().set({
+    margin:0.5,
+    filename:'ملخص_تحويل_الباقات.pdf',
+    image:{type:'jpeg', quality:0.98},
+    html2canvas:{scale:2},
+    jsPDF:{unit:'cm', format:'a4', orientation:'portrait'}
+  }).from(element).save();
 }
 </script>
 </body>
