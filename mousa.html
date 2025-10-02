@@ -294,14 +294,26 @@
     }
 
     function downloadPDF() {
-      const element = document.querySelector(".results");
-      element.style.position = "static"; // إصلاح ظهور صفحة بيضاء
+      const original = document.querySelector(".results");
+      const clone = original.cloneNode(true);
 
-      const images = element.getElementsByTagName('img');
+      // إزالة خصائص قد تسبب مشاكل
+      clone.style.position = "static";
+      clone.style.visibility = "visible";
+      clone.style.width = "100%";
+      clone.style.boxShadow = "none";
+
+      const tempDiv = document.createElement("div");
+      tempDiv.style.position = "fixed";
+      tempDiv.style.top = "-10000px"; // خارج الشاشة
+      tempDiv.appendChild(clone);
+      document.body.appendChild(tempDiv);
+
+      // التأكد من تحميل الصور
+      const images = clone.getElementsByTagName('img');
       let loaded = 0;
-      if (images.length === 0) {
-        savePDF();
-      } else {
+      if (images.length === 0) savePDF();
+      else {
         for (let img of images) {
           if (img.complete) loaded++;
           else img.onload = img.onerror = () => {
@@ -313,14 +325,15 @@
       }
 
       function savePDF() {
-        const opt = {
+        html2pdf().set({
           margin: 0.5,
           filename: 'ملخص-تحويل-الباقات.pdf',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2 },
           jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        }).from(clone).save().then(() => {
+          document.body.removeChild(tempDiv);
+        });
       }
     }
 
