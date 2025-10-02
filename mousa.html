@@ -15,7 +15,22 @@
     button:hover { opacity:0.9; }
     #calculateBtn { background:#0288d1; width:48%; }
     #resetBtn { background:#ffb300; width:48%; }
-    #printBtn { background:#4caf50; width:100%; font-size:18px; margin-top:20px; padding:15px; display:none; }
+    #printBtn {
+      background: #009688; /* لون جذاب */
+      width: 100%;          /* يغطي كامل عرض الحاوية */
+      font-size: 20px;      /* أكبر من السابق */
+      margin-top: 20px;
+      padding: 18px;        /* تكبير الزر */
+      border-radius: 12px;  /* حواف متناسقة مع الجدول */
+      display: none;        /* سيظهر بعد الضغط على احسب */
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* تأثير خفيف للزر */
+      cursor: pointer;
+      color: #fff;
+      transition: 0.3s;
+    }
+    #printBtn:hover { background: #00796b; }
+
     .results { margin-top: 20px; background: #f1f8e9; padding: 15px; border-radius: 10px; border: 1px solid #c5e1a5; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     table, th, td { border: 1px solid #cfd8dc; }
