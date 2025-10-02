@@ -80,6 +80,7 @@
   </div>
 </div>
 
+<!-- مكتبة html2pdf.js جاهزة عبر CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function calculate() {
@@ -141,7 +142,7 @@ function resetFields(){
 
 function downloadPDF(){
   const element = document.getElementById("results");
-  setTimeout(()=>{  // تأخير بسيط للصور والجدول
+  setTimeout(()=>{ // تأخير بسيط للصور والجدول
     html2pdf().set({
       margin:0.5,
       filename:'ملخص_تحويل_الباقات.pdf',
