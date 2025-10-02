@@ -6,21 +6,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
 <style>
 body { font-family: Arial, sans-serif; padding: 30px; background: #e0f7fa; }
-.container { max-width: 600px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+.container { max-width: 600px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15);}
 h2 { text-align:center; color:#00796b; }
-input[type=number] { width:100%; padding:8px; margin-top:10px; border-radius:8px; border:1px solid #b0bec5;}
-button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:10px; background:#0288d1; color:white; font-size:16px; cursor:pointer;}
-button:hover { opacity:0.9;}
-.results { margin-top:20px; background:#f1f8e9; padding:15px; border-radius:10px; border:1px solid #c5e1a5;}
-table { width:100%; border-collapse:collapse; margin-top:10px;}
-th, td { border:1px solid #cfd8dc; padding:8px; text-align:center;}
-th { background:#0288d1; color:white;}
+input[type=number] { width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #b0bec5; font-size:16px;}
+button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:10px; background:#0288d1; color:white; font-size:16px; cursor:pointer; transition:0.3s;}
+button:hover { background:#026aa7; }
+#nextBtn { background:#0288d1; }
+#printBtn { display:none; margin-top:10px; background:#009688; font-size:18px; padding:12px; border-radius:10px;}
+#printBtn:hover { background:#00796b; }
+.results { margin-top:20px; padding:15px; border-radius:10px; border:1px solid #c5e1a5; background:white; box-shadow:0 3px 10px rgba(0,0,0,0.1);}
+table { width:100%; border-collapse:collapse; margin-top:10px; background:white; }
+th, td { border:1px solid #b0bec5; padding:10px; text-align:center; font-size:16px; }
+th { background:#0288d1; color:white; }
 .printLogo { text-align:center; margin-bottom:15px; }
 .printLogo img { max-width:150px; }
 .signature { margin-top:20px; text-align:left; font-family:'Rakkas', 'Arial', cursive; font-size:20px; color:#00796b; }
 .signature .line { border-bottom:2px solid #00796b; display:block; width:300px; height:20px; margin-bottom:6px; }
-#printBtn { display:none; margin-top:10px; background:#009688; font-size:18px; padding:12px; }
-#printBtn:hover { background:#00796b; }
 </style>
 </head>
 <body>
@@ -29,7 +30,7 @@ th { background:#0288d1; color:white;}
   <div id="stepContainer">
     <label id="questionLabel">سعر الباقة السابقة:</label>
     <input type="number" id="answerInput" min="0">
-    <button onclick="nextStep()">التالي</button>
+    <button id="nextBtn" onclick="nextStep()">التالي</button>
   </div>
 
   <div class="results" id="results" style="display:none;"></div>
