@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>حاسبة تحويل الباقات</title>
   <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -88,6 +87,7 @@
       padding: 10px;
       text-align: center;
     }
+    /* بيانات العميل للطباعة فقط */
     .clientInfoPrint {
       display: none;
       text-align: center;
@@ -97,6 +97,7 @@
       margin: 5px 0;
       color: #000;
     }
+    /* شعار للطباعة */
     .printLogo {
       display: none;
       text-align: center;
@@ -105,6 +106,7 @@
     .printLogo img {
       max-width: 150px;
     }
+    /* توقيع */
     .signature {
       margin-top: 40px;
       text-align: left;
@@ -119,6 +121,7 @@
       height: 20px;
       margin-bottom: 6px;
     }
+    /* ألوان الطباعة */
     @media print {
       body * {
         visibility: hidden;
@@ -245,103 +248,9 @@
 
       let clientInfoHTML = "";
       if (clientName || clientNumber) {
-        clientInfoHTML = `
-          <div class="clientInfoPrint">
-            <h3>اسم العميل: ${clientName || '-'}</h3>
-            <h3>رقم العميل: ${clientNumber || '-'}</h3>
-          </div>
-        `;
+        clientInfoHTML = <div class="clientInfoPrint"> <h3>اسم العميل: ${clientName || '-'}</h3> <h3>رقم العميل: ${clientNumber || '-'}</h3> </div> ;
       }
 
-      let logoHTML = `
-        <div class="printLogo">
-          <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة">
-        </div>
-      `;
+      let logoHTML = <div class="printLogo"> <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة"> </div> ;
 
-      document.getElementById('results').innerHTML = `
-        ${logoHTML}
-        ${clientInfoHTML}
-        <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3>
-        <table>
-          <tr><th>الوصف</th><th>القيمة</th></tr>
-          <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldDayRate.toFixed(2)} ريال</td></tr>
-          <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newDayRate.toFixed(2)} ريال</td></tr>
-          <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
-          <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
-          <tr><td>إجمالي التكلفة</td><td>${totalCost.toFixed(2)} ريال</td></tr>
-          <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
-          <tr><td>${remainingText}</td><td style="color:${remainingColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)} ريال</td></tr>
-        </table>
-
-        <div class="signature">
-          <span class="line"></span>
-          Accountant Mousa
-        </div>
-
-        <button onclick="window.print()" 
-          style="margin-top:15px; width:100%; padding:12px; font-size:16px; 
-                 background:#ff7043; color:white; border:none; border-radius:10px; cursor:pointer;">
-          🖨️ طباعة الملخص
-        </button>
-
-        <button onclick="downloadPDF()" 
-          style="margin-top:10px; width:100%; padding:12px; font-size:16px; 
-                 background:#43a047; color:white; border:none; border-radius:10px; cursor:pointer;">
-          📥 تنزيل PDF
-        </button>
-      `;
-    }
-
-    function downloadPDF() {
-      const original = document.querySelector(".results");
-      const clone = original.cloneNode(true);
-
-      // إزالة خصائص قد تسبب مشاكل
-      clone.style.position = "static";
-      clone.style.visibility = "visible";
-      clone.style.width = "100%";
-      clone.style.boxShadow = "none";
-
-      const tempDiv = document.createElement("div");
-      tempDiv.style.position = "fixed";
-      tempDiv.style.top = "-10000px"; // خارج الشاشة
-      tempDiv.appendChild(clone);
-      document.body.appendChild(tempDiv);
-
-      // التأكد من تحميل الصور
-      const images = clone.getElementsByTagName('img');
-      let loaded = 0;
-      if (images.length === 0) savePDF();
-      else {
-        for (let img of images) {
-          if (img.complete) loaded++;
-          else img.onload = img.onerror = () => {
-            loaded++;
-            if (loaded === images.length) savePDF();
-          };
-        }
-        if (loaded === images.length) savePDF();
-      }
-
-      function savePDF() {
-        html2pdf().set({
-          margin: 0.5,
-          filename: 'ملخص-تحويل-الباقات.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        }).from(clone).save().then(() => {
-          document.body.removeChild(tempDiv);
-        });
-      }
-    }
-
-    function resetFields() {
-      ['clientName','clientNumber','oldPrice','oldDays','newPrice','newDays','usedOld','usedNew']
-        .forEach(id => document.getElementById(id).value = '');
-      document.getElementById('results').innerHTML = '';
-    }
-  </script>
-</body>
-</html>
+      document.getElementById('results').innerHTML = ${logoHTML} ${clientInfoHTML} <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3> <table> <tr><th>الوصف</th><th>القيمة</th></tr> <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldDayRate.toFixed(2)} ريال</td></tr> <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newDayRate.toFixed(2)} ريال</td></tr> <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr> <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr> <tr><td>إجمالي التكلفة</td><td>${totalCost.toFixed(2)} ريال</td></tr> <tr><td
