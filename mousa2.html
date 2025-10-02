@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>حاسبة تحويل الباقات خطوة خطوة</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 30px; background: #e0f7fa; }
+.container { max-width: 500px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+h2 { text-align:center; color:#00796b; }
+input[type=number] { width:100%; padding:8px; margin-top:10px; border-radius:8px; border:1px solid #b0bec5;}
+button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:10px; background:#0288d1; color:white; font-size:16px; cursor:pointer;}
+button:hover { opacity:0.9;}
+.results { margin-top:20px; background:#f1f8e9; padding:15px; border-radius:10px; border:1px solid #c5e1a5;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>حاسبة تحويل الباقات خطوة خطوة</h2>
+  <div id="stepContainer">
+    <label id="questionLabel">سعر الباقة السابقة:</label>
+    <input type="number" id="answerInput" min="0">
+    <button onclick="nextStep()">التالي</button>
+  </div>
+
+  <div class="results" id="results" style="display:none;"></div>
+</div>
+
+<script>
+const questions = [
+  {label: "سعر الباقة السابقة:", id:"oldPrice"},
+  {label: "عدد أيام الباقة السابقة:", id:"oldDays"},
+  {label: "سعر الباقة الجديدة:", id:"newPrice"},
+  {label: "عدد أيام الباقة الجديدة:", id:"newDays"},
+  {label: "الأيام المستخدمة من الباقة السابقة:", id:"usedOld"},
+  {label: "الأيام المستخدمة من الباقة الجديدة:", id:"usedNew"}
+];
+
+const answers = {};
+let currentStep = 0;
+
+function nextStep() {
+  const value = parseFloat(document.getElementById("answerInput").value);
+  if(isNaN(value) || value < 0) {
+    alert("يرجى إدخال قيمة صحيحة");
+    return;
+  }
+
+  answers[questions[currentStep].id] = value;
+  currentStep++;
+
+  if(currentStep < questions.length){
+    document.getElementById("questionLabel").innerText = questions[currentStep].label;
+    document.getElementById("answerInput").value = "";
+    document.getElementById("answerInput").focus();
+  } else {
+    showResults();
+  }
+}
+
+function showResults(){
+  const oldRate = answers.oldPrice / answers.oldDays;
+  const newRate = answers.newPrice / answers.newDays;
+  const costOld = oldRate * answers.usedOld;
+  const costNew = newRate * answers.usedNew;
+  const total = costOld + costNew;
+  const paid = answers.oldPrice;
+  const remaining = paid - total;
+  const remainingText = remaining >= 0 ? "المتبقي للعميل" : "المتبقي على العميل";
+
+  let html = `<h3>ملخص تحويل الباقات</h3>`;
+  html += `<table style="width:100%; border-collapse:collapse;">
+    <tr><th style="border:1px solid #cfd8dc; padding:8px;">الوصف</th><th style="border:1px solid #cfd8dc; padding:8px;">القيمة (ريال)</th></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">سعر اليوم في الباقة السابقة</td><td style="border:1px solid #cfd8dc; padding:8px;">${oldRate.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">سعر اليوم في الباقة الجديدة</td><td style="border:1px solid #cfd8dc; padding:8px;">${newRate.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">التكلفة من الباقة السابقة</td><td style="border:1px solid #cfd8dc; padding:8px;">${costOld.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">التكلفة من الباقة الجديدة</td><td style="border:1px solid #cfd8dc; padding:8px;">${costNew.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">إجمالي التكلفة</td><td style="border:1px solid #cfd8dc; padding:8px;">${total.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">المبلغ المدفوع</td><td style="border:1px solid #cfd8dc; padding:8px;">${paid.toFixed(2)}</td></tr>
+    <tr><td style="border:1px solid #cfd8dc; padding:8px;">${remainingText}</td><td style="border:1px solid #cfd8dc; padding:8px;">${Math.abs(remaining).toFixed(2)}</td></tr>
+  </table>`;
+
+  document.getElementById("stepContainer").style.display = "none";
+  const resDiv = document.getElementById("results");
+  resDiv.style.display = "block";
+  resDiv.innerHTML = html;
+}
+</script>
+</body>
+</html>
