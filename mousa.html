@@ -3,157 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <title>حاسبة تحويل الباقات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background: #e0f7fa;
+      font-family: 'Tahoma', sans-serif;
+      background: #f5f5f5;
       padding: 30px;
-      direction: rtl;
+      line-height: 1.6;
     }
     .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
       max-width: 700px;
       margin: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    h1 {
+    h2 {
       text-align: center;
-      color: #0288d1;
-      margin-bottom: 20px;
+      color: #00796b;
     }
     label {
-      display: block;
-      margin: 10px 0 5px;
       font-weight: bold;
-      color: #37474f;
+      display: block;
+      margin-top: 10px;
     }
     input {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      border: 1px solid #b0bec5;
-      margin-bottom: 15px;
     }
     button {
-      margin-top: 10px;
-      width: 100%;
+      margin-top: 15px;
+      width: 32%;
       padding: 12px;
-      font-size: 16px;
+      font-size: 15px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      color: white;
     }
-    button.calculate { background: #0288d1; color: white; }
-    button.print { background: #f57c00; color: white; }
-    button.pdf { background: #4caf50; color: white; }
+    .btn-calc { background: #00796b; }
+    .btn-reset { background: #757575; }
+    .btn-pdf { background: #ff7043; }
     .results {
       margin-top: 20px;
       padding: 15px;
-      background: #fafafa;
-      border: 1px solid #cfd8dc;
       border-radius: 10px;
-      display: none;
+      background: #fafafa;
+      border: 1px solid #ddd;
+    }
+    .results h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #00796b;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 15px;
     }
-    table, th, td {
-      border: 1px solid #b0bec5;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
     }
     th {
-      background: #0288d1;
+      background: #00796b;
       color: white;
-      padding: 8px;
     }
-    td {
-      padding: 8px;
-      text-align: center;
-    }
-    .positive { color: green; font-weight: bold; }
-    .negative { color: red; font-weight: bold; }
     .signature {
-      margin-top: 20px;
-      font-family: 'Rakkas', cursive;
-      font-size: 20px;
+      margin-top: 40px;
       text-align: center;
-      color: #37474f;
+      font-style: italic;
+      position: relative;
+    }
+    .signature .line {
+      display: block;
+      width: 200px;
+      margin: auto;
+      border-top: 1px solid #000;
+      margin-bottom: 5px;
+    }
+    .printLogo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .printLogo img {
+      max-width: 100px;
     }
     @media print {
+      button { display: none; }
       body { background: white; }
       .container { box-shadow: none; border: none; }
-      button { display: none; }
-      .results { display: block; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>حاسبة تحويل الباقات</h1>
-    <label>سعر الباقة الحالية:</label>
-    <input type="number" id="oldPrice" placeholder="أدخل السعر الحالي">
+    <h2>📊 حاسبة تحويل الباقات</h2>
+    
+    <label>اسم العميل:</label>
+    <input type="text" id="clientName" placeholder="أدخل اسم العميل">
 
-    <label>الأيام المتبقية:</label>
-    <input type="number" id="oldDays" placeholder="أدخل الأيام المتبقية">
+    <label>رقم العميل:</label>
+    <input type="text" id="clientNumber" placeholder="أدخل رقم العميل">
+
+    <label>سعر الباقة السابقة:</label>
+    <input type="number" id="oldPrice" placeholder="مثال: 795">
+
+    <label>عدد أيام الباقة السابقة:</label>
+    <input type="number" id="oldDays" placeholder="مثال: 30">
 
     <label>سعر الباقة الجديدة:</label>
-    <input type="number" id="newPrice" placeholder="أدخل السعر الجديد">
+    <input type="number" id="newPrice" placeholder="مثال: 1195">
 
-    <label>مدة الباقة الجديدة (أيام):</label>
-    <input type="number" id="newDays" placeholder="أدخل المدة الجديدة">
+    <label>عدد أيام الباقة الجديدة:</label>
+    <input type="number" id="newDays" placeholder="مثال: 30">
 
-    <button class="calculate" onclick="calculate()">احسب</button>
-    <button class="print" onclick="window.print()">🖨️ طباعة</button>
-    <button class="pdf" onclick="downloadPDF()">⬇️ تنزيل PDF</button>
+    <label>عدد الأيام المستخدمة من الباقة السابقة:</label>
+    <input type="number" id="usedOld" placeholder="مثال: 10">
 
-    <div class="results" id="results">
-      <h2>الملخص</h2>
-      <table>
-        <tr><th>الوصف</th><th>القيمة</th></tr>
-        <tr><td>المبلغ المسترجع</td><td id="refund"></td></tr>
-        <tr><td>سعر الباقة الجديدة</td><td id="newPackage"></td></tr>
-        <tr><td>المبلغ المطلوب/المتبقي</td><td id="finalAmount"></td></tr>
-      </table>
-      <div class="signature">التوقيع: ...................</div>
+    <label>عدد الأيام المستخدمة من الباقة الجديدة:</label>
+    <input type="number" id="usedNew" placeholder="مثال: 20">
+
+    <div style="text-align:center; display:flex; justify-content:space-between;">
+      <button class="btn-calc" onclick="calculate()">احسب</button>
+      <button class="btn-reset" onclick="resetFields()">إعادة تعيين</button>
+      <button class="btn-pdf" onclick="downloadPDF()">تنزيل PDF</button>
     </div>
+
+    <div id="results" class="results"></div>
   </div>
 
-  <!-- مكتبة PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    function calculate() {
-      let oldPrice = parseFloat(document.getElementById("oldPrice").value) || 0;
-      let oldDays = parseFloat(document.getElementById("oldDays").value) || 0;
-      let newPrice = parseFloat(document.getElementById("newPrice").value) || 0;
-      let newDays = parseFloat(document.getElementById("newDays").value) || 0;
+<script>
+  function calculate() {
+    const clientName = document.getElementById('clientName').value.trim();
+    const clientNumber = document.getElementById('clientNumber').value.trim();
+    const oldPrice = parseFloat(document.getElementById('oldPrice').value);
+    const oldDays = parseFloat(document.getElementById('oldDays').value);
+    const newPrice = parseFloat(document.getElementById('newPrice').value);
+    const newDays = parseFloat(document.getElementById('newDays').value);
+    const usedOld = parseFloat(document.getElementById('usedOld').value);
+    const usedNew = parseFloat(document.getElementById('usedNew').value);
 
-      let refund = (oldPrice / 30) * oldDays;
-      let finalAmount = newPrice - refund;
-
-      document.getElementById("refund").innerHTML = refund.toFixed(2) + " ريال";
-      document.getElementById("newPackage").innerHTML = newPrice.toFixed(2) + " ريال";
-      document.getElementById("finalAmount").innerHTML = 
-        (finalAmount >= 0 ? `<span class='positive'>${finalAmount.toFixed(2)} ريال (مطلوب)</span>` 
-                          : `<span class='negative'>${Math.abs(finalAmount).toFixed(2)} ريال (متبقي)</span>`);
-
-      document.getElementById("results").style.display = "block";
+    if ([oldPrice, oldDays, newPrice, newDays, usedOld, usedNew].some(v => isNaN(v) || v < 0)) {
+      alert("⚠️ يرجى إدخال قيم صحيحة وغير سالبة لجميع الحقول.");
+      return;
     }
 
-    function downloadPDF() {
-      var element = document.querySelector(".results"); // فقط الملخص
-      var opt = {
-        margin:       0.5,
-        filename:     'ملخص-تحويل-الباقات.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-  </script>
+    const oldDayRate = oldPrice / oldDays;
+    const newDayRate = newPrice / newDays;
+    const costOld = oldDayRate * usedOld;
+    const costNew = newDayRate * usedNew;
+    const totalCost = costOld + costNew;
+    const paid = oldPrice;
+    const remaining = paid - totalCost;
+
+    const remainingColor = remaining < 0 ? "#d32f2f" : "#388e3c";
+    const remainingText = remaining < 0 ? "المتبقي على العميل" : "المتبقي للعميل";
+
+    document.getElementById('results').innerHTML = `
+      <div class="printLogo">
+        <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة">
+      </div>
+
+      <h3>ملخص تحويل الباقات</h3>
+      <p><b>اسم العميل:</b> ${clientName || "-"} | <b>رقم العميل:</b> ${clientNumber || "-"}</p>
+      
+      <table>
+        <tr><th>الوصف</th><th>القيمة</th></tr>
+        <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldDayRate.toFixed(2)} ريال</td></tr>
+        <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newDayRate.toFixed(2)} ريال</td></tr>
+        <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
+        <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
+        <tr><td>إجمالي التكلفة</td><td>${totalCost.toFixed(2)} ريال</td></tr>
+        <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
+        <tr><td>${remainingText}</td><td style="color:${remainingColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)} ريال</td></tr>
+      </table>
+
+      <div class="signature">
+        <span class="line"></span>
+        Accountant Mousa
+      </div>
+
+      <button onclick="window.print()" 
+        style="margin-top:15px; width:100%; padding:12px; font-size:16px; 
+               background:#00796b; color:white; border:none; border-radius:10px; cursor:pointer;">
+        🖨️ طباعة الملخص
+      </button>
+    `;
+  }
+
+  function resetFields() {
+    ['clientName','clientNumber','oldPrice','oldDays','newPrice','newDays','usedOld','usedNew']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('results').innerHTML = '';
+  }
+
+  function downloadPDF() {
+    var element = document.querySelector(".results");
+    var opt = {
+      margin: 0.5,
+      filename: 'ملخص-تحويل-الباقات.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+</script>
 </body>
 </html>
