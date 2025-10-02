@@ -142,6 +142,30 @@ function calculate() {
     <button onclick="window.print()" style="margin-top:15px; width:100%; padding:12px; font-size:16px; background:#ff7043; color:white; border:none; border-radius:10px; cursor:pointer;">
       🖨️ طباعة الملخص
     </button>
+    <!-- زر تنزيل PDF -->
+<button onclick="downloadPDF()" 
+  style="margin-top:10px; width:100%; padding:12px; font-size:16px; 
+         background:#007bff; color:white; border:none; border-radius:10px; cursor:pointer;">
+  📄 تنزيل PDF
+</button>
+
+<!-- تحميل مكتبة html2pdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+function downloadPDF() {
+  const element = document.getElementById("results"); // الملخص فقط
+  var opt = {
+    margin:       0.5,
+    filename:     'ملخص-تحويل-الباقات.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'cm', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().from(element).set(opt).save();
+}
+</script>
+
   `;
 }
 
