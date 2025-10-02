@@ -26,7 +26,8 @@
     .printLogo img { max-width: 150px; }
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
-    @media print, .printMode {
+
+    @media print {
       body * { visibility: hidden; }
       .results, .results * { visibility: visible; }
       .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: linear-gradient(180deg, #ffffff 0%, #f0f4f7 100%); padding: 30px; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.2); border: 2px solid #0288d1; font-size: 16px; }
@@ -45,6 +46,7 @@
 <body>
   <div class="container">
     <h2>حاسبة تحويل الباقات</h2>
+
     <label>اسم العميل (اختياري):
       <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
     </label>
@@ -76,9 +78,14 @@
     </div>
 
     <div class="results" id="results"></div>
+
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button onclick="window.print()" style="flex:1; background:#ff7043;">🖨️ طباعة الملخص</button>
+      <button onclick="downloadPDF()" style="flex:1; background:#4caf50;">📄 تنزيل PDF</button>
+    </div>
   </div>
 
-  <!-- مكتبة html2pdf.js جاهزة -->
+  <!-- مكتبة html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
@@ -141,8 +148,6 @@
           <span class="line"></span>
           Accountant Mousa
         </div>
-        <button onclick="window.print()" style="margin-top:15px; width:100%; padding:12px; font-size:16px; background:#ff7043; color:white; border:none; border-radius:10px; cursor:pointer;">🖨️ طباعة الملخص</button>
-        <button onclick="downloadPDF()" style="margin-top:10px; width:100%; padding:12px; font-size:16px; background:#4caf50; color:white; border:none; border-radius:10px; cursor:pointer;">📄 تنزيل PDF</button>
       `;
     }
 
@@ -152,9 +157,16 @@
     }
 
     function downloadPDF() {
-      const body = document.body;
-      body.classList.add("printMode");
       const element = document.getElementById("results");
-      setTimeout(() => {
-        const opt = {
-          margin
+      const opt = {
+        margin: 0.5,
+        filename: 'ملخص_تحويل_الباقات.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+</html>
