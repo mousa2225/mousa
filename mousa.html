@@ -13,11 +13,11 @@
     }
     .container {
       background: #fff;
-      padding: 25px;
+      padding: 20px;
       border-radius: 15px;
-      max-width: 800px;
+      max-width: 700px;
       margin: auto;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     h1 {
       text-align: center;
@@ -26,42 +26,32 @@
     }
     label {
       display: block;
-      margin: 12px 0 6px;
+      margin: 10px 0 5px;
       font-weight: bold;
       color: #37474f;
     }
-    input, select {
+    input {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #b0bec5;
       margin-bottom: 15px;
-      font-size: 15px;
     }
     button {
+      margin-top: 10px;
       width: 100%;
       padding: 12px;
       font-size: 16px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      margin-top: 10px;
     }
-    button.calculate {
-      background: #0288d1;
-      color: white;
-    }
-    button.print {
-      background: #f57c00;
-      color: white;
-    }
-    button.pdf {
-      background: #4caf50;
-      color: white;
-    }
+    button.calculate { background: #0288d1; color: white; }
+    button.print { background: #f57c00; color: white; }
+    button.pdf { background: #4caf50; color: white; }
     .results {
-      margin-top: 25px;
-      padding: 20px;
+      margin-top: 20px;
+      padding: 15px;
       background: #fafafa;
       border: 1px solid #cfd8dc;
       border-radius: 10px;
@@ -70,7 +60,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 10px;
     }
     table, th, td {
       border: 1px solid #b0bec5;
@@ -78,10 +68,10 @@
     th {
       background: #0288d1;
       color: white;
-      padding: 10px;
+      padding: 8px;
     }
     td {
-      padding: 10px;
+      padding: 8px;
       text-align: center;
     }
     .positive { color: green; font-weight: bold; }
@@ -89,11 +79,10 @@
     .signature {
       margin-top: 20px;
       font-family: 'Rakkas', cursive;
-      font-size: 22px;
+      font-size: 20px;
       text-align: center;
       color: #37474f;
     }
-    /* الطباعة */
     @media print {
       body { background: white; }
       .container { box-shadow: none; border: none; }
@@ -107,20 +96,20 @@
     <h1>حاسبة تحويل الباقات</h1>
     <label>سعر الباقة الحالية:</label>
     <input type="number" id="oldPrice" placeholder="أدخل السعر الحالي">
-    
+
     <label>الأيام المتبقية:</label>
     <input type="number" id="oldDays" placeholder="أدخل الأيام المتبقية">
-    
+
     <label>سعر الباقة الجديدة:</label>
     <input type="number" id="newPrice" placeholder="أدخل السعر الجديد">
-    
+
     <label>مدة الباقة الجديدة (أيام):</label>
     <input type="number" id="newDays" placeholder="أدخل المدة الجديدة">
-    
+
     <button class="calculate" onclick="calculate()">احسب</button>
     <button class="print" onclick="window.print()">🖨️ طباعة</button>
     <button class="pdf" onclick="downloadPDF()">⬇️ تنزيل PDF</button>
-    
+
     <div class="results" id="results">
       <h2>الملخص</h2>
       <table>
@@ -155,7 +144,7 @@
     }
 
     function downloadPDF() {
-      var element = document.querySelector(".results"); // الملخص فقط
+      var element = document.querySelector(".results"); // فقط الملخص
       var opt = {
         margin:       0.5,
         filename:     'ملخص-تحويل-الباقات.pdf',
