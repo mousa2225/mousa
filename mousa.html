@@ -155,17 +155,6 @@
       const body = document.body;
       body.classList.add("printMode");
       const element = document.getElementById("results");
-      const opt = {
-        margin: 0.5,
-        filename: 'ملخص_تحويل_الباقات.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save().then(() => {
-        body.classList.remove("printMode");
-      });
-    }
-  </script>
-</body>
-</html>
+      setTimeout(() => {
+        const opt = {
+          margin
