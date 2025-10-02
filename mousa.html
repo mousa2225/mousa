@@ -11,20 +11,22 @@
     label { display: block; margin-top: 10px; color:#37474f; font-weight:bold; }
     input[type="number"], input[type="text"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #b0bec5; border-radius: 10px; transition: 0.3s; }
     input:focus { border-color: #00796b; box-shadow: 0 0 5px rgba(0,121,107,0.5); outline: none; }
+
     button { padding: 12px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; color: white; }
     button:hover { opacity:0.9; }
     #calculateBtn { background:#0288d1; width:48%; }
     #resetBtn { background:#ffb300; width:48%; }
+
     #printBtn {
       background: #009688; /* لون جذاب */
-      width: 100%;          /* يغطي كامل عرض الحاوية */
-      font-size: 20px;      /* أكبر من السابق */
+      width: 100%;
+      font-size: 20px; /* أكبر */
       margin-top: 20px;
-      padding: 18px;        /* تكبير الزر */
-      border-radius: 12px;  /* حواف متناسقة مع الجدول */
-      display: none;        /* سيظهر بعد الضغط على احسب */
+      padding: 18px;
+      border-radius: 12px;
+      display: none; /* سيظهر بعد الضغط على احسب */
       font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* تأثير خفيف للزر */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       cursor: pointer;
       color: #fff;
       transition: 0.3s;
@@ -36,12 +38,28 @@
     table, th, td { border: 1px solid #cfd8dc; }
     th { background:#0288d1; color:white; }
     th, td { padding: 10px; text-align: center; }
+
     .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
     .clientInfoPrint h3 { margin: 5px 0; color: #000; }
+
     .printLogo { display: none; text-align: center; margin-bottom: 15px; }
     .printLogo img { max-width: 150px; }
+
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
+
+    /* قسم معلومات العميل الاختياري */
+    .clientInfoSection {
+      background:#e0f2f1;
+      padding:15px;
+      border-radius:10px;
+      margin-bottom:20px;
+    }
+    .clientInfoSection h3 {
+      color:#00796b;
+      margin-bottom:10px;
+      text-align:center;
+    }
 
     @media print {
       body * { visibility: hidden; }
@@ -56,12 +74,18 @@
 <div class="container">
   <h2>حاسبة تحويل الباقات</h2>
 
-  <label>اسم العميل:
-    <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
-  </label>
-  <label>رقم العميل:
-    <input type="text" id="clientNumber" placeholder="مثال: 0551234567">
-  </label>
+  <!-- قسم معلومات العميل (اختياري) -->
+  <div class="clientInfoSection">
+    <h3>معلومات العميل (اختياري)</h3>
+    <label>اسم العميل:
+      <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
+    </label>
+    <label>رقم العميل:
+      <input type="text" id="clientNumber" placeholder="مثال: 0551234567">
+    </label>
+  </div>
+
+  <!-- باقي الحقول الحسابية -->
   <label>سعر الباقة السابقة:
     <input type="number" id="oldPrice" placeholder="795" min="0">
   </label>
