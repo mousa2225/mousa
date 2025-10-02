@@ -22,6 +22,16 @@ th { background:#0288d1; color:white; }
 .printLogo img { max-width:150px; }
 .signature { margin-top:20px; text-align:left; font-family:'Rakkas', 'Arial', cursive; font-size:20px; color:#00796b; }
 .signature .line { border-bottom:2px solid #00796b; display:block; width:300px; height:20px; margin-bottom:6px; }
+
+/* إعدادات الطباعة */
+@media print {
+  body * { visibility: hidden; }
+  .results, .results * { visibility: visible; }
+  .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background:white; padding:30px; border-radius:16px; box-shadow:0 0 20px rgba(0,0,0,0.2); border:2px solid #0288d1; }
+  .printLogo { display:block; }
+  .signature { display:block; }
+  button { display:none; }
+}
 </style>
 </head>
 <body>
