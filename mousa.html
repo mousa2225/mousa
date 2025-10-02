@@ -15,7 +15,7 @@
     button:hover { opacity:0.9; }
     #calculateBtn { background:#0288d1; width:48%; }
     #resetBtn { background:#ffb300; width:48%; }
-    #printBtn { background:#ff7043; width:48%; }
+    #printBtn { background:#4caf50; width:100%; font-size:18px; margin-top:20px; padding:15px; display:none; }
     .results { margin-top: 20px; background: #f1f8e9; padding: 15px; border-radius: 10px; border: 1px solid #c5e1a5; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     table, th, td { border: 1px solid #cfd8dc; }
@@ -73,12 +73,9 @@
 
   <div class="results" id="results"></div>
 
-  <div style="display:flex; gap:10px; margin-top:10px;">
-    <button id="printBtn" onclick="window.print()">🖨️ طباعة الملخص</button>
-  </div>
+  <button id="printBtn" onclick="window.print()">🖨️ طباعة الملخص</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function calculate() {
   const cName = document.getElementById('clientName').value.trim();
@@ -130,11 +127,15 @@ function calculate() {
     </table>
     <div class="signature"><span class="line"></span>Accountant Mousa</div>
   `;
+
+  // إظهار زر الطباعة بعد الضغط على احسب
+  document.getElementById('printBtn').style.display = 'block';
 }
 
 function resetFields(){
   ['clientName','clientNumber','oldPrice','oldDays','newPrice','newDays','usedOld','usedNew'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('results').innerHTML='';
+  document.getElementById('printBtn').style.display = 'none';
 }
 </script>
 </body>
