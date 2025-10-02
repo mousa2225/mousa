@@ -3,14 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>حاسبة تحويل الباقات خطوة خطوة</title>
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
 <style>
 body { font-family: Arial, sans-serif; padding: 30px; background: #e0f7fa; }
-.container { max-width: 500px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+.container { max-width: 600px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
 h2 { text-align:center; color:#00796b; }
 input[type=number] { width:100%; padding:8px; margin-top:10px; border-radius:8px; border:1px solid #b0bec5;}
 button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:10px; background:#0288d1; color:white; font-size:16px; cursor:pointer;}
 button:hover { opacity:0.9;}
 .results { margin-top:20px; background:#f1f8e9; padding:15px; border-radius:10px; border:1px solid #c5e1a5;}
+table { width:100%; border-collapse:collapse; margin-top:10px;}
+th, td { border:1px solid #cfd8dc; padding:8px; text-align:center;}
+th { background:#0288d1; color:white;}
+.printLogo { text-align:center; margin-bottom:15px; }
+.printLogo img { max-width:150px; }
+.signature { margin-top:20px; text-align:left; font-family:'Rakkas', 'Arial', cursive; font-size:20px; color:#00796b; }
+.signature .line { border-bottom:2px solid #00796b; display:block; width:300px; height:20px; margin-bottom:6px; }
+#printBtn { display:none; margin-top:10px; background:#009688; font-size:18px; padding:12px; }
+#printBtn:hover { background:#00796b; }
 </style>
 </head>
 <body>
@@ -23,6 +33,7 @@ button:hover { opacity:0.9;}
   </div>
 
   <div class="results" id="results" style="display:none;"></div>
+  <button id="printBtn" onclick="window.print()">🖨️ طباعة الملخص</button>
 </div>
 
 <script>
@@ -66,23 +77,31 @@ function showResults(){
   const paid = answers.oldPrice;
   const remaining = paid - total;
   const remainingText = remaining >= 0 ? "المتبقي للعميل" : "المتبقي على العميل";
+  const remainColor = remaining >= 0 ? "#388e3c" : "#d32f2f";
 
-  let html = `<h3>ملخص تحويل الباقات</h3>`;
-  html += `<table style="width:100%; border-collapse:collapse;">
-    <tr><th style="border:1px solid #cfd8dc; padding:8px;">الوصف</th><th style="border:1px solid #cfd8dc; padding:8px;">القيمة (ريال)</th></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">سعر اليوم في الباقة السابقة</td><td style="border:1px solid #cfd8dc; padding:8px;">${oldRate.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">سعر اليوم في الباقة الجديدة</td><td style="border:1px solid #cfd8dc; padding:8px;">${newRate.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">التكلفة من الباقة السابقة</td><td style="border:1px solid #cfd8dc; padding:8px;">${costOld.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">التكلفة من الباقة الجديدة</td><td style="border:1px solid #cfd8dc; padding:8px;">${costNew.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">إجمالي التكلفة</td><td style="border:1px solid #cfd8dc; padding:8px;">${total.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">المبلغ المدفوع</td><td style="border:1px solid #cfd8dc; padding:8px;">${paid.toFixed(2)}</td></tr>
-    <tr><td style="border:1px solid #cfd8dc; padding:8px;">${remainingText}</td><td style="border:1px solid #cfd8dc; padding:8px;">${Math.abs(remaining).toFixed(2)}</td></tr>
-  </table>`;
+  let html = `
+    <div class="printLogo">
+      <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة">
+    </div>
+    <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3>
+    <table>
+      <tr><th>الوصف</th><th>القيمة (ريال)</th></tr>
+      <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)}</td></tr>
+      <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)}</td></tr>
+      <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)}</td></tr>
+      <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)}</td></tr>
+      <tr><td>إجمالي التكلفة</td><td>${total.toFixed(2)}</td></tr>
+      <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)}</td></tr>
+      <tr><td>${remainingText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)}</td></tr>
+    </table>
+    <div class="signature"><span class="line"></span>Accountant Mousa</div>
+  `;
 
   document.getElementById("stepContainer").style.display = "none";
   const resDiv = document.getElementById("results");
   resDiv.style.display = "block";
   resDiv.innerHTML = html;
+  document.getElementById("printBtn").style.display = "block";
 }
 </script>
 </body>
