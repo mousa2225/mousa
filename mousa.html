@@ -16,18 +16,25 @@
     #calculateBtn { background:#0288d1; width:48%; }
     #resetBtn { background:#ffb300; width:48%; }
     #printBtn { background:#ff7043; width:48%; }
-    #pdfBtn { background:#4caf50; width:48%; }
     .results { margin-top: 20px; background: #f1f8e9; padding: 15px; border-radius: 10px; border: 1px solid #c5e1a5; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     table, th, td { border: 1px solid #cfd8dc; }
     th { background:#0288d1; color:white; }
     th, td { padding: 10px; text-align: center; }
-    .clientInfoPrint { text-align: center; margin-bottom: 15px; }
+    .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
     .clientInfoPrint h3 { margin: 5px 0; color: #000; }
-    .printLogo { text-align: center; margin-bottom: 15px; }
+    .printLogo { display: none; text-align: center; margin-bottom: 15px; }
     .printLogo img { max-width: 150px; }
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
+
+    @media print {
+      body * { visibility: hidden; }
+      .results, .results * { visibility: visible; }
+      .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.2); border: 2px solid #0288d1; }
+      .clientInfoPrint, .printLogo { display: block; }
+      button { display:none; }
+    }
   </style>
 </head>
 <body>
@@ -68,7 +75,6 @@
 
   <div style="display:flex; gap:10px; margin-top:10px;">
     <button id="printBtn" onclick="window.print()">🖨️ طباعة الملخص</button>
-    <button id="pdfBtn" onclick="downloadPDF()">📄 تنزيل PDF</button>
   </div>
 </div>
 
@@ -129,21 +135,6 @@ function calculate() {
 function resetFields(){
   ['clientName','clientNumber','oldPrice','oldDays','newPrice','newDays','usedOld','usedNew'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('results').innerHTML='';
-}
-
-function downloadPDF(){
-  const element = document.getElementById("results");
-
-  // عرض كل العناصر المخفية قبل PDF
-  document.querySelectorAll('.printLogo, .clientInfoPrint').forEach(el=>el.style.display='block');
-
-  html2pdf().set({
-    margin:0.5,
-    filename:'ملخص_تحويل_الباقات.pdf',
-    image:{type:'jpeg', quality:0.98},
-    html2canvas:{scale:2},
-    jsPDF:{unit:'cm', format:'a4', orientation:'portrait'}
-  }).from(element).save();
 }
 </script>
 </body>
