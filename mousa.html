@@ -101,7 +101,7 @@
   <label>الأيام المستخدمة من الباقة السابقة:
     <input type="number" id="usedOld" placeholder="1" min="0">
   </label>
-  <label>الأيام المستخدمة من الباقة الجديدة:
+  <label>الأيام التي بايستخدمها من الباقة الجديدة:
     <input type="number" id="usedNew" placeholder="19" min="0">
   </label>
 
@@ -158,8 +158,8 @@ function calculate() {
       <tr><th>الوصف</th><th>القيمة</th></tr>
       <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)} ريال</td></tr>
       <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)} ريال</td></tr>
-      <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
-      <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
+      <tr><td>المستحق من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
+      <tr><td>المستحق من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
       <tr><td>إجمالي التكلفة</td><td>${total.toFixed(2)} ريال</td></tr>
       <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
       <tr><td>${remainText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
