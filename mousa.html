@@ -81,7 +81,7 @@
       <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
     </label>
     <label>رقم العميل:
-      <input type="text" id="clientNumber" placeholder="مثال: 0551234567">
+      <input type="number" id="clientNumber" placeholder="مثال: 0551234567">
     </label>
   </div>
 
@@ -160,7 +160,7 @@ function calculate() {
       <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)} ريال</td></tr>
       <tr><td>المستحق من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
       <tr><td>المستحق من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
-      <tr><td>إجمالي التكلفة</td><td>${total.toFixed(2)} ريال</td></tr>
+      <tr><td>إجمالي المستحق</td><td>${total.toFixed(2)} ريال</td></tr>
       <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
       <tr><td>${remainText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
     </table>
