@@ -54,7 +54,7 @@ const questions = [
   {label: "سعر الباقة الجديدة:", id:"newPrice"},
   {label: "عدد أيام الباقة الجديدة:", id:"newDays"},
   {label: "الأيام المستخدمة من الباقة السابقة:", id:"usedOld"},
-  {label: "الأيام المستخدمة من الباقة الجديدة:", id:"usedNew"}
+  {label: "الأيام التي بايستخدمها من الباقة الجديدة:", id:"usedNew"}
 ];
 
 const answers = {};
@@ -99,9 +99,9 @@ function showResults(){
       <tr><th>الوصف</th><th>القيمة (ريال)</th></tr>
       <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)}</td></tr>
       <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)}</td></tr>
-      <tr><td>التكلفة من الباقة السابقة</td><td>${costOld.toFixed(2)}</td></tr>
-      <tr><td>التكلفة من الباقة الجديدة</td><td>${costNew.toFixed(2)}</td></tr>
-      <tr><td>إجمالي التكلفة</td><td>${total.toFixed(2)}</td></tr>
+      <tr><td>المستحق من الباقة السابقة</td><td>${costOld.toFixed(2)}</td></tr>
+      <tr><td>المستحق من الباقة الجديدة</td><td>${costNew.toFixed(2)}</td></tr>
+      <tr><td>إجمالي المستحق</td><td>${total.toFixed(2)}</td></tr>
       <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)}</td></tr>
       <tr><td>${remainingText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remaining).toFixed(2)}</td></tr>
     </table>
