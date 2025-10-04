@@ -1,140 +1,362 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة الأرباح والضرائب للشركات</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-        .calculator-container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-        }
-        h2 {
-            color: #333;
-            text-align: center;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="number"] {
-            width: 95%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 4px;
-            background-color: #e9ecef;
-            border-left: 5px solid #28a745;
-        }
-        .result p {
-            margin: 5px 0;
-            font-size: 1.1em;
-        }
-        .result .profit { color: #28a745; font-weight: bold; }
-        .result .loss { color: #dc3545; font-weight: bold; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حاسبة الأرباح والضرائب الاحترافية</title>
+  <!-- مكتبات: Chart.js, html2pdf, SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.9.3/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      --bg: #eef2f7;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent1: #0b74ff;
+      --accent2: #00bfa6;
+      --success: #28a745;
+      --danger: #dc3545;
+      --glass: rgba(255,255,255,0.85);
+    }
+    [data-theme="dark"]{
+      --bg: #0f1724;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --accent1: #3b82f6;
+      --accent2: #34d399;
+      --glass: rgba(15,23,36,0.85);
+    }
+    *{box-sizing:border-box;font-family: 'Segoe UI', Tahoma, Arial, sans-serif}
+    body{background:var(--bg);margin:0;padding:20px;display:flex;justify-content:center}
+    .app{width:100%;max-width:1100px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;padding:10px;border-radius:8px;font-weight:700}
+    h1{margin:0;font-size:18px}
+    .controls{display:flex;gap:8px;align-items:center}
+    .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(10,10,10,0.06);}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .form{padding:12px;display:flex;flex-direction:column;gap:10px}
+    label{font-weight:700;color:var(--muted);font-size:13px}
+    input[type='text'], input[type='number'], select{padding:10px;border-radius:6px;border:1px solid #d1d5db;background:transparent}
+    .row{display:flex;gap:8px}
+    .row .col{flex:1}
+    .small{font-size:12px;color:var(--muted)}
+    .actions{display:flex;gap:8px}
+    button{cursor:pointer;padding:10px 12px;border-radius:8px;border:none;color:white;background:linear-gradient(90deg,var(--accent1),var(--accent2));font-weight:700}
+    button.ghost{background:transparent;color:var(--muted);border:1px solid #e6eefc}
+    .list{max-height:220px;overflow:auto;padding:8px;border-radius:8px;border:1px solid #eef2ff}
+    .list .item{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px;border-bottom:1px dashed #f1f5f9}
+    .summary{display:flex;flex-direction:column;gap:6px}
+    .summary .line{display:flex;justify-content:space-between;gap:10px;padding:8px;border-radius:6px}
+    .line.total{background:linear-gradient(90deg,rgba(11,116,255,0.06),rgba(0,191,166,0.04));font-weight:800}
+    footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+    /* responsive */
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}.controls{flex-direction:column;align-items:flex-end}}
+  </style>
 </head>
 <body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">حاسبة</div>
+        <div>
+          <h1>حاسبة الأرباح والضرائب الاحترافية</h1>
+          <div class="small">شاملة: إيرادات، مصروفات مفصّلة، ضريبة القيمة المضافة، ضريبة الدخل، تقارير وطباعة وتحميل</div>
+        </div>
+      </div>
+      <div class="controls">
+        <label style="display:flex;align-items:center;gap:8px"><input id="themeToggle" type="checkbox"> وضع ليلي</label>
+        <button id="saveLocal" class="ghost">حفظ محلي</button>
+        <button id="reset" class="ghost">إعادة تعيين</button>
+      </div>
+    </header>
 
-<div class="calculator-container">
-    <h2>حاسبة الأرباح والضرائب</h2>
+    <div class="grid">
+      <!-- left: form and inputs -->
+      <div>
+        <div class="card form">
+          <label>اسم التقرير / الشركة</label>
+          <input id="companyName" type="text" placeholder="مثلاً: موسى للشحن" />
 
-    <div>
-        <label for="revenues">إجمالي الإيرادات (المبيعات):</label>
-        <input type="number" id="revenues" value="100000" min="0">
+          <div class="row">
+            <div class="col">
+              <label>من تاريخ</label>
+              <input id="dateFrom" type="date" />
+            </div>
+            <div class="col">
+              <label>إلى تاريخ</label>
+              <input id="dateTo" type="date" />
+            </div>
+          </div>
+
+          <h3 style="margin:6px 0">الإيرادات</h3>
+          <div class="row">
+            <input id="revName" type="text" placeholder="وصف الإيراد (مثلاً: مبيعات)" />
+            <input id="revValue" type="number" placeholder="القيمة" />
+            <button id="addRev">أضف</button>
+          </div>
+          <div class="list" id="revenuesList"></div>
+
+          <h3 style="margin:6px 0">المصروفات</h3>
+          <div class="row">
+            <select id="expType">
+              <option>تشغيلية - رواتب</option>
+              <option>إيجار</option>
+              <option>تسويق</option>
+              <option>إدارية</option>
+              <option>استهلاك</option>
+              <option>مصاريف أخرى</option>
+            </select>
+            <input id="expName" type="text" placeholder="وصف المصروف" />
+            <input id="expValue" type="number" placeholder="القيمة" />
+            <button id="addExp">أضف</button>
+          </div>
+          <div class="list" id="expensesList"></div>
+
+          <h3 style="margin:6px 0">إعدادات الضرائب وماليات إضافية</h3>
+          <div class="row">
+            <div class="col">
+              <label>معدل ضريبة الدخل (%)</label>
+              <input id="taxRate" type="number" value="15" min="0" max="100" />
+            </div>
+            <div class="col">
+              <label>معدل ضريبة القيمة المضافة VAT (%)</label>
+              <input id="vatRate" type="number" value="15" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label>تكاليف ثابتة تقديرية</label>
+              <input id="fixedCosts" type="number" value="0" />
+            </div>
+            <div class="col">
+              <label>نسبة التكاليف المتغيرة من المبيعات (%)</label>
+              <input id="varCostPct" type="number" value="0" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="calc">حساب التقرير</button>
+            <button id="downloadPdf">تحميل PDF</button>
+            <button id="downloadXls">تحميل Excel</button>
+            <button id="printReport" class="ghost">طباعة</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin:6px 0">إعدادات سريعة ونصائح</h3>
+          <div class="small">أضف بنود الإيرادات والمصروفات بدقة. احفظ محليًا قبل الخروج. يُنصح بإدخال التواريخ لعمل تقارير زمنية.</div>
+        </div>
+      </div>
+
+      <!-- right: summary and charts -->
+      <div>
+        <div class="card">
+          <h3>ملخص التقرير</h3>
+          <div class="summary" id="summaryBox">
+            <div class="line"><div>إجمالي الإيرادات</div><div id="sumRevenues">0</div></div>
+            <div class="line"><div>إجمالي المصروفات</div><div id="sumExpenses">0</div></div>
+            <div class="line"><div>الربح قبل الضريبة</div><div id="profitBefore">0</div></div>
+            <div class="line"><div>قيمة VAT</div><div id="vatValue">0</div></div>
+            <div class="line"><div>ضريبة الدخل</div><div id="incomeTax">0</div></div>
+            <div class="line total"><div>صافي الربح بعد الضرائب</div><div id="netProfit">0</div></div>
+            <div class="line"><div>هامش الربح (%)</div><div id="profitMargin">0%</div></div>
+            <div class="line"><div>نقطة التعادل (إيرادات)</div><div id="breakEven">-</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding-bottom:10px">
+          <canvas id="chart" style="width:100%;height:260px"></canvas>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding:10px">
+          <h3>نسب ومحكات مالية سريعة</h3>
+          <div class="row">
+            <div class="col"><label>إجمالي الأصول</label><input id="totalAssets" type="number"/></div>
+            <div class="col"><label>حقوق الملكية</label><input id="equity" type="number"/></div>
+          </div>
+          <div style="margin-top:8px" id="ratiosBox">
+            <div class="small">ROA: <span id="roa">-</span></div>
+            <div class="small">ROE: <span id="roe">-</span></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div>
-        <label for="expenses">إجمالي التكاليف والمصروفات:</label>
-        <input type="number" id="expenses" value="60000" min="0">
-    </div>
+    <footer class="small">تم الإنشاء بواسطة الحاسبة الاحترافية • يمكنك تعديل وإرسال ملاحظات</footer>
+  </div>
 
-    <div>
-        <label for="taxRate">معدل الضريبة (%) (مثلاً 15 لـ 15%):</label>
-        <input type="number" id="taxRate" value="15" min="0" max="100">
-    </div>
+  <script>
+    // ===== state =====
+    let revenues = [];
+    let expenses = [];
+    const $ = id => document.getElementById(id);
 
-    <button onclick="calculate()">حساب الأرباح والضريبة</button>
-
-    <div id="results" class="result">
-        <p>النتائج ستظهر هنا بعد الضغط على زر الحساب.</p>
-    </div>
-</div>
-
-<script>
-    function calculate() {
-        // 1. جلب القيم من حقول الإدخال
-        const revenues = parseFloat(document.getElementById('revenues').value) || 0;
-        const expenses = parseFloat(document.getElementById('expenses').value) || 0;
-        const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
-
-        // 2. حساب الربح/الخسارة قبل الضريبة
-        const profitBeforeTax = revenues - expenses;
-
-        // 3. حساب قيمة الضريبة
-        let taxAmount = 0;
-        if (profitBeforeTax > 0) {
-            taxAmount = profitBeforeTax * (taxRate / 100);
+    // load saved
+    function loadLocal(){
+      try{
+        const data = JSON.parse(localStorage.getItem('profitCalcV1')||'null');
+        if(data){
+          revenues = data.revenues||[]; expenses = data.expenses||[];
+          $('companyName').value = data.companyName||'';
+          $('dateFrom').value = data.dateFrom||'';
+          $('dateTo').value = data.dateTo||'';
+          $('taxRate').value = data.taxRate!=null?data.taxRate:15;
+          $('vatRate').value = data.vatRate!=null?data.vatRate:15;
+          $('fixedCosts').value = data.fixedCosts||0;
+          $('varCostPct').value = data.varCostPct||0;
         }
-
-        // 4. حساب صافي الربح/الخسارة بعد الضريبة
-        const netProfit = profitBeforeTax - taxAmount;
-
-        // 5. عرض النتائج
-        const resultsDiv = document.getElementById('results');
-        
-        // تحديد ما إذا كان ربحًا أو خسارة لعرض اللون المناسب
-        const netProfitClass = netProfit >= 0 ? 'profit' : 'loss';
-        const profitBeforeTaxClass = profitBeforeTax >= 0 ? 'profit' : 'loss';
-        
-        resultsDiv.innerHTML = `
-            <h3>ملخص التقرير المالي</h3>
-            <p><strong>الربح/الخسارة قبل الضريبة:</strong> <span class="${profitBeforeTaxClass}">${profitBeforeTax.toFixed(2)}</span></p>
-            <p><strong>قيمة الضريبة المستحقة:</strong> <span class="loss">${taxAmount.toFixed(2)}</span></p>
-            <hr>
-            <p><strong>صافي الربح/الخسارة بعد الضريبة:</strong> <span class="${netProfitClass}">${netProfit.toFixed(2)}</span></p>
-        `;
-
-        // تغيير لون الإطار الجانبي بناءً على صافي الربح
-        resultsDiv.style.borderLeftColor = netProfit >= 0 ? '#28a745' : '#dc3545';
+      }catch(e){console.warn(e)}
+      renderLists();
     }
-</script>
 
+    function saveLocal(){
+      const payload = {revenues, expenses, companyName:$('companyName').value, dateFrom:$('dateFrom').value, dateTo:$('dateTo').value, taxRate:$('taxRate').value, vatRate:$('vatRate').value, fixedCosts:$('fixedCosts').value, varCostPct:$('varCostPct').value};
+      localStorage.setItem('profitCalcV1', JSON.stringify(payload));
+      alert('تم الحفظ محليًا');
+    }
+
+    $('saveLocal').addEventListener('click', saveLocal);
+    $('reset').addEventListener('click', ()=>{if(confirm('هل أنت متأكد من إعادة التعيين؟ ستفقد البيانات غير المحفوظة')){revenues=[];expenses=[];renderLists();updateSummary();localStorage.removeItem('profitCalcV1')}})
+
+    // theme toggle
+    $('themeToggle').addEventListener('change', (e)=>{if(e.target.checked)document.documentElement.setAttribute('data-theme','dark');else document.documentElement.removeAttribute('data-theme')});
+
+    // add revenue
+    $('addRev').addEventListener('click', ()=>{
+      const name = $('revName').value.trim()||'إيراد';
+      const val = parseFloat($('revValue').value)||0;
+      if(val<=0){alert('أدخل قيمة إيراد صحيحة');return}
+      revenues.push({name, value:val});
+      $('revName').value='';$('revValue').value='';renderLists();
+    });
+
+    // add expense
+    $('addExp').addEventListener('click', ()=>{
+      const type = $('expType').value; const name = $('expName').value.trim()||type; const val = parseFloat($('expValue').value)||0;
+      if(val<=0){alert('أدخل قيمة مصروف صحيحة');return}
+      expenses.push({type,name,value:val});
+      $('expName').value='';$('expValue').value='';renderLists();
+    });
+
+    function renderLists(){
+      const revBox = $('revenuesList'); revBox.innerHTML='';
+      revenues.forEach((r,i)=>{
+        const div = document.createElement('div'); div.className='item';
+        div.innerHTML = `<div>${r.name}</div><div style="display:flex;gap:8px"><div>${toCurrency(r.value)}</div><button data-i="${i}" class="ghost" onclick="delRev(${i})">حذف</button></div>`;
+        revBox.appendChild(div);
+      });
+      const expBox = $('expensesList'); expBox.innerHTML='';
+      expenses.forEach((e,i)=>{
+        const div = document.createElement('div'); div.className='item';
+        div.innerHTML = `<div>${e.type} • ${e.name}</div><div style="display:flex;gap:8px"><div>${toCurrency(e.value)}</div><button data-i="${i}" class="ghost" onclick="delExp(${i})">حذف</button></div>`;
+        expBox.appendChild(div);
+      });
+      updateSummary();
+    }
+    window.delRev = function(i){revenues.splice(i,1);renderLists()}
+    window.delExp = function(i){expenses.splice(i,1);renderLists()}
+
+    function toCurrency(n){return Number(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
+
+    // calculation
+    let chart=null;
+    $('calc').addEventListener('click', ()=>{ updateSummary(true); });
+
+    function updateSummary(runChart=false){
+      const sumR = revenues.reduce((s,r)=>s+r.value,0);
+      const sumE = expenses.reduce((s,e)=>s+e.value,0);
+      const fixed = parseFloat($('fixedCosts').value)||0;
+      const varPct = parseFloat($('varCostPct').value)||0;
+      const varCost = sumR * (varPct/100);
+      const totalExpenses = sumE + fixed + varCost;
+      const profitBeforeTax = sumR - totalExpenses;
+      const vatRate = parseFloat($('vatRate').value)||0;
+      const vatValue = sumR * (vatRate/100);
+      const taxRate = parseFloat($('taxRate').value)||0;
+      const incomeTax = profitBeforeTax>0 ? (profitBeforeTax * (taxRate/100)) : 0;
+      const netProfit = profitBeforeTax - incomeTax - vatValue;
+      const margin = sumR? (netProfit / sumR *100) : 0;
+
+      // break even simplified: fixedCosts / contribution margin ratio
+      // contribution margin ratio = (sumR - variable costs) / sumR
+      const contributionRatio = sumR? ((sumR - varCost)/sumR):0;
+      const breakEven = contributionRatio>0? (fixed / contributionRatio) : '-';
+
+      $('sumRevenues').innerText = toCurrency(sumR);
+      $('sumExpenses').innerText = toCurrency(totalExpenses);
+      $('profitBefore').innerText = toCurrency(profitBeforeTax);
+      $('vatValue').innerText = toCurrency(vatValue);
+      $('incomeTax').innerText = toCurrency(incomeTax);
+      $('netProfit').innerText = toCurrency(netProfit);
+      $('profitMargin').innerText = margin.toFixed(2) + '%';
+      $('breakEven').innerText = breakEven==='-'?'-':toCurrency(breakEven);
+
+      // ratios
+      const assets = parseFloat($('totalAssets').value)||0;
+      const equity = parseFloat($('equity').value)||0;
+      $('roa').innerText = assets? ( (netProfit / assets *100).toFixed(2)+'%' ) : '-';
+      $('roe').innerText = equity? ( (netProfit / equity *100).toFixed(2)+'%' ) : '-';
+
+      if(runChart)drawChart(sumR, totalExpenses, vatValue, incomeTax, netProfit);
+    }
+
+    function drawChart(sumR, sumE, vat, tax, net){
+      const ctx = document.getElementById('chart').getContext('2d');
+      const labels = ['الإيرادات','المجموع المصروفات','VAT','ضريبة الدخل','صافي الربح'];
+      const data = [sumR, sumE, vat, tax, net];
+      if(chart)chart.destroy();
+      chart = new Chart(ctx,{type:'bar',data:{labels, datasets:[{label:'القيم',data, backgroundColor: ['rgba(11,116,255,0.7)','rgba(220,53,69,0.6)','rgba(0,191,166,0.6)','rgba(255,193,7,0.6)','rgba(40,167,69,0.6)']}]}, options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
+    }
+
+    // PDF download
+    $('downloadPdf').addEventListener('click', ()=>{
+      const opt = {margin:0.4, filename: `${$('companyName').value||'report'}_${new Date().toISOString().slice(0,10)}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in',format:'a4',orientation:'portrait'}};
+      const el = document.querySelector('.app');
+      html2pdf().set(opt).from(el).save();
+    });
+
+    // Print
+    $('printReport').addEventListener('click', ()=>{window.print()});
+
+    // Excel download via SheetJS
+    $('downloadXls').addEventListener('click', ()=>{
+      const wb = XLSX.utils.book_new();
+      const revSheet = XLSX.utils.json_to_sheet(revenues.map(r=>({الوصف:r.name,القيمة:r.value})));
+      const expSheet = XLSX.utils.json_to_sheet(expenses.map(e=>({النوع:e.type,الوصف:e.name,القيمة:e.value})));
+      XLSX.utils.book_append_sheet(wb, revSheet, 'Revenues');
+      XLSX.utils.book_append_sheet(wb, expSheet, 'Expenses');
+      XLSX.writeFile(wb, `${$('companyName').value||'report'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    });
+
+    // init
+    loadLocal();
+
+    // auto calculate every 2s when lists change? we update on renderLists already
+
+    // small helper: paste bulk numbers (optional enhancement)
+    // allow dropping CSV lines into revenues list
+    document.addEventListener('paste', (e)=>{
+      const text = (e.clipboardData||window.clipboardData).getData('text');
+      if(!text) return;
+      // detect lines of "name,value" or just numbers
+      const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+      if(lines.length>1 && confirm('هل تريد استيراد النص الملصوق كبنود إيرادات؟ (سيتم محاولة قراءته)')){
+        for(const ln of lines){
+          const parts = ln.split(/[,;\t]/).map(p=>p.trim());
+          if(parts.length===1){
+            const val = parseFloat(parts[0]); if(!isNaN(val)) revenues.push({name:'إيراد', value:val});
+          }else{
+            const val = parseFloat(parts[parts.length-1]); if(!isNaN(val)) revenues.push({name: parts.slice(0,parts.length-1).join(' '), value:val});
+          }
+        }
+        renderLists();
+      }
+    });
+
+  </script>
 </body>
 </html>
