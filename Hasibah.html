@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة الأرباح والضرائب للشركات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .calculator-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            border-left: 5px solid #28a745;
+        }
+        .result p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+        .result .profit { color: #28a745; font-weight: bold; }
+        .result .loss { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h2>حاسبة الأرباح والضرائب</h2>
+
+    <div>
+        <label for="revenues">إجمالي الإيرادات (المبيعات):</label>
+        <input type="number" id="revenues" value="100000" min="0">
+    </div>
+
+    <div>
+        <label for="expenses">إجمالي التكاليف والمصروفات:</label>
+        <input type="number" id="expenses" value="60000" min="0">
+    </div>
+
+    <div>
+        <label for="taxRate">معدل الضريبة (%) (مثلاً 15 لـ 15%):</label>
+        <input type="number" id="taxRate" value="15" min="0" max="100">
+    </div>
+
+    <button onclick="calculate()">حساب الأرباح والضريبة</button>
+
+    <div id="results" class="result">
+        <p>النتائج ستظهر هنا بعد الضغط على زر الحساب.</p>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        // 1. جلب القيم من حقول الإدخال
+        const revenues = parseFloat(document.getElementById('revenues').value) || 0;
+        const expenses = parseFloat(document.getElementById('expenses').value) || 0;
+        const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+
+        // 2. حساب الربح/الخسارة قبل الضريبة
+        const profitBeforeTax = revenues - expenses;
+
+        // 3. حساب قيمة الضريبة
+        let taxAmount = 0;
+        if (profitBeforeTax > 0) {
+            taxAmount = profitBeforeTax * (taxRate / 100);
+        }
+
+        // 4. حساب صافي الربح/الخسارة بعد الضريبة
+        const netProfit = profitBeforeTax - taxAmount;
+
+        // 5. عرض النتائج
+        const resultsDiv = document.getElementById('results');
+        
+        // تحديد ما إذا كان ربحًا أو خسارة لعرض اللون المناسب
+        const netProfitClass = netProfit >= 0 ? 'profit' : 'loss';
+        const profitBeforeTaxClass = profitBeforeTax >= 0 ? 'profit' : 'loss';
+        
+        resultsDiv.innerHTML = `
+            <h3>ملخص التقرير المالي</h3>
+            <p><strong>الربح/الخسارة قبل الضريبة:</strong> <span class="${profitBeforeTaxClass}">${profitBeforeTax.toFixed(2)}</span></p>
+            <p><strong>قيمة الضريبة المستحقة:</strong> <span class="loss">${taxAmount.toFixed(2)}</span></p>
+            <hr>
+            <p><strong>صافي الربح/الخسارة بعد الضريبة:</strong> <span class="${netProfitClass}">${netProfit.toFixed(2)}</span></p>
+        `;
+
+        // تغيير لون الإطار الجانبي بناءً على صافي الربح
+        resultsDiv.style.borderLeftColor = netProfit >= 0 ? '#28a745' : '#dc3545';
+    }
+</script>
+
+</body>
+</html>
