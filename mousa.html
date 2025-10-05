@@ -19,13 +19,13 @@
     #resetBtn { background:#ffb300; width:48%; }
 
     #printBtn {
-      background: #009688; /* لون جذاب */
+      background: #009688;
       width: 100%;
-      font-size: 20px; /* أكبر */
+      font-size: 20px;
       margin-top: 20px;
       padding: 18px;
       border-radius: 12px;
-      display: none; /* سيظهر بعد الضغط على احسب */
+      display: none;
       font-weight: bold;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       cursor: pointer;
@@ -34,22 +34,62 @@
     }
     #printBtn:hover { background: #00796b; }
 
-    .results { margin-top: 20px; background: #f1f8e9; padding: 15px; border-radius: 10px; border: 1px solid #c5e1a5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .results { 
+      margin-top: 20px; 
+      background: #ffffff; 
+      padding: 20px; 
+      border-radius: 16px; 
+      border: 2px solid #0288d1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* تصميم الجدول */
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 10px; 
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
     table, th, td { border: 1px solid #cfd8dc; }
     th { background:#0288d1; color:white; }
-    th, td { padding: 10px; text-align: center; }
+    th, td { padding: 10px; text-align: center; color:#333; }
+
+    /* الشيب العلوي مع شعار الشركة */
+    .headerShape {
+      background: linear-gradient(135deg, #0288d1, #26c6da);
+      padding: 25px;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+      position: relative;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .headerShape img {
+      max-width: 120px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: #fff;
+    }
+    .headerShape::after {
+      content: "";
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: #fff;
+      border-top-left-radius: 50% 20px;
+      border-top-right-radius: 50% 20px;
+    }
 
     .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
     .clientInfoPrint h3 { margin: 5px 0; color: #000; }
 
-    .printLogo { display: none; text-align: center; margin-bottom: 15px; }
-    .printLogo img { max-width: 150px; }
-
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
 
-    /* قسم معلومات العميل الاختياري */
     .clientInfoSection {
       background:#e0f2f1;
       padding:15px;
@@ -65,8 +105,7 @@
     @media print {
       body * { visibility: hidden; }
       .results, .results * { visibility: visible; }
-      .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 0 20px rgba(0,0,0,0.2); border: 2px solid #0288d1; }
-      .clientInfoPrint, .printLogo { display: block; }
+      .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: none; border: 2px solid #0288d1; }
       button { display:none; }
     }
   </style>
@@ -75,7 +114,6 @@
 <div class="container">
   <h2>حاسبة تحويل الباقات</h2>
 
-  <!-- قسم معلومات العميل (اختياري) -->
   <div class="clientInfoSection">
     <h3>معلومات العميل (اختياري)</h3>
     <label>اسم العميل:
@@ -86,7 +124,6 @@
     </label>
   </div>
 
-  <!-- باقي الحقول الحسابية -->
   <label>سعر الباقة السابقة:
     <input type="number" id="oldPrice" placeholder="مثال:795" min="0">
   </label>
@@ -150,11 +187,16 @@ function calculate() {
     </div>`;
   }
 
-  let logoHTML = `<div class="printLogo"><img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة"></div>`;
+  // شعار شركتك الحقيقي في الشيب
+  let logoHTML = `
+    <div class="headerShape">
+      <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة">
+    </div>
+  `;
 
   document.getElementById('results').innerHTML = `
     ${logoHTML}${clientHTML}
-    <h3 style="text-align:center; color:#00796b;">ملخص تحويل الباقات</h3>
+    <h3 style="text-align:center; color:#00796b; margin-top:10px;">ملخص تحويل الباقات</h3>
     <table>
       <tr><th>الوصف</th><th>القيمة</th></tr>
       <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)} ريال</td></tr>
@@ -168,7 +210,6 @@ function calculate() {
     <div class="signature"><span class="line"></span>Accountant Mousa</div>
   `;
 
-  // إظهار زر الطباعة بعد الضغط على احسب
   document.getElementById('printBtn').style.display = 'block';
 }
 
