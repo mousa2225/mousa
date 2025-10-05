@@ -55,9 +55,6 @@
     th { background:#0288d1; color:white; }
     th, td { padding: 10px; text-align: center; color:#333; }
 
-    .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
-    .clientInfoPrint h3 { margin: 5px 0; color: #000; }
-
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
 
@@ -73,11 +70,16 @@
       text-align:center;
     }
 
+    .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
+    .clientInfoPrint h3 { margin: 5px 0; color: #000; }
+
     @media print {
       body * { visibility: hidden; }
       .results, .results * { visibility: visible; }
       .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: none; border: 2px solid #0288d1; }
       button { display:none; }
+      /* عرض معلومات العميل عند الطباعة فقط */
+      .clientInfoPrint { display:block !important; }
     }
   </style>
 </head>
@@ -150,15 +152,16 @@ function calculate() {
   const remainColor = remain<0?"#d32f2f":"#388e3c";
   const remainText = remain<0?"المتبقي على العميل":"المتبقي للعميل";
 
+  // معلومات العميل للطباعة فقط إذا كانت مكتوبة
   let clientHTML = "";
-  if(cName||cNum){
+  if(cName || cNum){
     clientHTML = `<div class="clientInfoPrint">
-      <h3>اسم العميل: ${cName||'-'}</h3>
-      <h3>رقم العميل: ${cNum||'-'}</h3>
+      ${cName ? `<h3>اسم العميل: ${cName}</h3>` : ""}
+      ${cNum ? `<h3>رقم العميل: ${cNum}</h3>` : ""}
     </div>`;
   }
 
-  // شعار الشركة مباشرة بدون أي أشكال
+  // شعار الشركة فوق الجدول
   let logoHTML = `<div style="text-align:center; margin-bottom:15px;">
                     <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة" style="max-width:200px;">
                   </div>`;
