@@ -3,75 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مصمم تخطيط عمراني لصالة مبنى ضخم</title>
+  <title>مصمم تخطيط عمراني ديناميكي</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-      direction: rtl;
-    }
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    label {
-      display: block;
-      margin-bottom: 10px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      background-color: #4caf50;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #scene-container {
-      width: 100%;
-      height: 600px;
-      margin-top: 20px;
-    }
-    #measurements {
-      margin-top: 20px;
-      padding: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+    form { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+    label { display: block; margin-bottom: 10px; }
+    input { width: 100%; padding: 8px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; }
+    button { background-color: #4caf50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    #scene-container { width: 100%; height: 600px; margin-top: 20px; border: 1px solid #ccc; border-radius: 4px;}
+    #measurements { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
   </style>
 </head>
 <body>
-  <h1>حاسبة ومصمم تخطيط عمراني لصالة مبنى ضخم</h1>
+  <h1>مصمم تخطيط عمراني ديناميكي</h1>
   <form id="input-form">
-    <label for="land-length">طول الأرض (بالمتر):</label>
+    <label for="land-length">طول الأرض (متر):</label>
     <input type="number" id="land-length" required min="10" step="0.1" />
-
-    <label for="land-width">عرض الأرض (بالمتر):</label>
+    <label for="land-width">عرض الأرض (متر):</label>
     <input type="number" id="land-width" required min="10" step="0.1" />
-
-    <label for="num-rooms">عدد الغرف (اختياري):</label>
+    <label for="num-rooms">عدد الغرف:</label>
     <input type="number" id="num-rooms" min="0" step="1" />
-
-    <label for="num-bathrooms">عدد الحمامات (اختياري):</label>
+    <label for="num-bathrooms">عدد الحمامات:</label>
     <input type="number" id="num-bathrooms" min="0" step="1" />
-
     <button type="submit">إنشاء المخطط</button>
   </form>
 
@@ -85,39 +41,29 @@
 
     let scene, camera, renderer, controls;
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", function(event) {
       event.preventDefault();
-
       const landLength = parseFloat(document.getElementById("land-length").value);
       const landWidth = parseFloat(document.getElementById("land-width").value);
       const numRooms = parseInt(document.getElementById("num-rooms").value) || 0;
       const numBathrooms = parseInt(document.getElementById("num-bathrooms").value) || 0;
 
-      const totalArea = landLength * landWidth;
-      const hallArea = totalArea * 0.6;
-      const hallLength = landLength * 0.8;
-      const hallWidth = hallArea / hallLength;
-
-      const roomSize = 4;
-      const bathroomSize = 2;
       const wallThickness = 0.2;
       const doorWidth = 1;
 
       init3D(landLength, landWidth);
-      drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth);
-      displayMeasurements(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth);
-
+      drawBuilding(landLength, landWidth, numRooms, numBathrooms, wallThickness, doorWidth);
       animate();
     });
 
     function init3D(landLength, landWidth) {
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xcccccc);
+      scene.background = new THREE.Color(0xe0f7fa);
 
       camera = new THREE.PerspectiveCamera(75, sceneContainer.clientWidth / 600, 0.1, 1000);
-      camera.position.set(landLength / 2, 20, landWidth * 1.5);
+      camera.position.set(landLength/2, 20, landWidth*1.5);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias:true });
       renderer.setSize(sceneContainer.clientWidth, 600);
       sceneContainer.innerHTML = "";
       sceneContainer.appendChild(renderer.domElement);
@@ -128,60 +74,102 @@
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
       const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-      directionalLight.position.set(landLength, landWidth, landLength);
+      directionalLight.position.set(50, 50, 50);
       scene.add(directionalLight);
 
+      // الأرضية
+      const floorMaterial = new THREE.MeshPhongMaterial({ color: 0xdddddd, side: THREE.DoubleSide });
       const floorGeometry = new THREE.PlaneGeometry(landLength, landWidth);
-      const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
       const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-      floor.rotation.x = -Math.PI / 2;
+      floor.rotation.x = -Math.PI/2;
       scene.add(floor);
     }
 
-    function drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
-      const hallGeometry = new THREE.BoxGeometry(hallLength, 5, hallWidth);
-      const hallMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-      const hall = new THREE.Mesh(hallGeometry, hallMaterial);
-      hall.position.set(hallLength / 2, 2.5, hallWidth / 2 + (landWidth - hallWidth) / 2);
+    function drawBuilding(landLength, landWidth, numRooms, numBathrooms, wallThickness, doorWidth) {
+      const hallLength = landLength * 0.8;
+      const hallWidth = landWidth * 0.6;
+      const hallHeight = 5;
+
+      // الصالة
+      const hallGeom = new THREE.BoxGeometry(hallLength, hallHeight, hallWidth);
+      const hallMat = new THREE.MeshPhongMaterial({ color: 0x00ff00, transparent:true, opacity:0.5 });
+      const hall = new THREE.Mesh(hallGeom, hallMat);
+      hall.position.set(hallLength/2, hallHeight/2, hallWidth/2 + (landWidth - hallWidth)/2);
       scene.add(hall);
 
-      const roomsPerSide = Math.ceil(numRooms / 2);
-      const bathroomsPerSide = Math.ceil(numBathrooms / 2);
-      let roomOffset = (landWidth - hallWidth) / 2 - roomSize / 2 - wallThickness;
+      addLabel(hall, `الصالة\n${hallLength.toFixed(1)}×${hallWidth.toFixed(1)}`);
 
-      for (let i = 0; i < numRooms; i++) {
-        const roomGeometry = new THREE.BoxGeometry(roomSize, 5, roomSize);
-        const roomMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
-        const room = new THREE.Mesh(roomGeometry, roomMaterial);
-        room.position.set((i % roomsPerSide) * (roomSize + wallThickness) + roomSize / 2, 2.5, i < roomsPerSide ? roomOffset : landWidth - roomOffset);
+      const roomSize = 4;
+      const bathroomSize = 2;
+      let roomPositions = [];
+
+      // الغرف
+      for(let i=0; i<numRooms; i++) {
+        let x = Math.random() * (landLength - roomSize);
+        let z = Math.random() * (landWidth - roomSize);
+        // منع تداخل الغرف
+        let overlap = roomPositions.some(pos => Math.abs(pos.x-x)<roomSize && Math.abs(pos.z-z)<roomSize);
+        if(overlap) { i--; continue; }
+        roomPositions.push({x,z});
+        const roomGeom = new THREE.BoxGeometry(roomSize, 5, roomSize);
+        const roomMat = new THREE.MeshPhongMaterial({ color: 0x0000ff, transparent:true, opacity:0.5 });
+        const room = new THREE.Mesh(roomGeom, roomMat);
+        room.position.set(x+roomSize/2, 2.5, z+roomSize/2);
         scene.add(room);
+        addLabel(room, `غرفة\n${roomSize}×${roomSize}`);
       }
 
-      let bathOffset = roomOffset - (numRooms > 0 ? roomSize + wallThickness : 0);
-      for (let i = 0; i < numBathrooms; i++) {
-        const bathGeometry = new THREE.BoxGeometry(bathroomSize, 5, bathroomSize);
-        const bathMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-        const bath = new THREE.Mesh(bathGeometry, bathMaterial);
-        bath.position.set((i % bathroomsPerSide) * (bathroomSize + wallThickness) + bathroomSize / 2, 2.5, i < bathroomsPerSide ? bathOffset : landWidth - bathOffset);
+      // الحمامات
+      for(let i=0; i<numBathrooms; i++) {
+        let x = Math.random() * (landLength - bathroomSize);
+        let z = Math.random() * (landWidth - bathroomSize);
+        let overlap = roomPositions.some(pos => Math.abs(pos.x-x)<bathroomSize && Math.abs(pos.z-z)<bathroomSize);
+        if(overlap) { i--; continue; }
+        roomPositions.push({x,z});
+        const bathGeom = new THREE.BoxGeometry(bathroomSize, 5, bathroomSize);
+        const bathMat = new THREE.MeshPhongMaterial({ color: 0xff0000, transparent:true, opacity:0.5 });
+        const bath = new THREE.Mesh(bathGeom, bathMat);
+        bath.position.set(x+bathroomSize/2, 2.5, z+bathroomSize/2);
         scene.add(bath);
+        addLabel(bath, `حمام\n${bathroomSize}×${bathroomSize}`);
       }
+
+      // القياسات
+      let measurements = `
+        <h2>القياسات:</h2>
+        <p>الأرض: ${landLength}×${landWidth} م</p>
+        <p>سمك الجدران: 0.2 م</p>
+        <p>عرض الأبواب: 1 م</p>
+        <p>عدد الغرف: ${numRooms}</p>
+        <p>عدد الحمامات: ${numBathrooms}</p>
+      `;
+      measurementsDiv.innerHTML = measurements;
     }
 
-    function displayMeasurements(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
-      let measurements = `
-        <h2>القياسات الدقيقة:</h2>
-        <p>مساحة الأرض الكلية: ${landLength} م × ${landWidth} م = ${(landLength * landWidth).toFixed(2)} م²</p>
-        <p>أبعاد الصالة الرئيسية: ${hallLength.toFixed(2)} م × ${hallWidth.toFixed(2)} م</p>
-        <p>سمك الجدران: ${wallThickness} م</p>
-        <p>عرض الأبواب: ${doorWidth} م</p>
-      `;
-      if (numRooms > 0) {
-        measurements += `<p>أبعاد كل غرفة: ${roomSize} م × ${roomSize} م</p>`;
-      }
-      if (numBathrooms > 0) {
-        measurements += `<p>أبعاد كل حمام: ${bathroomSize} م × ${bathroomSize} م</p>`;
-      }
-      measurementsDiv.innerHTML = measurements;
+    // إضافة نص فوق المجسمات
+    function addLabel(obj, text) {
+      const canvas = document.createElement('canvas');
+      const size = 256;
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext('2d');
+      context.fillStyle = 'rgba(255,255,255,0.8)';
+      context.fillRect(0,0,size,size);
+      context.fillStyle = 'black';
+      context.font = '28px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      const lines = text.split("\n");
+      lines.forEach((line,i) => {
+        context.fillText(line, size/2, size/2 + i*30 - 15);
+      });
+
+      const texture = new THREE.CanvasTexture(canvas);
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(obj.geometry.parameters.width, 3, 1);
+      sprite.position.set(obj.position.x, obj.position.y+3, obj.position.z);
+      scene.add(sprite);
     }
 
     function animate() {
