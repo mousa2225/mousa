@@ -4,20 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مصمم تخطيط عمراني لصالة مبنى ضخم</title>
+
+    <!-- مكتبات Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://threejs.org/examples/js/geometries/TextGeometry.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
-        form { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        label { display: block; margin-bottom: 10px; }
-        input { width: 100%; padding: 8px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            direction: rtl;
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label { display: block; margin-bottom: 10px; text-align: right; }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
         button:hover { background-color: #45a049; }
         #scene-container { width: 100%; height: 600px; margin-top: 20px; }
-        #measurements { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
+        #measurements {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
     <h1>حاسبة ومصمم تخطيط عمراني لصالة مبنى ضخم</h1>
+
     <form id="input-form">
         <label for="land-length">طول الأرض (بالمتر):</label>
         <input type="number" id="land-length" required min="10" step="0.1">
@@ -31,8 +70,6 @@
         <label for="num-bathrooms">عدد الحمامات (اختياري):</label>
         <input type="number" id="num-bathrooms" min="0" step="1">
 
-        <!-- يمكن إضافة المزيد من المدخلات هنا إذا لزم الأمر، مثل عدد المكاتب أو غيرها -->
-
         <button type="submit">إنشاء المخطط</button>
     </form>
 
@@ -44,41 +81,35 @@
         const sceneContainer = document.getElementById('scene-container');
         const measurementsDiv = document.getElementById('measurements');
 
-        let scene, camera, renderer, controls;
+        let scene, camera, renderer;
 
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
             const landLength = parseFloat(document.getElementById('land-length').value);
             const landWidth = parseFloat(document.getElementById('land-width').value);
-            let numRooms = parseInt(document.getElementById('num-rooms').value) || 0;
-            let numBathrooms = parseInt(document.getElementById('num-bathrooms').value) || 0;
+            const numRooms = parseInt(document.getElementById('num-rooms').value) || 0;
+            const numBathrooms = parseInt(document.getElementById('num-bathrooms').value) || 0;
 
-            // حسابات دقيقة: افتراض تخطيط بسيط
-            // الصالة الرئيسية تشغل 60% من المساحة، الغرف والحمامات تقسم الباقي
+            // حسابات بسيطة
             const totalArea = landLength * landWidth;
             const hallArea = totalArea * 0.6;
             const hallLength = landLength * 0.8;
             const hallWidth = hallArea / hallLength;
 
-            // حجم الغرفة الواحدة: افتراض 4x4 متر
-            const roomSize = 4; // متر
-            const bathroomSize = 2; // متر
+            const roomSize = 4; // م
+            const bathroomSize = 2; // م
+            const wallThickness = 0.2; // م
+            const doorWidth = 1; // م
 
-            // توزيع الغرف والحمامات على الجانبين
             const roomsPerSide = Math.ceil(numRooms / 2);
             const bathroomsPerSide = Math.ceil(numBathrooms / 2);
 
-            // حساب المسافات
-            const wallThickness = 0.2; // سمك الجدران
-            const doorWidth = 1; // عرض الباب
-
-            // إنشاء النموذج 3D
             init3D(landLength, landWidth);
-            drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth);
-
-            // عرض القياسات النصية
-            displayMeasurements(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth);
+            drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms,
+                roomSize, bathroomSize, wallThickness, doorWidth, roomsPerSide, bathroomsPerSide);
+            displayMeasurements(landLength, landWidth, hallLength, hallWidth,
+                numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth);
 
             animate();
         });
@@ -88,21 +119,19 @@
             scene.background = new THREE.Color(0xcccccc);
 
             camera = new THREE.PerspectiveCamera(75, sceneContainer.clientWidth / 600, 0.1, 1000);
-            camera.position.set(landLength / 2, landWidth / 2 + 20, landLength + 20);
+            camera.position.set(landLength / 2, 30, landWidth + 20);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(sceneContainer.clientWidth, 600);
             sceneContainer.innerHTML = '';
             sceneContainer.appendChild(renderer.domElement);
 
-            // إضافة إضاءة
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
             directionalLight.position.set(landLength, landWidth, landLength);
             scene.add(directionalLight);
 
-            // إضافة أرضية
             const floorGeometry = new THREE.PlaneGeometry(landLength, landWidth);
             const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -110,45 +139,43 @@
             scene.add(floor);
         }
 
-        function drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
-            // رسم الصالة الرئيسية
-            const hallGeometry = new THREE.BoxGeometry(hallLength, 5, hallWidth); // ارتفاع افتراضي 5 متر
+        function drawBuilding(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms,
+                              roomSize, bathroomSize, wallThickness, doorWidth, roomsPerSide, bathroomsPerSide) {
+
+            // الصالة
+            const hallGeometry = new THREE.BoxGeometry(hallLength, 5, hallWidth);
             const hallMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
             const hall = new THREE.Mesh(hallGeometry, hallMaterial);
             hall.position.set(hallLength / 2, 2.5, hallWidth / 2 + (landWidth - hallWidth) / 2);
             scene.add(hall);
+            addText(`الصالة: ${hallLength.toFixed(1)}m x ${hallWidth.toFixed(1)}m`, hall.position.x, 6, hall.position.z);
 
-            // إضافة نصوص للقياسات على الصالة
-            addText(الصالة: ${hallLength}m x ${hallWidth}m, hall.position.x, 5.5, hall.position.z);
-
-            // رسم الغرف على الجانب الأيمن
-            let roomOffset = hallWidth / 2 + (landWidth - hallWidth) / 2 + roomSize / 2 + wallThickness;
+            // الغرف
+            const roomOffset = hallWidth / 2 + (landWidth - hallWidth) / 2 + roomSize / 2 + wallThickness;
             for (let i = 0; i < numRooms; i++) {
                 const roomGeometry = new THREE.BoxGeometry(roomSize, 5, roomSize);
                 const roomMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
                 const room = new THREE.Mesh(roomGeometry, roomMaterial);
-                room.position.set((i % roomsPerSide) * (roomSize + wallThickness) + roomSize / 2, 2.5, i < roomsPerSide ? roomOffset : landWidth - roomOffset);
+                room.position.set((i % roomsPerSide) * (roomSize + wallThickness) + roomSize / 2,
+                                  2.5, i < roomsPerSide ? roomOffset : landWidth - roomOffset);
                 scene.add(room);
-
-                // باب لكل غرفة
                 addDoor(room.position.x, room.position.z, doorWidth);
-
-                addText(غرفة ${i+1}: ${roomSize}m x ${roomSize}m, room.position.x, 5.5, room.position.z);
+                addText(`غرفة ${i + 1}: ${roomSize}m x ${roomSize}m`, room.position.x, 6, room.position.z);
             }
 
-            // رسم الحمامات
-            let bathOffset = roomOffset + (numRooms > 0 ? roomSize + wallThickness : 0);
+            // الحمامات
+            const bathOffset = roomOffset + (numRooms > 0 ? roomSize + wallThickness : 0);
             for (let i = 0; i < numBathrooms; i++) {
                 const bathGeometry = new THREE.BoxGeometry(bathroomSize, 5, bathroomSize);
                 const bathMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
                 const bath = new THREE.Mesh(bathGeometry, bathMaterial);
-                bath.position.set((i % bathroomsPerSide) * (bathroomSize + wallThickness) + bathroomSize / 2, 2.5, i < bathroomsPerSide ? bathOffset : landWidth - bathOffset);
+                bath.position.set((i % bathroomsPerSide) * (bathroomSize + wallThickness) + bathroomSize / 2,
+                                  2.5, i < bathroomsPerSide ? bathOffset : landWidth - bathOffset);
                 scene.add(bath);
-
-                addText(حمام ${i+1}: ${bathroomSize}m x ${bathroomSize}m, bath.position.x, 5.5, bath.position.z);
+                addText(`حمام ${i + 1}: ${bathroomSize}m x ${bathroomSize}m`, bath.position.x, 6, bath.position.z);
             }
 
-            // رسم الجدران الخارجية
+            // الجدران الخارجية
             const outerWallGeometry = new THREE.BoxGeometry(landLength, 5, landWidth);
             const outerWallMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true });
             const outerWall = new THREE.Mesh(outerWallGeometry, outerWallMaterial);
@@ -157,11 +184,11 @@
         }
 
         function addDoor(x, z, doorWidth) {
-            // رسم باب بسيط كخط
             const doorMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
-            const doorPoints = [];
-            doorPoints.push(new THREE.Vector3(x - doorWidth/2, 0, z));
-            doorPoints.push(new THREE.Vector3(x + doorWidth/2, 0, z));
+            const doorPoints = [
+                new THREE.Vector3(x - doorWidth / 2, 0, z),
+                new THREE.Vector3(x + doorWidth / 2, 0, z)
+            ];
             const doorGeometry = new THREE.BufferGeometry().setFromPoints(doorPoints);
             const door = new THREE.Line(doorGeometry, doorMaterial);
             scene.add(door);
@@ -173,7 +200,7 @@
                 const textGeometry = new THREE.TextGeometry(text, {
                     font: font,
                     size: 0.5,
-                    height: 0.1
+                    height: 0.05
                 });
                 const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
                 const textMesh = new THREE.Mesh(textGeometry, textMaterial);
@@ -182,20 +209,17 @@
             });
         }
 
-        function displayMeasurements(landLength, landWidth, hallLength, hallWidth, numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
+        function displayMeasurements(landLength, landWidth, hallLength, hallWidth,
+                                     numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
             let measurements = `
                 <h2>القياسات الدقيقة:</h2>
-                <p>مساحة الأرض الكلية: ${landLength} م × ${landWidth} م = ${landLength * landWidth} م²</p>
-                <p>أبعاد الصالة الرئيسية: ${hallLength.toFixed(2)} م × ${hallWidth.toFixed(2)} م</p>
+                <p>مساحة الأرض الكلية: ${landLength} × ${landWidth} = ${(landLength * landWidth).toFixed(2)} م²</p>
+                <p>أبعاد الصالة الرئيسية: ${hallLength.toFixed(2)} × ${hallWidth.toFixed(2)} م</p>
                 <p>سمك الجدران: ${wallThickness} م</p>
                 <p>عرض الأبواب: ${doorWidth} م</p>
             `;
-            if (numRooms > 0) {
-                measurements += <p>أبعاد كل غرفة: ${roomSize} م × ${roomSize} م</p>;
-            }
-            if (numBathrooms > 0) {
-                measurements += <p>أبعاد كل حمام: ${bathroomSize} م × ${bathroomSize} م</p>;
-            }
+            if (numRooms > 0) measurements += `<p>أبعاد كل غرفة: ${roomSize} م × ${roomSize} م</p>`;
+            if (numBathrooms > 0) measurements += `<p>أبعاد كل حمام: ${bathroomSize} م × ${bathroomSize} م</p>`;
             measurementsDiv.innerHTML = measurements;
         }
 
