@@ -138,4 +138,77 @@
             });
         }
 
-        function displayMeasurements(landLength, landWidth, hallLength,
+        function displayMeasurements(landLength, landWidth, hallLength, hallWidth,
+                                     numRooms, numBathrooms, roomSize, bathroomSize, wallThickness, doorWidth) {
+            let html = `
+                <h2>القياسات الدقيقة:</h2>
+                <p>مساحة الأرض: ${landLength} × ${landWidth} = ${(landLength * landWidth).toFixed(1)} م²</p>
+                <p>الصالة: ${hallLength.toFixed(1)} × ${hallWidth.toFixed(1)} م</p>
+                <p>الجدران: ${wallThickness} م | الأبواب: ${doorWidth} م</p>`;
+            if (numRooms > 0) html += `<p>الغرف: ${numRooms} (كل غرفة ${roomSize} × ${roomSize} م)</p>`;
+            if (numBathrooms > 0) html += `<p>الحمامات: ${numBathrooms} (كل حمام ${bathroomSize} × ${bathroomSize} م)</p>`;
+            measurementsDiv.innerHTML = html;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+            direction: rtl;
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label { display: block; margin-bottom: 8px; text-align: right; }
+        input { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #4CAF50; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        #scene-container { width: 100%; height: 600px; margin-top: 20px; background: #ddd; border-radius: 6px; }
+        #measurements {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>مصمم تخطيط عمراني لصالة مبنى ضخم</h1>
+
+    <form id="input-form">
+        <label for="land-length">طول الأرض (متر):</label>
+        <input type="number" id="land-length" min="10" step="0.1" required>
+
+        <label for="land-width">عرض الأرض (متر):</label>
+        <input type="number" id="land-width" min="10" step="0.1" required>
+
+        <label for="num-rooms">عدد الغرف:</label>
+        <input type="number" id="num-rooms" min="0" step="1">
+
+        <label for="num-bathrooms">عدد الحمامات:</label>
+        <input type="number" id="num-bathrooms" min="0" step="1">
+
+        <button type="submit">إنشاء المخطط</button>
+    </form>
+
+    <div id="scene-container"></div>
+    <div id="measurements"></div>
+</body>
+</html>
