@@ -1,267 +1,79 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>مولّد مخطط بيت 3D & 2D</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة تعليم الحروف للأطفال</title>
 <style>
-body{font-family:Arial;background:#f4f4f4;margin:0;padding:18px}
-h1{text-align:center;margin:0 0 12px}
-#ui{max-width:960px;margin:0 auto 12px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-label{display:block;margin:6px 0 2px}
-input,select,button{width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd}
-.row{display:flex;gap:8px}
-.col{flex:1}
-#scene-container{width:100%;height:640px;border-radius:6px;overflow:hidden;border:1px solid #ccc;background:#dbeff0;margin:12px auto;max-width:960px;position:relative}
-#measurements{max-width:960px;margin:12px auto;padding:10px;background:#fff;border-radius:6px}
-@media(max-width:760px){.row{flex-direction:column}}
-#toggleBtn{margin-bottom:12px;}
+  body { font-family: Arial; background: #fef7e5; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; }
+  h1 { text-align:center; color:#ff6b6b; }
+  #game { max-width:600px; width:100%; text-align:center; margin-top:20px; }
+  .letter { font-size:60px; margin-bottom:20px; color:#4a90e2; }
+  .options { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+  .option { padding:15px; border-radius:10px; background:#fff; border:2px solid #ddd; cursor:pointer; width:120px; font-size:18px; transition:0.3s; }
+  .option:hover { transform:scale(1.05); border-color:#4a90e2; }
+  #score { margin-top:20px; font-size:20px; color:#333; }
 </style>
 </head>
 <body>
-<div id="ui">
-<h1>مولّد مخطط بيت 3D & 2D</h1>
-<div class="row">
-  <div class="col">
-    <label>طول الأرض (م)</label>
-    <input id="land-length" type="number" min="6" value="24" step="0.1">
-  </div>
-  <div class="col">
-    <label>عرض الأرض (م)</label>
-    <input id="land-width" type="number" min="6" value="18" step="0.1">
-  </div>
-</div>
-<div class="row">
-  <div class="col">
-    <label>عدد غرف النوم</label>
-    <input id="num-rooms" type="number" min="0" value="4" step="1">
-  </div>
-  <div class="col">
-    <label>عدد الحمامات</label>
-    <input id="num-bath" type="number" min="0" value="3" step="1">
-  </div>
-</div>
-<div class="row">
-  <div class="col">
-    <label>مجلس ضيوف مستقل؟</label>
-    <select id="has-majlis"><option value="1">نعم</option><option value="0">لا</option></select>
-  </div>
-  <div class="col">
-    <label>&nbsp;</label>
-    <button id="generate">إنشاء المخطط</button>
-  </div>
-</div>
-<button id="toggleBtn">تبديل 3D / 2D</button>
-</div>
 
-<div id="scene-container"></div>
-<div id="measurements"></div>
+<h1>لعبة تعليم الحروف للأطفال</h1>
+<div id="game">
+  <div class="letter" id="letter">A</div>
+  <div class="options" id="options"></div>
+  <div id="score">النقاط: 0</div>
+</div>
 
 <script>
-let scene, camera, renderer, controls, labelRenderer;
-let is3D = true;
-const container = document.getElementById('scene-container');
-const measurementsDiv = document.getElementById('measurements');
-const toggleBtn = document.getElementById('toggleBtn');
+const letters = [
+  {letter:'A', options:['Apple','Ball','Cat'], correct:'Apple'},
+  {letter:'B', options:['Banana','Dog','Fish'], correct:'Banana'},
+  {letter:'C', options:['Car','Sun','Hat'], correct:'Car'},
+  {letter:'D', options:['Dog','Egg','Moon'], correct:'Dog'},
+  {letter:'E', options:['Elephant','Tree','Star'], correct:'Elephant'},
+  {letter:'F', options:['Fish','Flower','Chair'], correct:'Fish'}
+];
 
-document.getElementById('generate').addEventListener('click', () => {
-  const L = parseFloat(document.getElementById('land-length').value);
-  const W = parseFloat(document.getElementById('land-width').value);
-  const rooms = parseInt(document.getElementById('num-rooms').value)||0;
-  const baths = parseInt(document.getElementById('num-bath').value)||0;
-  const hasMajlis = document.getElementById('has-majlis').value==='1';
-  if(isNaN(L)||isNaN(W)||L<=0||W<=0){alert('ادخل أبعاد أرض صحيحة.'); return;}
-  initScene(L,W);
-  generatePlan(L,W,rooms,baths,hasMajlis);
-  animate();
-});
+let current = 0;
+let score = 0;
 
-toggleBtn.addEventListener('click',()=>{
-  is3D = !is3D;
-  if(is3D){
-    camera.position.set(20,Math.max(12,20),30);
-    controls.enabled = true;
-  }else{
-    camera.position.set(0,50,0);
-    camera.lookAt(0,0,0);
-    controls.enabled = false;
-  }
-});
-
-function initScene(L,W){
-  if(renderer){renderer.domElement.remove();renderer.dispose();}
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xbfd1e5);
-
-  camera = new THREE.PerspectiveCamera(60,container.clientWidth/container.clientHeight,0.1,2000);
-  camera.position.set(L*0.5, Math.max(12, Math.max(L,W)/1.5), W*1.2);
-
-  renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(container.clientWidth,container.clientHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  container.innerHTML=''; container.appendChild(renderer.domElement);
-
-  labelRenderer = new THREE.CSS2DRenderer();
-  labelRenderer.setSize(container.clientWidth,container.clientHeight);
-  labelRenderer.domElement.style.position='absolute';
-  labelRenderer.domElement.style.top='0';
-  container.appendChild(labelRenderer.domElement);
-
-  controls = new THREE.OrbitControls(camera,renderer.domElement);
-  controls.target.set(L/2,0,W/2);
-  controls.update();
-
-  const ambient = new THREE.AmbientLight(0xffffff,0.6);
-  scene.add(ambient);
-
-  const dirLight = new THREE.DirectionalLight(0xffffff,1);
-  dirLight.position.set(40,80,30);
-  dirLight.castShadow=true;
-  scene.add(dirLight);
-
-  // أرضية
-  const floorMat = new THREE.MeshStandardMaterial({color:0xf7f3ea});
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(L,W),floorMat);
-  floor.rotation.x=-Math.PI/2; floor.position.set(L/2,0,W/2);
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  const grid = new THREE.GridHelper(Math.max(L,W), Math.round(Math.max(L,W)),0x999999,0xdddddd);
-  grid.position.set(L/2,0.01,W/2);
-  scene.add(grid);
+function loadQuestion() {
+  const q = letters[current];
+  document.getElementById('letter').textContent = q.letter;
+  const optsDiv = document.getElementById('options');
+  optsDiv.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt);
+    optsDiv.appendChild(btn);
+  });
 }
 
-function addRoom(x,z,w,l,options={}){
-  const group = new THREE.Group();
-  const floorMat = new THREE.MeshStandardMaterial({color:options.floorColor||0xf5f5f5});
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(w,l),floorMat);
-  floor.rotation.x=-Math.PI/2;
-  floor.position.set(x+w/2,0.01,z+l/2);
-  group.add(floor);
-
-  const h = options.height||3;
-  const wallMat = new THREE.MeshStandardMaterial({color:0xff6b3b,roughness:0.5,metalness:0.1});
-  const wallGeo1 = new THREE.BoxGeometry(w, h, 0.25); // شمال وجنوب
-  const wallGeo2 = new THREE.BoxGeometry(0.25,h,l);   // شرق وغرب
-  const wallN = new THREE.Mesh(wallGeo1,wallMat); wallN.position.set(x+w/2,h/2,z); group.add(wallN);
-  const wallS = new THREE.Mesh(wallGeo1,wallMat); wallS.position.set(x+w/2,h/2,z+l); group.add(wallS);
-  const wallW = new THREE.Mesh(wallGeo2,wallMat); wallW.position.set(x,h/2,z+l/2); group.add(wallW);
-  const wallE = new THREE.Mesh(wallGeo2,wallMat); wallE.position.set(x+w,h/2,z+l/2); group.add(wallE);
-
-  addLabel(x+w/2,h+0.25,z+l/2,options.label||'',`${w.toFixed(2)}×${l.toFixed(2)}م`);
-
-  scene.add(group);
-  return group;
+function checkAnswer(selected) {
+  const q = letters[current];
+  if(selected === q.correct){
+    score++;
+    alert('صحيح! ✅');
+  } else {
+    alert('خطأ ❌ الإجابة الصحيحة: ' + q.correct);
+  }
+  current++;
+  if(current < letters.length){
+    loadQuestion();
+  } else {
+    alert('انتهت اللعبة! نقاطك: ' + score + '/' + letters.length);
+    current = 0;
+    score = 0;
+    loadQuestion();
+  }
+  document.getElementById('score').textContent = 'النقاط: ' + score;
 }
 
-function addLabel(x,y,z,title,sub){
-  const div = document.createElement('div');
-  div.className='label';
-  div.style.background='rgba(255,255,255,0.85)';
-  div.style.padding='2px 4px';
-  div.style.borderRadius='3px';
-  div.style.fontSize='14px';
-  div.style.color='#111';
-  div.innerHTML=`<b>${title}</b><br>${sub}`;
-  const label = new THREE.CSS2DObject(div);
-  label.position.set(x,y,z);
-  scene.add(label);
-}
-
-function generatePlan(L,W,rooms,baths,hasMajlis){
-  const margin=0.6;
-  const availW=W-2*margin, availL=L-2*margin;
-  const used=[]; 
-  function occupy(x,z,w,l){ used.push({x,z,w,l}); }
-  function overlaps(x,z,w,l){ for(const r of used){if(!(x+w<=r.x||x>=r.x+r.w||z+l<=r.z||z>=r.z+r.l)) return true;} return false;}
-
-  const frontDepth=Math.min(Math.max(3.5,availL*0.18),7);
-  const frontAreaZ=margin;
-  if(hasMajlis){
-    const mw=Math.min(availW*0.45,6);
-    const ml=frontDepth;
-    addRoom(margin,frontAreaZ,mw,ml,{label:'مجلس ضيوف',floorColor:0xf0e6d6});
-    occupy(margin,frontAreaZ,mw,ml);
-  }
-
-  const corridorWidth=Math.min(2.2,Math.max(1.1,availW*0.12));
-  const corridorX=margin+(availW-corridorWidth)/2;
-  const corridorZ=margin+frontDepth+0.4;
-  const corridorLen=availL-frontDepth-0.8;
-  occupy(corridorX-0.2,corridorZ-0.2,corridorWidth+0.4,corridorLen+0.4);
-
-  const familyW=Math.min(availW*0.45,6+rooms*0.15);
-  const familyL=Math.min(availL*0.25+1.2,7);
-  let familyX=corridorX+corridorWidth+0.5;
-  let familyZ=corridorZ;
-  if(familyX+familyW>margin+availW) familyX=corridorX-0.5-familyW;
-  addRoom(familyX,familyZ,familyW,familyL,{label:'صالة عائلية',floorColor:0xfffbef});
-  occupy(familyX,familyZ,familyW,familyL);
-
-  const kitchenW=Math.min(4.2,Math.max(2.5,familyW*0.55));
-  const kitchenL=Math.min(3.6,4);
-  let kx=familyX, kz=familyZ+familyL+0.5;
-  if(kz+kitchenL>margin+availL) kz=familyZ-kitchenL-0.5;
-  if(kz<margin) kz=familyZ+familyL+0.5;
-  addRoom(kx,kz,kitchenW,kitchenL,{label:'مطبخ',floorColor:0xdff3ff});
-  occupy(kx,kz,kitchenW,kitchenL);
-
-  const roomW=3.8, roomL=3.8;
-  let placedRooms=0;
-  const rowSpacing=roomL+0.6;
-  const rows=Math.floor(corridorLen/rowSpacing);
-  let zStart=corridorZ+0.1;
-  for(let r=0;r<rows&&placedRooms<rooms;r++){
-    const zpos=zStart+r*rowSpacing;
-    const rx=corridorX+corridorWidth+0.5;
-    if(rx+roomW<=margin+availW&&!overlaps(rx,zpos,roomW,roomL)&&placedRooms<rooms){addRoom(rx,zpos,roomW,roomL,{label:'غرفة نوم',floorColor:0xf0f8ff});occupy(rx,zpos,roomW,roomL);placedRooms++;}
-    const lx=corridorX-0.5-roomW;
-    if(lx>=margin&&!overlaps(lx,zpos,roomW,roomL)&&placedRooms<rooms){addRoom(lx,zpos,roomW,roomL,{label:'غرفة نوم',floorColor:0xf0f8ff});occupy(lx,zpos,roomW,roomL);placedRooms++;}
-  }
-
-  let placedBaths=0;
-  const bathW=2.0,bathL=2.0;
-  for(let r=0;r<rows&&placedBaths<baths;r++){
-    const zpos=zStart+r*rowSpacing;
-    const bx=corridorX-bathW-0.6;
-    if(bx>=margin&&!overlaps(bx,zpos,bathW,bathL)){addRoom(bx,zpos,bathW,bathL,{label:'حمام',floorColor:0xdff7ef});occupy(bx,zpos,bathW,bathL);placedBaths++;}
-    if(placedBaths>=baths) break;
-    const bx2=corridorX+corridorWidth+0.6;
-    if(bx2+bathW<=margin+availW&&!overlaps(bx2,zpos,bathW,bathL)&&placedBaths<baths){addRoom(bx2,zpos,bathW,bathL,{label:'حمام',floorColor:0xdff7ef});occupy(bx2,zpos,bathW,bathL);placedBaths++;}
-  }
-
-  measurementsDiv.innerHTML=`
-    <h3>معلومات المخطط</h3>
-    <p>أبعاد الأرض: ${L.toFixed(2)} × ${W.toFixed(2)} م</p>
-    <p>عدد غرف النوم المطلوب: ${rooms}</p>
-    <p>عدد الحمامات المطلوب: ${baths}</p>
-    <p>تم توليد التصميم بشكل تقريبي – للتحسينات أطلب التعديل.</p>
-  `;
-}
-
-let animHandle=null;
-function animate(){
-  if(animHandle) cancelAnimationFrame(animHandle);
-  function loop(){
-    animHandle=requestAnimationFrame(loop);
-    controls.update();
-    renderer.render(scene,camera);
-    labelRenderer.render(scene,camera);
-  }
-  loop();
-}
-
-window.addEventListener('resize',()=>{
-  if(!renderer) return;
-  renderer.setSize(container.clientWidth,container.clientHeight);
-  labelRenderer.setSize(container.clientWidth,container.clientHeight);
-  camera.aspect=container.clientWidth/container.clientHeight;
-  camera.updateProjectionMatrix();
-});
+// بداية اللعبة
+loadQuestion();
 </script>
+
 </body>
 </html>
