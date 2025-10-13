@@ -2,357 +2,266 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>مولّد مخطط بيت ثلاثي الأبعاد - نسخة محسّنة</title>
-<!-- Three.js r128 + examples -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>مولّد مخطط بيت 3D & 2D</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/BufferGeometryUtils.js"></script>
 <style>
-  body{font-family:Arial,background:#f4f4f4;margin:0;padding:18px}
-  h1{margin:0 0 12px;text-align:center}
-  #ui{max-width:1100px;margin:0 auto 12px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-  label{display:block;margin:6px 0 2px}
-  input,select,button{width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd}
-  .row{display:flex;gap:8px}
-  .col{flex:1}
-  #scene-container{width:100%;height:680px;border-radius:6px;overflow:hidden;border:1px solid #ccc;background:#dbeff0; margin:12px auto; max-width:1100px;position:relative}
-  #measurements{max-width:1100px;margin:12px auto;padding:10px;background:#fff;border-radius:6px}
-  #tools{display:flex;gap:8px}
-  #tools button{flex:1}
-  @media (max-width:760px){ .row{flex-direction:column} }
-  .label-2d{background:rgba(255,255,255,0.9);padding:6px;border-radius:6px;border:1px solid #ccc;font-size:12px}
-  #compass{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.9);padding:8px;border-radius:6px;border:1px solid #ccc}
+body{font-family:Arial;background:#f4f4f4;margin:0;padding:18px}
+h1{text-align:center;margin:0 0 12px}
+#ui{max-width:960px;margin:0 auto 12px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+label{display:block;margin:6px 0 2px}
+input,select,button{width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd}
+.row{display:flex;gap:8px}
+.col{flex:1}
+#scene-container{width:100%;height:640px;border-radius:6px;overflow:hidden;border:1px solid #ccc;background:#dbeff0;margin:12px auto;max-width:960px;position:relative}
+#measurements{max-width:960px;margin:12px auto;padding:10px;background:#fff;border-radius:6px}
+@media(max-width:760px){.row{flex-direction:column}}
+#toggleBtn{margin-bottom:12px;}
 </style>
 </head>
 <body>
-  <div id="ui">
-    <h1>مولّد مخطط بيت ثلاثي الأبعاد — نسخة محسّنة</h1>
-    <div class="row">
-      <div class="col">
-        <label>طول الأرض (م)</label>
-        <input id="land-length" type="number" min="6" value="24" step="0.1">
-      </div>
-      <div class="col">
-        <label>عرض الأرض (م)</label>
-        <input id="land-width" type="number" min="6" value="18" step="0.1">
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <label>عدد غرف النوم</label>
-        <input id="num-rooms" type="number" min="0" value="4" step="1">
-      </div>
-      <div class="col">
-        <label>عدد الحمامات</label>
-        <input id="num-bath" type="number" min="0" value="3" step="1">
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <label>مجلس ضيوف مستقل؟</label>
-        <select id="has-majlis"><option value="1">نعم</option><option value="0">لا</option></select>
-      </div>
-      <div class="col">
-        <label>&nbsp;</label>
-        <button id="generate">إنشاء المخطط</button>
-      </div>
-    </div>
-
-    <div id="tools">
-      <button id="reset">إعادة ضبط الكاميرا</button>
-      <button id="export">حفظ صورة PNG</button>
-      <button id="download-gltf">تصدير (مبعثر) GLTF</button>
-    </div>
-
+<div id="ui">
+<h1>مولّد مخطط بيت 3D & 2D</h1>
+<div class="row">
+  <div class="col">
+    <label>طول الأرض (م)</label>
+    <input id="land-length" type="number" min="6" value="24" step="0.1">
   </div>
-
-  <div id="scene-container">
-    <div id="compass">شمال ↑</div>
+  <div class="col">
+    <label>عرض الأرض (م)</label>
+    <input id="land-width" type="number" min="6" value="18" step="0.1">
   </div>
-  <div id="measurements"></div>
+</div>
+<div class="row">
+  <div class="col">
+    <label>عدد غرف النوم</label>
+    <input id="num-rooms" type="number" min="0" value="4" step="1">
+  </div>
+  <div class="col">
+    <label>عدد الحمامات</label>
+    <input id="num-bath" type="number" min="0" value="3" step="1">
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <label>مجلس ضيوف مستقل؟</label>
+    <select id="has-majlis"><option value="1">نعم</option><option value="0">لا</option></select>
+  </div>
+  <div class="col">
+    <label>&nbsp;</label>
+    <button id="generate">إنشاء المخطط</button>
+  </div>
+</div>
+<button id="toggleBtn">تبديل 3D / 2D</button>
+</div>
+
+<div id="scene-container"></div>
+<div id="measurements"></div>
 
 <script>
-/* نسخة محسنة من مولد المخطط
-   تحسينات مُطبقة:
-   - إنشاء الجدران باستخدام THREE.Shape + ExtrudeGeometry مع فتحات للأبواب والنوافذ
-   - سقف (ceiling)
-   - نصوص قابلة للقراءة باستخدام CSS2DRenderer (لا تتأثر بالـ zoom بنفس طريقة الـ sprites)
-   - إضاءة مع ظلال
-   - دمج الـ geometries لتحسين الأداء باستخدام BufferGeometryUtils
-   - توزيع غُرف منظم (شبكة بدلاً من fallback عشوائي)
-   - زر لتصدير صورة PNG
-   - واجهة نظيفة قابلة للتعديل
-*/
-
 let scene, camera, renderer, controls, labelRenderer;
+let is3D = true;
 const container = document.getElementById('scene-container');
 const measurementsDiv = document.getElementById('measurements');
-let currentGroup = null;
+const toggleBtn = document.getElementById('toggleBtn');
 
-// إعداد الأحداث
 document.getElementById('generate').addEventListener('click', () => {
   const L = parseFloat(document.getElementById('land-length').value);
   const W = parseFloat(document.getElementById('land-width').value);
-  const rooms = parseInt(document.getElementById('num-rooms').value) || 0;
-  const baths = parseInt(document.getElementById('num-bath').value) || 0;
-  const hasMajlis = document.getElementById('has-majlis').value === '1';
-  if (isNaN(L) || isNaN(W) || L<=0 || W<=0) { alert('ادخل أبعاد أرض صحيحة.'); return; }
+  const rooms = parseInt(document.getElementById('num-rooms').value)||0;
+  const baths = parseInt(document.getElementById('num-bath').value)||0;
+  const hasMajlis = document.getElementById('has-majlis').value==='1';
+  if(isNaN(L)||isNaN(W)||L<=0||W<=0){alert('ادخل أبعاد أرض صحيحة.'); return;}
   initScene(L,W);
   generatePlan(L,W,rooms,baths,hasMajlis);
   animate();
 });
 
-document.getElementById('reset').addEventListener('click', ()=>{
-  if(!camera || !controls) return;
-  controls.reset();
-  camera.position.set(10,12,20);
-  controls.update();
+toggleBtn.addEventListener('click',()=>{
+  is3D = !is3D;
+  if(is3D){
+    camera.position.set(20,Math.max(12,20),30);
+    controls.enabled = true;
+  }else{
+    camera.position.set(0,50,0);
+    camera.lookAt(0,0,0);
+    controls.enabled = false;
+  }
 });
 
-document.getElementById('export').addEventListener('click', ()=>{
-  if(!renderer) return;
-  renderer.domElement.toBlob(function(blob){
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'plan.png'; a.click();
-    URL.revokeObjectURL(url);
-  });
-});
-
-// مُهيِّئ المشهد
 function initScene(L,W){
-  if(renderer){ renderer.domElement.remove(); renderer.dispose(); labelRenderer.domElement.remove(); }
+  if(renderer){renderer.domElement.remove();renderer.dispose();}
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xeaf6f8);
+  scene.background = new THREE.Color(0xbfd1e5);
 
-  camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 2000);
+  camera = new THREE.PerspectiveCamera(60,container.clientWidth/container.clientHeight,0.1,2000);
   camera.position.set(L*0.5, Math.max(12, Math.max(L,W)/1.5), W*1.2);
 
-  renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:false});
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(container.clientWidth,container.clientHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
+  container.innerHTML=''; container.appendChild(renderer.domElement);
 
   labelRenderer = new THREE.CSS2DRenderer();
-  labelRenderer.setSize(container.clientWidth, container.clientHeight);
-  labelRenderer.domElement.style.position = 'absolute';
-  labelRenderer.domElement.style.top = '0';
+  labelRenderer.setSize(container.clientWidth,container.clientHeight);
+  labelRenderer.domElement.style.position='absolute';
+  labelRenderer.domElement.style.top='0';
   container.appendChild(labelRenderer.domElement);
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(L/2,0, W/2);
+  controls = new THREE.OrbitControls(camera,renderer.domElement);
+  controls.target.set(L/2,0,W/2);
   controls.update();
 
-  const amb = new THREE.AmbientLight(0xffffff,0.6); scene.add(amb);
-  const sun = new THREE.DirectionalLight(0xffffff,0.8); sun.position.set(50,80,30); sun.castShadow = true;
-  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048;
-  sun.shadow.camera.left = -50; sun.shadow.camera.right = 50; sun.shadow.camera.top = 50; sun.shadow.camera.bottom = -50;
-  scene.add(sun);
+  const ambient = new THREE.AmbientLight(0xffffff,0.6);
+  scene.add(ambient);
 
-  // أرضية عامة مع استقبال الظلال
+  const dirLight = new THREE.DirectionalLight(0xffffff,1);
+  dirLight.position.set(40,80,30);
+  dirLight.castShadow=true;
+  scene.add(dirLight);
+
+  // أرضية
   const floorMat = new THREE.MeshStandardMaterial({color:0xf7f3ea});
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(L, W), floorMat);
-  floor.rotation.x = -Math.PI/2; floor.position.set(L/2,0,W/2);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(L,W),floorMat);
+  floor.rotation.x=-Math.PI/2; floor.position.set(L/2,0,W/2);
   floor.receiveShadow = true;
   scene.add(floor);
 
-  // شبكة مساعدة
-  const grid = new THREE.GridHelper(Math.max(L,W), Math.round(Math.max(L,W)), 0xcccccc, 0xeeeeee);
-  grid.position.set(L/2, 0.01, W/2); scene.add(grid);
-
-  // حذف المجموعة الحالية إن وجدت
-  if(currentGroup){ scene.remove(currentGroup); }
-  currentGroup = new THREE.Group(); scene.add(currentGroup);
+  const grid = new THREE.GridHelper(Math.max(L,W), Math.round(Math.max(L,W)),0x999999,0xdddddd);
+  grid.position.set(L/2,0.01,W/2);
+  scene.add(grid);
 }
 
-/* انشاء حافة (سياج خارجي بسيط) */
-function addOuterBorder(L,W,thickness=0.4,height=3.2){
-  const mat = new THREE.MeshStandardMaterial({color:0x8b0000});
-  const boxGeom1 = new THREE.BoxGeometry(L, height, thickness);
-  const back = new THREE.Mesh(boxGeom1, mat); back.position.set(L/2, height/2, 0);
-  const front = new THREE.Mesh(boxGeom1, mat); front.position.set(L/2, height/2, W);
-  const boxGeom2 = new THREE.BoxGeometry(thickness, height, W);
-  const left = new THREE.Mesh(boxGeom2, mat); left.position.set(0, height/2, W/2);
-  const right = new THREE.Mesh(boxGeom2, mat); right.position.set(L, height/2, W/2);
-  [back,front,left,right].forEach(m=>{ m.castShadow=true; m.receiveShadow=true; currentGroup.add(m); });
+function addRoom(x,z,w,l,options={}){
+  const group = new THREE.Group();
+  const floorMat = new THREE.MeshStandardMaterial({color:options.floorColor||0xf5f5f5});
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(w,l),floorMat);
+  floor.rotation.x=-Math.PI/2;
+  floor.position.set(x+w/2,0.01,z+l/2);
+  group.add(floor);
+
+  const h = options.height||3;
+  const wallMat = new THREE.MeshStandardMaterial({color:0xff6b3b,roughness:0.5,metalness:0.1});
+  const wallGeo1 = new THREE.BoxGeometry(w, h, 0.25); // شمال وجنوب
+  const wallGeo2 = new THREE.BoxGeometry(0.25,h,l);   // شرق وغرب
+  const wallN = new THREE.Mesh(wallGeo1,wallMat); wallN.position.set(x+w/2,h/2,z); group.add(wallN);
+  const wallS = new THREE.Mesh(wallGeo1,wallMat); wallS.position.set(x+w/2,h/2,z+l); group.add(wallS);
+  const wallW = new THREE.Mesh(wallGeo2,wallMat); wallW.position.set(x,h/2,z+l/2); group.add(wallW);
+  const wallE = new THREE.Mesh(wallGeo2,wallMat); wallE.position.set(x+w,h/2,z+l/2); group.add(wallE);
+
+  addLabel(x+w/2,h+0.25,z+l/2,options.label||'',`${w.toFixed(2)}×${l.toFixed(2)}م`);
+
+  scene.add(group);
+  return group;
 }
 
-/* دالة لخلق غرفة باستخدام Shape + ExtrudeGeometry مع فتحات */
-function createRoomMesh(w,l,opts={wallThickness:0.25,wallHeight:3,openings:[],color:0xff6b3b}){
-  // سنبني شكل المستطيل ثم نضيف فتحات كـ holes
-  const shape = new THREE.Shape();
-  shape.moveTo(0,0); shape.lineTo(w,0); shape.lineTo(w,l); shape.lineTo(0,l); shape.lineTo(0,0);
-
-  // كل فتحة تعطى بـ {side:'north'|'south'|'east'|'west', offset:بداية العرض, width:عرض, type:'door'|'window'}
-  // سنحول إحداثيات الفتحة إلى مستطيل داخل الشكل
-  opts.openings.forEach(op=>{
-    let hx, hy, hw, hl;
-    if(op.side==='north'){ // شمال => y=0
-      hx = op.offset; hy = 0; hw = op.width; hl = 0.6; // عمق الثقب نحو الداخل قليل
-    } else if(op.side==='south'){ hx = op.offset; hy = l - 0.6; hw = op.width; hl = 0.6; }
-    else if(op.side==='west'){ hx = 0; hy = op.offset; hw = 0.6; hl = op.width; }
-    else /*east*/ { hx = w - 0.6; hy = op.offset; hw = 0.6; hl = op.width; }
-
-    const hole = new THREE.Path();
-    hole.moveTo(hx, hy);
-    hole.lineTo(hx + hw, hy);
-    hole.lineTo(hx + hw, hy + hl);
-    hole.lineTo(hx, hy + hl);
-    hole.lineTo(hx, hy);
-    shape.holes.push(hole);
-  });
-
-  const extrudeSettings = { depth: opts.wallHeight || 3, bevelEnabled: false };
-  const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  // Extrude يولد المحور Y كارتفاع. سنجعل سمك الحائط عبر تحريك ونسخ الحواف: بدلاً من عمل جدران منفصلة سنستخدم هذا كتعبير مبسط لجسم الغرفة (جدار خارجي مع فتحات)
-  const mat = new THREE.MeshStandardMaterial({color: opts.color || 0xff6b3b, side: THREE.DoubleSide});
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.castShadow = true; mesh.receiveShadow = true;
-  return mesh; // لاحقاً سنضعها في المكان المناسب
-}
-
-/* اضافة سطح (سقف) لغرفة */
-function addCeiling(x,z,w,l,h){
-  const mat = new THREE.MeshStandardMaterial({color:0xf8f8f8});
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(w, l), mat);
-  ceiling.rotation.x = Math.PI/2; ceiling.position.set(x + w/2, h, z + l/2);
-  ceiling.receiveShadow = true;
-  currentGroup.add(ceiling);
-}
-
-/* اضافة تسمية CSS2D */
-function addLabel2D(x,y,z,title,sub){
+function addLabel(x,y,z,title,sub){
   const div = document.createElement('div');
-  div.className = 'label-2d';
-  div.innerHTML = `<strong>${title}</strong><br/><span style=\"font-size:11px\">${sub}</span>`;
+  div.className='label';
+  div.style.background='rgba(255,255,255,0.85)';
+  div.style.padding='2px 4px';
+  div.style.borderRadius='3px';
+  div.style.fontSize='14px';
+  div.style.color='#111';
+  div.innerHTML=`<b>${title}</b><br>${sub}`;
   const label = new THREE.CSS2DObject(div);
   label.position.set(x,y,z);
-  currentGroup.add(label);
+  scene.add(label);
 }
 
-/* توليد مخطط منظم بدون اعتمادية على Math.random */
 function generatePlan(L,W,rooms,baths,hasMajlis){
-  const margin = 0.6;
-  const availW = W - 2*margin;
-  const availL = L - 2*margin;
+  const margin=0.6;
+  const availW=W-2*margin, availL=L-2*margin;
+  const used=[]; 
+  function occupy(x,z,w,l){ used.push({x,z,w,l}); }
+  function overlaps(x,z,w,l){ for(const r of used){if(!(x+w<=r.x||x>=r.x+r.w||z+l<=r.z||z>=r.z+r.l)) return true;} return false;}
 
-  // نضع حدود خارجية
-  addOuterBorder(L,W);
-
-  // شبكة موزعة لطول الممر
-  const frontDepth = Math.min( Math.max(3.5, availL*0.18), 7 );
-  const corridorWidth = Math.min(2.2, Math.max(1.1, availW*0.12));
-  const corridorX = margin + (availW - corridorWidth)/2;
-  const corridorZ = margin + frontDepth + 0.4;
-  const corridorLen = availL - frontDepth - 0.8;
-
-  // منطقة مجلس أمامي
+  const frontDepth=Math.min(Math.max(3.5,availL*0.18),7);
+  const frontAreaZ=margin;
   if(hasMajlis){
-    const mw = Math.min(availW*0.45, 6);
-    const ml = frontDepth;
-    const mx = margin;
-    const mz = margin;
-    const rm = createRoomMesh(mw, ml, {openings:[{side:'south',offset:Math.max(0,mw*0.35),width:1.2,type:'door'}], color:0xf0e6d6});
-    rm.position.set(mx,0,mz);
-    rm.rotation.x = Math.PI; // Extrude axis adjust if needed
-    currentGroup.add(rm);
-    addCeiling(mx,mz,mw,ml,3);
-    addLabel2D(mx + mw/2, 3.2, mz + ml/2, 'MAJLES', `${mw.toFixed(2)} × ${ml.toFixed(2)} م`);
+    const mw=Math.min(availW*0.45,6);
+    const ml=frontDepth;
+    addRoom(margin,frontAreaZ,mw,ml,{label:'مجلس ضيوف',floorColor:0xf0e6d6});
+    occupy(margin,frontAreaZ,mw,ml);
   }
 
-  // صالة عائلية
-  const familyW = Math.min(availW*0.45, 6 + rooms*0.15);
-  const familyL = Math.min(availL*0.25 + 1.2, 7);
-  let familyX = corridorX + corridorWidth + 0.5;
-  let familyZ = corridorZ;
-  if(familyX + familyW > margin + availW) familyX = corridorX - 0.5 - familyW;
-  const familyMesh = createRoomMesh(familyW, familyL, {color:0xfffbef, openings:[{side:'south',offset:Math.max(0,familyW*0.4),width:1.2,type:'door'}]});
-  familyMesh.position.set(familyX,0,familyZ);
-  currentGroup.add(familyMesh);
-  addCeiling(familyX,familyZ,familyW,familyL,3);
-  addLabel2D(familyX + familyW/2, 3.2, familyZ + familyL/2, 'FAMILY HALL', `${familyW.toFixed(2)} × ${familyL.toFixed(2)} م`);
+  const corridorWidth=Math.min(2.2,Math.max(1.1,availW*0.12));
+  const corridorX=margin+(availW-corridorWidth)/2;
+  const corridorZ=margin+frontDepth+0.4;
+  const corridorLen=availL-frontDepth-0.8;
+  occupy(corridorX-0.2,corridorZ-0.2,corridorWidth+0.4,corridorLen+0.4);
 
-  // مطبخ ملاصق
-  const kitchenW = Math.min(4.2, Math.max(2.5, familyW*0.55));
-  const kitchenL = Math.min(3.6, 4);
-  let kx = familyX; let kz = familyZ + familyL + 0.5;
-  if(kz + kitchenL > margin + availL) kz = familyZ - kitchenL - 0.5;
-  const kmesh = createRoomMesh(kitchenW,kitchenL,{color:0xdff3ff, openings:[{side:'north',offset:0.4,width:1.0,type:'window'}]});
-  kmesh.position.set(kx,0,kz);
-  currentGroup.add(kmesh);
-  addCeiling(kx,kz,kitchenW,kitchenL,3);
-  addLabel2D(kx + kitchenW/2, 3.2, kz + kitchenL/2, 'KITCHEN', `${kitchenW.toFixed(2)} × ${kitchenL.toFixed(2)} م`);
+  const familyW=Math.min(availW*0.45,6+rooms*0.15);
+  const familyL=Math.min(availL*0.25+1.2,7);
+  let familyX=corridorX+corridorWidth+0.5;
+  let familyZ=corridorZ;
+  if(familyX+familyW>margin+availW) familyX=corridorX-0.5-familyW;
+  addRoom(familyX,familyZ,familyW,familyL,{label:'صالة عائلية',floorColor:0xfffbef});
+  occupy(familyX,familyZ,familyW,familyL);
 
-  // توزيع غرف النوم على جانبي الممر بطريقة شبكة
-  const roomW = 3.8, roomL = 3.8; let placedRooms = 0;
-  const rowSpacing = roomL + 0.6; const rows = Math.floor(corridorLen / rowSpacing);
-  const zStart = corridorZ + 0.1;
-  for(let r=0; r<rows && placedRooms < rooms; r++){
-    const zpos = zStart + r*rowSpacing;
-    const rx = corridorX + corridorWidth + 0.5;
-    if(rx + roomW <= margin + availW && placedRooms < rooms){
-      const rm = createRoomMesh(roomW,roomL,{color:0xf0f8ff, openings:[{side:'north',offset:0.8,width:1.0,type:'window'}]});
-      rm.position.set(rx,0,zpos); currentGroup.add(rm); addCeiling(rx,zpos,roomW,roomL,3); addLabel2D(rx + roomW/2,3.2,zpos + roomL/2,'BEDROOM',`${roomW}×${roomL}`);
-      placedRooms++;
-    }
-    const lx = corridorX - 0.5 - roomW;
-    if(lx >= margin && placedRooms < rooms){
-      const lm = createRoomMesh(roomW,roomL,{color:0xf0f8ff, openings:[{side:'south',offset:0.8,width:1.0,type:'window'}]});
-      lm.position.set(lx,0,zpos); currentGroup.add(lm); addCeiling(lx,zpos,roomW,roomL,3); addLabel2D(lx + roomW/2,3.2,zpos + roomL/2,'BEDROOM',`${roomW}×${roomL}`);
-      placedRooms++;
-    }
-  }
-  // لو بقي غرف نتوسع بجانب المطبخ
-  while(placedRooms < rooms){
-    const rx = familyX + familyW + 0.3; const rz = corridorZ + (placedRooms* (roomL+0.4));
-    if(rz + roomL <= margin + availL){ const m = createRoomMesh(roomW,roomL,{color:0xf0f8ff}); m.position.set(rx,0,rz); currentGroup.add(m); addCeiling(rx,rz,roomW,roomL,3); addLabel2D(rx+roomW/2,3.2,rz+roomL/2,'BEDROOM',`${roomW}×${roomL}`); placedRooms++; } else break;
+  const kitchenW=Math.min(4.2,Math.max(2.5,familyW*0.55));
+  const kitchenL=Math.min(3.6,4);
+  let kx=familyX, kz=familyZ+familyL+0.5;
+  if(kz+kitchenL>margin+availL) kz=familyZ-kitchenL-0.5;
+  if(kz<margin) kz=familyZ+familyL+0.5;
+  addRoom(kx,kz,kitchenW,kitchenL,{label:'مطبخ',floorColor:0xdff3ff});
+  occupy(kx,kz,kitchenW,kitchenL);
+
+  const roomW=3.8, roomL=3.8;
+  let placedRooms=0;
+  const rowSpacing=roomL+0.6;
+  const rows=Math.floor(corridorLen/rowSpacing);
+  let zStart=corridorZ+0.1;
+  for(let r=0;r<rows&&placedRooms<rooms;r++){
+    const zpos=zStart+r*rowSpacing;
+    const rx=corridorX+corridorWidth+0.5;
+    if(rx+roomW<=margin+availW&&!overlaps(rx,zpos,roomW,roomL)&&placedRooms<rooms){addRoom(rx,zpos,roomW,roomL,{label:'غرفة نوم',floorColor:0xf0f8ff});occupy(rx,zpos,roomW,roomL);placedRooms++;}
+    const lx=corridorX-0.5-roomW;
+    if(lx>=margin&&!overlaps(lx,zpos,roomW,roomL)&&placedRooms<rooms){addRoom(lx,zpos,roomW,roomL,{label:'غرفة نوم',floorColor:0xf0f8ff});occupy(lx,zpos,roomW,roomL);placedRooms++;}
   }
 
-  // توزيع الحمامات بجانب الممر
-  let placedBaths = 0; const bathW = 2.0, bathL = 2.0;
-  for(let r=0;r<rows && placedBaths < baths;r++){
-    const zpos = zStart + r*rowSpacing;
-    const bx = corridorX - bathW - 0.6;
-    if(bx >= margin){ const bm = createRoomMesh(bathW,bathL,{color:0xdff7ef}); bm.position.set(bx,0,zpos); currentGroup.add(bm); addCeiling(bx,zpos,bathW,bathL,3); addLabel2D(bx+bathW/2,3.2,zpos + bathL/2,'W.C',`${bathW}×${bathL}`); placedBaths++; }
-    if(placedBaths >= baths) break;
-    const bx2 = corridorX + corridorWidth + 0.6;
-    if(bx2 + bathW <= margin + availW){ const bm2 = createRoomMesh(bathW,bathL,{color:0xdff7ef}); bm2.position.set(bx2,0,zpos); currentGroup.add(bm2); addCeiling(bx2,zpos,bathW,bathL,3); addLabel2D(bx2+bathW/2,3.2,zpos + bathL/2,'W.C',`${bathW}×${bathL}`); placedBaths++; }
+  let placedBaths=0;
+  const bathW=2.0,bathL=2.0;
+  for(let r=0;r<rows&&placedBaths<baths;r++){
+    const zpos=zStart+r*rowSpacing;
+    const bx=corridorX-bathW-0.6;
+    if(bx>=margin&&!overlaps(bx,zpos,bathW,bathL)){addRoom(bx,zpos,bathW,bathL,{label:'حمام',floorColor:0xdff7ef});occupy(bx,zpos,bathW,bathL);placedBaths++;}
+    if(placedBaths>=baths) break;
+    const bx2=corridorX+corridorWidth+0.6;
+    if(bx2+bathW<=margin+availW&&!overlaps(bx2,zpos,bathW,bathL)&&placedBaths<baths){addRoom(bx2,zpos,bathW,bathL,{label:'حمام',floorColor:0xdff7ef});occupy(bx2,zpos,bathW,bathL);placedBaths++;}
   }
 
-  // لوحة معلومات بسيطة
-  measurementsDiv.innerHTML = `\n    <h3>معلومات المخطط</h3>\n    <p>أبعاد الأرض: ${L.toFixed(2)} × ${W.toFixed(2)} م</p>\n    <p>عدد غرف النوم المطلوب: ${rooms}</p>\n    <p>عدد الحمامات المطلوب: ${baths}</p>\n    <p>تحسينات مضافة: فتحات حقيقية (بشكل holes في الـ Shape)، سقف، إضاءة وظلال، نص CSS2D، وتوزيع شبكي للغرف.</p>\n  `;
-
-  // تحسين أداء: دمج بعض الgeometries البسيطة (الجدران/الأرضيات) — هنا مجرد مثال صغير
-  // (يمكن تطبيق BufferGeometryUtils.mergeBufferGeometries على مصفوفة من الـ geometries عند الحاجة)
+  measurementsDiv.innerHTML=`
+    <h3>معلومات المخطط</h3>
+    <p>أبعاد الأرض: ${L.toFixed(2)} × ${W.toFixed(2)} م</p>
+    <p>عدد غرف النوم المطلوب: ${rooms}</p>
+    <p>عدد الحمامات المطلوب: ${baths}</p>
+    <p>تم توليد التصميم بشكل تقريبي – للتحسينات أطلب التعديل.</p>
+  `;
 }
 
-// إنعاش الرسوم المتحركة
-let animHandle = null;
+let animHandle=null;
 function animate(){
   if(animHandle) cancelAnimationFrame(animHandle);
   function loop(){
-    animHandle = requestAnimationFrame(loop);
+    animHandle=requestAnimationFrame(loop);
     controls.update();
-    renderer.render(scene, camera);
-    labelRenderer.render(scene, camera);
+    renderer.render(scene,camera);
+    labelRenderer.render(scene,camera);
   }
   loop();
 }
 
-// إعادة ضبط عند تغيير حجم الصفحة
-window.addEventListener('resize', () => {
+window.addEventListener('resize',()=>{
   if(!renderer) return;
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  labelRenderer.setSize(container.clientWidth, container.clientHeight);
-  camera.aspect = container.clientWidth / container.clientHeight;
+  renderer.setSize(container.clientWidth,container.clientHeight);
+  labelRenderer.setSize(container.clientWidth,container.clientHeight);
+  camera.aspect=container.clientWidth/container.clientHeight;
   camera.updateProjectionMatrix();
 });
-
 </script>
 </body>
 </html>
