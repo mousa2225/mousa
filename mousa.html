@@ -52,8 +52,15 @@
       overflow: hidden;
     }
     table, th, td { border: 1px solid #cfd8dc; }
-    th { background:#0288d1; color:white; }
+    th { background:#0288d1; color:white; text-align:center; }
     th, td { padding: 10px; text-align: center; color:#333; }
+
+    /* العمود الأوسط (الأيام المستخدمة) */
+    td.days-col, th.days-col {
+      background-color: #e0f2f1;
+      font-weight: bold;
+      color: #004d40;
+    }
 
     .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
     .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
@@ -169,16 +176,16 @@ function calculate() {
     <table>
       <tr>
         <th>الوصف</th>
+        <th class="days-col">الأيام المستخدمة</th>
         <th>القيمة</th>
-        <th>الأيام المستخدمة</th>
       </tr>
-      <tr><td>الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td><td>${usedOld} يوم</td></tr>
-      <tr><td>الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td><td>${usedNew} يوم</td></tr>
-      <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)} ريال</td><td>${oldDays} يوم</td></tr>
-      <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)} ريال</td><td>${newDays} يوم</td></tr>
-      <tr><td>إجمالي المستحق</td><td>${total.toFixed(2)} ريال</td><td>-</td></tr>
-      <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td><td>-</td></tr>
-      <tr><td>${remainText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td><td>-</td></tr>
+      <tr><td>الباقة السابقة</td><td class="days-col">${usedOld} يوم</td><td>${costOld.toFixed(2)} ريال</td></tr>
+      <tr><td>الباقة الجديدة</td><td class="days-col">${usedNew} يوم</td><td>${costNew.toFixed(2)} ريال</td></tr>
+      <tr><td>سعر اليوم في الباقة السابقة</td><td class="days-col"></td><td>${oldRate.toFixed(2)} ريال</td></tr>
+      <tr><td>سعر اليوم في الباقة الجديدة</td><td class="days-col"></td><td>${newRate.toFixed(2)} ريال</td></tr>
+      <tr><td>إجمالي المستحق</td><td class="days-col"></td><td>${total.toFixed(2)} ريال</td></tr>
+      <tr><td>المبلغ المدفوع</td><td class="days-col"></td><td>${paid.toFixed(2)} ريال</td></tr>
+      <tr><td>${remainText}</td><td class="days-col"></td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
     </table>
     <div class="signature"><span class="line"></span>Accountant Mousa</div>
   `;
