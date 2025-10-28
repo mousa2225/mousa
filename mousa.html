@@ -78,7 +78,6 @@
       .results, .results * { visibility: visible; }
       .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: none; border: 2px solid #0288d1; }
       button { display:none; }
-      /* عرض معلومات العميل عند الطباعة فقط */
       .clientInfoPrint { display:block !important; }
     }
   </style>
@@ -152,7 +151,6 @@ function calculate() {
   const remainColor = remain<0?"#d32f2f":"#388e3c";
   const remainText = remain<0?"المتبقي على العميل":"المتبقي للعميل";
 
-  // معلومات العميل للطباعة فقط إذا كانت مكتوبة
   let clientHTML = "";
   if(cName || cNum){
     clientHTML = `<div class="clientInfoPrint">
@@ -161,7 +159,6 @@ function calculate() {
     </div>`;
   }
 
-  // شعار الشركة فوق الجدول
   let logoHTML = `<div style="text-align:center; margin-bottom:15px;">
                     <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة" style="max-width:200px;">
                   </div>`;
@@ -170,14 +167,18 @@ function calculate() {
     ${logoHTML}${clientHTML}
     <h3 style="text-align:center; color:#00796b; margin-top:10px;">ملخص تحويل الباقات</h3>
     <table>
-      <tr><th>الوصف</th><th>القيمة</th></tr>
-      <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)} ريال</td></tr>
-      <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)} ريال</td></tr>
-      <tr><td>المستحق من الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td></tr>
-      <tr><td>المستحق من الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td></tr>
-      <tr><td>إجمالي المستحق</td><td>${total.toFixed(2)} ريال</td></tr>
-      <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td></tr>
-      <tr><td>${remainText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
+      <tr>
+        <th>الوصف</th>
+        <th>القيمة</th>
+        <th>الأيام المستخدمة</th>
+      </tr>
+      <tr><td>الباقة السابقة</td><td>${costOld.toFixed(2)} ريال</td><td>${usedOld} يوم</td></tr>
+      <tr><td>الباقة الجديدة</td><td>${costNew.toFixed(2)} ريال</td><td>${usedNew} يوم</td></tr>
+      <tr><td>سعر اليوم في الباقة السابقة</td><td>${oldRate.toFixed(2)} ريال</td><td>${oldDays} يوم</td></tr>
+      <tr><td>سعر اليوم في الباقة الجديدة</td><td>${newRate.toFixed(2)} ريال</td><td>${newDays} يوم</td></tr>
+      <tr><td>إجمالي المستحق</td><td>${total.toFixed(2)} ريال</td><td>-</td></tr>
+      <tr><td>المبلغ المدفوع</td><td>${paid.toFixed(2)} ريال</td><td>-</td></tr>
+      <tr><td>${remainText}</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td><td>-</td></tr>
     </table>
     <div class="signature"><span class="line"></span>Accountant Mousa</div>
   `;
