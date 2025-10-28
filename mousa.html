@@ -1,134 +1,182 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حاسبة تحويل الباقات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Arial', sans-serif; background: #e0f7fa; padding: 30px; direction: rtl; }
-    .container { background: #fff; padding: 20px; border-radius: 16px; max-width: 700px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    h2 { text-align: center; margin-bottom: 20px; color: #00796b; }
-    label { display: block; margin-top: 10px; color:#37474f; font-weight:bold; }
-    input[type="number"], input[type="text"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #b0bec5; border-radius: 10px; transition: 0.3s; }
-    input:focus { border-color: #00796b; box-shadow: 0 0 5px rgba(0,121,107,0.5); outline: none; }
-
-    button { padding: 12px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; color: white; }
-    button:hover { opacity:0.9; }
-    #calculateBtn { background:#0288d1; width:48%; }
-    #resetBtn { background:#ffb300; width:48%; }
-
-    #printBtn {
-      background: #009688;
-      width: 100%;
-      font-size: 20px;
-      margin-top: 20px;
-      padding: 18px;
-      border-radius: 12px;
-      display: none;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      cursor: pointer;
-      color: #fff;
-      transition: 0.3s;
-    }
-    #printBtn:hover { background: #00796b; }
-
-    .results { 
-      margin-top: 20px; 
-      background: #ffffff; 
-      padding: 20px; 
-      border-radius: 16px; 
-      border: 2px solid #0288d1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 10px; 
-      background: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    table, th, td { border: 1px solid #cfd8dc; }
-    th { background:#0288d1; color:white; text-align:center; }
-    th, td { padding: 10px; text-align: center; color:#333; }
-
-    /* العمود الأوسط (الأيام المستخدمة) */
-    td.days-col, th.days-col {
-      background-color: #e0f2f1;
-      font-weight: bold;
-      color: #004d40;
-    }
-
-    .signature { margin-top: 40px; text-align: left; font-family: 'Rakkas', 'Arial', cursive; font-size: 20px; color: #00796b; }
-    .signature .line { border-bottom: 2px solid #00796b; display: block; width: 300px; height: 20px; margin-bottom: 6px; }
-
-    .clientInfoSection {
-      background:#e0f2f1;
-      padding:15px;
-      border-radius:10px;
-      margin-bottom:20px;
-    }
-    .clientInfoSection h3 {
-      color:#00796b;
-      margin-bottom:10px;
-      text-align:center;
-    }
-
-    .clientInfoPrint { display: none; text-align: center; margin-bottom: 15px; }
-    .clientInfoPrint h3 { margin: 5px 0; color: #000; }
-
-    @media print {
-      body * { visibility: hidden; }
-      .results, .results * { visibility: visible; }
-      .results { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); background: #fff; padding: 30px; border-radius: 16px; box-shadow: none; border: 2px solid #0288d1; }
-      button { display:none; }
-      .clientInfoPrint { display:block !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة تحويل الباقات</title>
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  background: #e0f7fa;
+  padding: 30px;
+  direction: rtl;
+}
+.container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 700px;
+  margin: auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00796b;
+}
+label {
+  display: block;
+  margin-top: 10px;
+  color:#37474f;
+  font-weight:bold;
+}
+input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+input:focus {
+  border-color: #00796b;
+  box-shadow: 0 0 5px rgba(0,121,107,0.5);
+  outline: none;
+}
+button {
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  color: white;
+}
+button:hover { opacity:0.9; }
+#calculateBtn { background:#0288d1; width:48%; }
+#resetBtn { background:#ffb300; width:48%; }
+#printBtn {
+  background: #009688;
+  width: 100%;
+  font-size: 20px;
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  display: none;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+  color: #fff;
+  transition: 0.3s;
+}
+#printBtn:hover { background: #00796b; }
+.results {
+  margin-top: 20px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  border: 2px solid #0288d1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+table, th, td {
+  border: 1px solid #cfd8dc;
+}
+th {
+  background:#0288d1;
+  color:white;
+}
+th, td {
+  padding: 10px;
+  text-align: center;
+  color:#333;
+}
+th:nth-child(2) {
+  width: 80px;
+  background: #039be5;
+}
+.signature {
+  margin-top: 40px;
+  text-align: left;
+  font-family: 'Rakkas', 'Arial', cursive;
+  font-size: 20px;
+  color: #00796b;
+}
+.signature .line {
+  border-bottom: 2px solid #00796b;
+  display: block;
+  width: 300px;
+  height: 20px;
+  margin-bottom: 6px;
+}
+.clientInfoSection {
+  background:#e0f2f1;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+.clientInfoSection h3 {
+  color:#00796b;
+  margin-bottom:10px;
+  text-align:center;
+}
+.clientInfoPrint {
+  display: none;
+  text-align: center;
+  margin-bottom: 15px;
+}
+.clientInfoPrint h3 {
+  margin: 5px 0;
+  color: #000;
+}
+@media print {
+  body * { visibility: hidden; }
+  .results, .results * { visibility: visible; }
+  .results {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: calc(100% - 40px);
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: none;
+    border: 2px solid #0288d1;
+  }
+  button { display:none; }
+  .clientInfoPrint { display:block !important; }
+}
+</style>
 </head>
 <body>
 <div class="container">
   <h2>حاسبة تحويل الباقات</h2>
-
   <div class="clientInfoSection">
     <h3>معلومات العميل (اختياري)</h3>
-    <label>اسم العميل:
-      <input type="text" id="clientName" placeholder="مثال: أحمد محمد">
-    </label>
-    <label>رقم العميل:
-      <input type="number" id="clientNumber" placeholder="مثال: 0551234567">
-    </label>
+    <label>اسم العميل: <input type="text" id="clientName" placeholder="مثال: أحمد محمد"></label>
+    <label>رقم العميل: <input type="number" id="clientNumber" placeholder="مثال: 0551234567"></label>
   </div>
-
-  <label>سعر الباقة السابقة:
-    <input type="number" id="oldPrice" placeholder="مثال:795" min="0">
-  </label>
-  <label>عدد أيام الباقة السابقة:
-    <input type="number" id="oldDays" placeholder="مثال:20" min="1">
-  </label>
-  <label>سعر الباقة الجديدة:
-    <input type="number" id="newPrice" placeholder="مثال:1225" min="0">
-  </label>
-  <label>عدد أيام الباقة الجديدة:
-    <input type="number" id="newDays" placeholder="مثال:24" min="1">
-  </label>
-  <label>الأيام المستخدمة من الباقة السابقة:
-    <input type="number" id="usedOld" placeholder="مثال:5" min="0">
-  </label>
-  <label>الأيام التي بايستخدمها من الباقة الجديدة:
-    <input type="number" id="usedNew" placeholder="مثال:19" min="0">
-  </label>
-
+  <label>سعر الباقة السابقة: <input type="number" id="oldPrice" placeholder="مثال:795" min="0"></label>
+  <label>عدد أيام الباقة السابقة: <input type="number" id="oldDays" placeholder="مثال:20" min="1"></label>
+  <label>سعر الباقة الجديدة: <input type="number" id="newPrice" placeholder="مثال:1225" min="0"></label>
+  <label>عدد أيام الباقة الجديدة: <input type="number" id="newDays" placeholder="مثال:24" min="1"></label>
+  <label>الأيام المستخدمة من الباقة السابقة: <input type="number" id="usedOld" placeholder="مثال:5" min="0"></label>
+  <label>الأيام التي بايستخدمها من الباقة الجديدة: <input type="number" id="usedNew" placeholder="مثال:19" min="0"></label>
+  
   <div style="display:flex; justify-content:space-between; margin-top:10px;">
     <button id="calculateBtn" onclick="calculate()">احسب</button>
     <button id="resetBtn" onclick="resetFields()">إعادة التعيين</button>
   </div>
 
   <div class="results" id="results"></div>
-
   <button id="printBtn" onclick="window.print()">🖨️ طباعة الملخص</button>
 </div>
 
@@ -160,35 +208,36 @@ function calculate() {
 
   let clientHTML = "";
   if(cName || cNum){
-    clientHTML = `<div class="clientInfoPrint">
+    clientHTML = `
+    <div class="clientInfoPrint">
       ${cName ? `<h3>اسم العميل: ${cName}</h3>` : ""}
       ${cNum ? `<h3>رقم العميل: ${cNum}</h3>` : ""}
     </div>`;
   }
 
-  let logoHTML = `<div style="text-align:center; margin-bottom:15px;">
-                    <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة" style="max-width:200px;">
-                  </div>`;
+  let logoHTML = `
+  <div style="text-align:center; margin-bottom:15px;">
+    <img src="https://i.postimg.cc/0rR6MfD3/image.png" alt="شعار الشركة" style="max-width:200px;">
+  </div>`;
 
   document.getElementById('results').innerHTML = `
-    ${logoHTML}${clientHTML}
-    <h3 style="text-align:center; color:#00796b; margin-top:10px;">ملخص تحويل الباقات</h3>
-    <table>
-      <tr>
-        <th>الوصف</th>
-        <th class="days-col">الأيام المستخدمة</th>
-        <th>القيمة</th>
-      </tr>
-      <tr><td>الباقة السابقة</td><td class="days-col">${usedOld} يوم</td><td>${costOld.toFixed(2)} ريال</td></tr>
-      <tr><td>الباقة الجديدة</td><td class="days-col">${usedNew} يوم</td><td>${costNew.toFixed(2)} ريال</td></tr>
-      <tr><td>سعر اليوم في الباقة السابقة</td><td class="days-col"></td><td>${oldRate.toFixed(2)} ريال</td></tr>
-      <tr><td>سعر اليوم في الباقة الجديدة</td><td class="days-col"></td><td>${newRate.toFixed(2)} ريال</td></tr>
-      <tr><td>إجمالي المستحق</td><td class="days-col"></td><td>${total.toFixed(2)} ريال</td></tr>
-      <tr><td>المبلغ المدفوع</td><td class="days-col"></td><td>${paid.toFixed(2)} ريال</td></tr>
-      <tr><td>${remainText}</td><td class="days-col"></td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
-    </table>
-    <div class="signature"><span class="line"></span>Accountant Mousa</div>
-  `;
+  ${logoHTML}${clientHTML}
+  <h3 style="text-align:center; color:#00796b; margin-top:10px;">ملخص تحويل الباقات</h3>
+  <table>
+    <tr>
+      <th>الوصف</th>
+      <th>الأيام</th>
+      <th>القيمة</th>
+    </tr>
+    <tr><td>سعر اليوم في الباقة السابقة</td><td>-</td><td>${oldRate.toFixed(2)} ريال</td></tr>
+    <tr><td>سعر اليوم في الباقة الجديدة</td><td>-</td><td>${newRate.toFixed(2)} ريال</td></tr>
+    <tr><td>المستحق من الباقة السابقة</td><td>${usedOld}</td><td>${costOld.toFixed(2)} ريال</td></tr>
+    <tr><td>المستحق من الباقة الجديدة</td><td>${usedNew}</td><td>${costNew.toFixed(2)} ريال</td></tr>
+    <tr><td>إجمالي المستحق</td><td>-</td><td>${total.toFixed(2)} ريال</td></tr>
+    <tr><td>المبلغ المدفوع</td><td>-</td><td>${paid.toFixed(2)} ريال</td></tr>
+    <tr><td>${remainText}</td><td>-</td><td style="color:${remainColor}; font-weight:bold;">${Math.abs(remain).toFixed(2)} ريال</td></tr>
+  </table>
+  <div class="signature"><span class="line"></span>Accountant Mousa</div>`;
 
   document.getElementById('printBtn').style.display = 'block';
 }
