@@ -17,10 +17,6 @@ button { background: #1e88e5; border: none; color: white; padding: 10px 18px; bo
 button:hover { background: #1565c0; }
 .add-btn { background: #43a047; }
 .add-btn:hover { background: #2e7d32; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; }
-th, td { border: 1px solid #bbdefb; padding: 12px; text-align: center; }
-th { background-color: #4CAF50; color: white; font-weight:bold; font-size:18px; }
-td { background: #f9fcff; }
 </style>
 </head>
 <body>
@@ -50,24 +46,15 @@ function addClient() {
   <div class="client-section" id="client-${id}">
     <button class="remove-btn" onclick="removeClient(${id})">×</button>
     <h3>👤 بيانات العميل</h3>
-    <label>اسم العميل:</label>
-    <input type="text" id="name-${id}" placeholder="مثال: أحمد محمد">
-    <label>رقم العميل:</label>
-    <input type="text" id="id-${id}" placeholder="مثال: 123456">
-    <label>قيمة الباقة المشترك عليها (ريال):</label>
-    <input type="number" id="price-${id}" placeholder="مثال: 1295">
-    <label>عدد أيام الباقة:</label>
-    <input type="number" id="days-${id}" placeholder="مثال: 24">
-    <label>عدد الأيام المستفاد بها:</label>
-    <input type="number" id="used-${id}" placeholder="مثال: 19">
-    <label>اسم البنك:</label>
-    <input type="text" id="bank-${id}" placeholder="مثال: Alinma">
-    <label>رقم الحساب البنكي:</label>
-    <input type="text" id="account-${id}" placeholder="مثال: 1234567890">
-    <label>نوع الاشتراك:</label>
-    <input type="text" id="subscription-${id}" placeholder="مثال: شهرية">
-    <label>الملاحظات:</label>
-    <input type="text" id="notes-${id}" placeholder="مثال: بدون ملاحظات">
+    <label>اسم العميل:</label><input type="text" id="name-${id}">
+    <label>رقم العميل:</label><input type="text" id="id-${id}">
+    <label>قيمة الباقة المشترك عليها (ريال):</label><input type="number" id="price-${id}">
+    <label>عدد أيام الباقة:</label><input type="number" id="days-${id}">
+    <label>عدد الأيام المستفاد بها:</label><input type="number" id="used-${id}">
+    <label>اسم البنك:</label><input type="text" id="bank-${id}">
+    <label>رقم الحساب البنكي:</label><input type="text" id="account-${id}">
+    <label>نوع الاشتراك:</label><input type="text" id="subscription-${id}">
+    <label>الملاحظات:</label><input type="text" id="notes-${id}">
   </div>`;
   document.getElementById("clientsContainer").insertAdjacentHTML("beforeend", clientHTML);
 }
@@ -81,10 +68,17 @@ function removeClient(id) {
 function calculateAll() {
   if (clientsData.length === 0) { alert("الرجاء إضافة عميل واحد على الأقل."); return; }
 
-  let tableHTML = `<table id="resultTable"><thead>
-  <tr>
-  <th>اسم العميل</th><th>رقم العميل</th><th>قيمة الباقة المشترك عليها</th><th>عدد الأيام المستفاد بها</th>
-  <th>اسم البنك</th><th>رقم الحساب البنكي</th><th>نوع الاشتراك</th><th>المبلغ المسترد</th><th>الملاحظات</th>
+  let tableHTML = `<table id="resultTable" style="border-collapse:collapse; width:100%; table-layout:fixed;"><thead>
+  <tr style="background-color:#4CAF50; color:white; font-weight:bold; font-size:18px;">
+  <th style="width:120px;">اسم العميل</th>
+  <th style="width:100px;">رقم العميل</th>
+  <th style="width:130px;">قيمة الباقة المشترك عليها</th>
+  <th style="width:120px;">عدد الأيام المستفاد بها</th>
+  <th style="width:120px;">اسم البنك</th>
+  <th style="width:130px;">رقم الحساب البنكي</th>
+  <th style="width:120px;">نوع الاشتراك</th>
+  <th style="width:120px;">المبلغ المسترد</th>
+  <th style="width:150px;">الملاحظات</th>
   </tr></thead><tbody>`;
 
   clientsData.forEach((id,index)=>{
@@ -102,12 +96,10 @@ function calculateAll() {
     const remaining = Math.max(days-used,0);
     const refund = (price/days)*remaining;
     const bg = index%2===0?'#f9fcff':'#e8f0fe';
-
     tableHTML+=`<tr style="background-color:${bg}; font-weight:bold; font-size:16px;">
-    <td>${name}</td><td>${cid}</td><td>${price.toFixed(2)}</td><td>${used}</td>
+    <td>${name}</td><td>${cid}</td><td>${price.toFixed(2)}(${days})</td><td>${used}</td>
     <td>${bank}</td><td>${account}</td><td>${subscription}</td>
-    <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)}</td>
-    <td>${notes}</td></tr>`;
+    <td>${refund.toFixed(2)}</td><td>${notes}</td></tr>`;
   });
 
   tableHTML+=`<tr><td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px; font-size:16px;">Accountant Mousa</td></tr>`;
@@ -135,10 +127,17 @@ function exportExcel(){
   const month=monthNames[yesterday.getMonth()];
   const fileName=`ملف الاسترداد اليومي ${day} ${month}.xls`;
 
-  let excelHtml=`<table border="1" style="border-collapse:collapse; font-family:Arial; font-size:16px;">
+  let excelHtml=`<table border="1" style="border-collapse:collapse; font-family:Arial; font-size:16px; table-layout:fixed;">
   <tr style="background-color:#4CAF50; color:white; font-weight:bold; font-size:18px;">
-  <th>اسم العميل</th><th>رقم العميل</th><th>قيمة الباقة المشترك عليها</th><th>عدد الأيام المستفاد بها</th>
-  <th>اسم البنك</th><th>رقم الحساب البنكي</th><th>نوع الاشتراك</th><th>المبلغ المسترد</th><th>الملاحظات</th>
+  <th style="width:120px;">اسم العميل</th>
+  <th style="width:100px;">رقم العميل</th>
+  <th style="width:130px;">قيمة الباقة المشترك عليها</th>
+  <th style="width:120px;">عدد الأيام المستفاد بها</th>
+  <th style="width:120px;">اسم البنك</th>
+  <th style="width:130px;">رقم الحساب البنكي</th>
+  <th style="width:120px;">نوع الاشتراك</th>
+  <th style="width:120px;">المبلغ المسترد</th>
+  <th style="width:150px;">الملاحظات</th>
   </tr>`;
 
   clientsData.forEach((id,index)=>{
