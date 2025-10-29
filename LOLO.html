@@ -100,7 +100,7 @@
 
   <button class="add-btn" onclick="addClient()">➕ إضافة عميل</button>
   <button onclick="calculateAll()">💰 احسب لجميع العملاء</button>
-  <button onclick="copyRows()">📋 نسخ النتائج</button>
+  <button onclick="copyRows()">📋 نسخ النتائج (ثلاث خانات فقط)</button>
   <button onclick="exportExcel()">📥 تصدير إلى Excel</button>
 
   <div class="result-section" id="results"></div>
@@ -185,10 +185,9 @@ function calculateAll() {
     </tr>`;
   });
 
-  // توقيع أسفل الجدول يمين
   tableHTML += `
     <tr>
-      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#ff5722; padding:15px;">
+      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px;">
         Accountant Mousa
       </td>
     </tr>`;
@@ -203,8 +202,8 @@ function copyRows() {
   let rowsText = "";
   for (let i = 1; i < table.rows.length - 1; i++) {
     const cells = table.rows[i].cells;
-    for (let j = 0; j < cells.length; j++) { rowsText += cells[j].innerText + (j < cells.length - 1 ? "\t" : ""); }
-    rowsText += "\n";
+    // نسخ فقط 3 خانات: قيمة الباقة، الأيام المستفاد بها، المبلغ المسترد
+    rowsText += cells[2].innerText + "\t" + cells[3].innerText + "\t" + cells[7].innerText + "\n";
   }
   navigator.clipboard.writeText(rowsText).then(() => alert("تم نسخ البيانات!")).catch(() => alert("حدث خطأ أثناء النسخ."));
 }
@@ -223,7 +222,43 @@ function exportExcel() {
 
   const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
 
-  let html = `<table border='1' style='border-collapse:collapse; font-family:Arial; font-size:12px; width:160%;'>` + table.innerHTML + `</table>`;
+  // جدول Excel منسق وجميل
+  let html = `
+  <table border='1' style='border-collapse:collapse; font-family:Arial; font-size:11px; width:120%;'>
+    <thead>
+      <tr style='background-color:#4CAF50; color:white; font-weight:bold;'>
+        <th>اسم العميل</th>
+        <th>رقم العميل</th>
+        <th>قيمة الباقة المشترك عليها</th>
+        <th>عدد الأيام المستفاد بها</th>
+        <th>اسم البنك</th>
+        <th>رقم الحساب البنكي</th>
+        <th>نوع الاشتراك</th>
+        <th>المبلغ المسترد</th>
+        <th>الملاحظات</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  for (let i = 1; i < table.rows.length - 1; i++) {
+    const row = table.rows[i];
+    html += `<tr style='font-weight:bold; font-size:11px;'>`;
+    for (let j = 0; j < row.cells.length; j++) {
+      html += `<td>${row.cells[j].innerText}</td>`;
+    }
+    html += `</tr>`;
+  }
+
+  // توقيع
+  html += `
+    <tr>
+      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:10px;">
+        Accountant Mousa
+      </td>
+    </tr>`;
+
+  html += `</tbody></table>`;
+
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
