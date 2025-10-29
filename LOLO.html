@@ -20,7 +20,7 @@
     background: #fff;
     padding: 20px;
     border-radius: 14px;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
   }
@@ -79,16 +79,15 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    font-size: 16px;
   }
   th, td {
     border: 1px solid #bbdefb;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
-    font-size: 14px;
   }
-  th { background-color: #4CAF50; color: white; font-weight:bold; }
+  th { background-color: #4CAF50; color: white; font-weight:bold; font-size:18px; }
   td { background: #f9fcff; }
-  tr:nth-child(even) td { background: #e8f0fe; }
 </style>
 </head>
 <body>
@@ -162,7 +161,7 @@ function calculateAll() {
     </thead>
     <tbody>`;
 
-  clients.forEach((client) => {
+  clients.forEach((client, index) => {
     const name = client.querySelector('input[id^="name-"]').value || "";
     const id = client.querySelector('input[id^="id-"]').value || "";
     const price = parseFloat(client.querySelector('input[id^="price-"]')?.value) || 0;
@@ -174,8 +173,10 @@ function calculateAll() {
 
     const refund = price - ((price / 30) * used);
 
+    const bgColor = index % 2 === 0 ? '#f9fcff' : '#e8f0fe';
+
     tableHTML += `
-    <tr>
+    <tr style="background-color:${bgColor}; font-weight:bold; font-size:16px;">
       <td>${name}</td>
       <td>${id}</td>
       <td>${price.toFixed(2)}</td>
@@ -190,7 +191,7 @@ function calculateAll() {
 
   tableHTML += `
     <tr>
-      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px;">
+      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px; font-size:16px;">
         Accountant Mousa
       </td>
     </tr>`;
@@ -205,68 +206,4 @@ function copyRows() {
   let rowsText = "";
   for (let i = 1; i < table.rows.length - 1; i++) {
     const cells = table.rows[i].cells;
-    rowsText += cells[2].innerText + "\t" + cells[3].innerText + "\t" + cells[7].innerText + "\n";
-  }
-  navigator.clipboard.writeText(rowsText).then(() => alert("تم نسخ البيانات!")).catch(() => alert("حدث خطأ أثناء النسخ."));
-}
-
-function exportExcel() {
-  const table = document.getElementById("resultTable");
-  if (!table) return alert("لا توجد بيانات للتصدير!");
-
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const day = yesterday.getDate();
-  const monthNames = ["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
-  const month = monthNames[yesterday.getMonth()];
-  const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
-
-  let html = `
-  <table border='1' style='border-collapse:collapse; font-family:Arial; font-size:14px; width:140%;'>
-    <thead>
-      <tr style='background-color:#4CAF50; color:white; font-weight:bold; font-size:15px;'>
-        <th>اسم العميل</th>
-        <th>رقم العميل</th>
-        <th>قيمة الباقة المشترك عليها</th>
-        <th>عدد الأيام المستفاد بها</th>
-        <th>اسم البنك</th>
-        <th>رقم الحساب البنكي</th>
-        <th>نوع الاشتراك</th>
-        <th>المبلغ المسترد</th>
-        <th>الملاحظات</th>
-      </tr>
-    </thead>
-    <tbody>`;
-
-  for (let i = 1; i < table.rows.length - 1; i++) {
-    const row = table.rows[i];
-    html += `<tr style='font-weight:bold; font-size:14px;'>`;
-    for (let j = 0; j < row.cells.length; j++) {
-      html += `<td>${row.cells[j].innerText}</td>`;
-    }
-    html += `</tr>`;
-  }
-
-  html += `
-    <tr>
-      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px; font-size:14px;">
-        Accountant Mousa
-      </td>
-    </tr>`;
-
-  html += `</tbody></table>`;
-
-  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-</script>
-
-</body>
-</html>
+    rowsText += cells[2].innerText + "\t" + cells[3].innerText +
