@@ -153,18 +153,15 @@ function calculateAll() {
   let tableHTML = `
   <table id="resultTable">
     <tr>
-      <th>اسم العميل</th>
       <th>المبلغ المسترد</th>
       <th>عدد الأيام المستفاد منها</th>
       <th>قيمة الباقة</th>
     </tr>`;
 
-  clients.forEach((client, index) => {
-    const id = index + 1;
-    const name = document.getElementById(`name-${id}`)?.value || "غير محدد";
-    const price = parseFloat(document.getElementById(`price-${id}`)?.value) || 0;
-    const totalDays = parseFloat(document.getElementById(`days-${id}`)?.value) || 0;
-    const used = parseFloat(document.getElementById(`used-${id}`)?.value) || 0;
+  clients.forEach((client) => {
+    const price = parseFloat(client.querySelector('input[id^="price-"]')?.value) || 0;
+    const totalDays = parseFloat(client.querySelector('input[id^="days-"]')?.value) || 0;
+    const used = parseFloat(client.querySelector('input[id^="used-"]')?.value) || 0;
 
     const remaining = totalDays - used;
     const dailyRate = totalDays > 0 ? price / totalDays : 0;
@@ -172,7 +169,6 @@ function calculateAll() {
 
     tableHTML += `
     <tr>
-      <td>${name}</td>
       <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)}</td>
       <td>${used}</td>
       <td>${price.toFixed(2)}</td>
