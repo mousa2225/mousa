@@ -120,6 +120,8 @@ function addClient() {
     <input type="text" id="id-${clientCount}" placeholder="مثال: 123456">
     <label>قيمة الباقة المشترك عليها (ريال):</label>
     <input type="number" id="price-${clientCount}" placeholder="مثال: 1295">
+    <label>عدد أيام الباقة:</label>
+    <input type="number" id="days-${clientCount}" placeholder="مثال: 24">
     <label>عدد الأيام المستفاد بها:</label>
     <input type="number" id="used-${clientCount}" placeholder="مثال: 19">
     <label>اسم البنك:</label>
@@ -165,13 +167,15 @@ function calculateAll() {
     const name = client.querySelector('input[id^="name-"]').value || "";
     const id = client.querySelector('input[id^="id-"]').value || "";
     const price = parseFloat(client.querySelector('input[id^="price-"]')?.value) || 0;
+    const days = parseFloat(client.querySelector('input[id^="days-"]')?.value) || 1;
     const used = parseFloat(client.querySelector('input[id^="used-"]')?.value) || 0;
     const bank = client.querySelector('input[id^="bank-"]').value || "";
     const account = client.querySelector('input[id^="account-"]').value || "";
     const subscription = client.querySelector('input[id^="subscription-"]').value || "";
     const notes = client.querySelector('input[id^="notes-"]').value || "";
 
-    const refund = price - ((price / 30) * used);
+    const remaining = Math.max(days - used, 0);
+    const refund = (price / days) * remaining;
 
     const bgColor = index % 2 === 0 ? '#f9fcff' : '#e8f0fe';
 
@@ -206,4 +210,22 @@ function copyRows() {
   let rowsText = "";
   for (let i = 1; i < table.rows.length - 1; i++) {
     const cells = table.rows[i].cells;
-    rowsText += cells[2].innerText + "\t" + cells[3].innerText +
+    rowsText += cells[2].innerText + "\t" + cells[3].innerText + "\t" + cells[7].innerText + "\n";
+  }
+  navigator.clipboard.writeText(rowsText).then(() => alert("تم نسخ البيانات!")).catch(() => alert("حدث خطأ أثناء النسخ."));
+}
+
+function exportExcel() {
+  const table = document.getElementById("resultTable");
+  if (!table) return alert("لا توجد بيانات للتصدير!");
+
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const day = yesterday.getDate();
+  const monthNames = ["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
+  const month = monthNames[yesterday.getMonth()];
+  const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
+
+  let html = `
+  <table border='1' style='border-collapse:collapse; font-family:Arial; font-size:16px;
