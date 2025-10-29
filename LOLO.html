@@ -20,7 +20,7 @@
     background: #fff;
     padding: 20px;
     border-radius: 14px;
-    max-width: 900px;
+    max-width: 1000px;
     margin: auto;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
   }
@@ -73,9 +73,7 @@
     margin: 5px 5px 10px 0;
   }
   button:hover { background: #1565c0; }
-  .add-btn {
-    background: #43a047;
-  }
+  .add-btn { background: #43a047; }
   .add-btn:hover { background: #2e7d32; }
   table {
     width: 100%;
@@ -88,21 +86,9 @@
     text-align: center;
     font-size: 14px;
   }
-  th {
-    background-color: #1e88e5;
-    color: white;
-  }
-  td {
-    background: #f9fcff;
-  }
+  th { background-color: #1e88e5; color: white; }
+  td { background: #f9fcff; }
   tr:nth-child(even) td { background: #e8f0fe; }
-  .signature {
-    margin-top: 20px;
-    text-align: left;
-    font-weight: bold;
-    font-size: 18px;
-    color: #ff5722;
-  }
 </style>
 </head>
 <body>
@@ -118,7 +104,6 @@
   <button onclick="exportExcel()">📥 تصدير إلى Excel</button>
 
   <div class="result-section" id="results"></div>
-  <div class="signature" id="signature">Mousa</div>
 </div>
 
 <script>
@@ -132,25 +117,18 @@ function addClient() {
     <h3>👤 بيانات العميل ${clientCount}</h3>
     <label>اسم العميل:</label>
     <input type="text" id="name-${clientCount}" placeholder="مثال: أحمد محمد">
-
     <label>رقم العميل:</label>
     <input type="text" id="id-${clientCount}" placeholder="مثال: 123456">
-
     <label>قيمة الباقة المشترك عليها (ريال):</label>
     <input type="number" id="price-${clientCount}" placeholder="مثال: 1295">
-
     <label>عدد الأيام المستفاد بها:</label>
     <input type="number" id="used-${clientCount}" placeholder="مثال: 19">
-
     <label>اسم البنك:</label>
     <input type="text" id="bank-${clientCount}" placeholder="مثال: Alinma">
-
     <label>رقم الحساب البنكي:</label>
     <input type="text" id="account-${clientCount}" placeholder="مثال: 1234567890">
-
     <label>نوع الاشتراك:</label>
     <input type="text" id="subscription-${clientCount}" placeholder="مثال: شهرية">
-
     <label>الملاحظات:</label>
     <input type="text" id="notes-${clientCount}" placeholder="مثال: بدون ملاحظات">
   </div>`;
@@ -165,10 +143,7 @@ function removeClient(id) {
 function calculateAll() {
   const container = document.getElementById("clientsContainer");
   const clients = container.querySelectorAll(".client-section");
-  if (clients.length === 0) {
-    alert("الرجاء إضافة عميل واحد على الأقل.");
-    return;
-  }
+  if (clients.length === 0) { alert("الرجاء إضافة عميل واحد على الأقل."); return; }
 
   let tableHTML = `
   <table id="resultTable">
@@ -194,7 +169,7 @@ function calculateAll() {
     const subscription = client.querySelector('input[id^="subscription-"]').value || "";
     const notes = client.querySelector('input[id^="notes-"]').value || "";
 
-    const refund = price - ((price / 30) * used); // مثال احتساب المبلغ المسترد
+    const refund = price - ((price / 30) * used);
 
     tableHTML += `
     <tr>
@@ -210,42 +185,50 @@ function calculateAll() {
     </tr>`;
   });
 
+  // توقيع أسفل الجدول يمين
+  tableHTML += `
+    <tr>
+      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#ff5722; padding:15px;">
+        Accountant Mousa
+      </td>
+    </tr>`;
+
   tableHTML += `</table>`;
   document.getElementById("results").innerHTML = tableHTML;
 }
 
-// نسخ البيانات
 function copyRows() {
   const table = document.getElementById("resultTable");
   if (!table) return alert("لا توجد نتائج للنسخ!");
-
   let rowsText = "";
-  for (let i = 1; i < table.rows.length; i++) { // نتجاوز العنوان
+  for (let i = 1; i < table.rows.length - 1; i++) {
     const cells = table.rows[i].cells;
-    for (let j = 0; j < cells.length; j++) {
-      rowsText += cells[j].innerText + (j < cells.length - 1 ? "\t" : "");
-    }
+    for (let j = 0; j < cells.length; j++) { rowsText += cells[j].innerText + (j < cells.length - 1 ? "\t" : ""); }
     rowsText += "\n";
   }
-
-  navigator.clipboard.writeText(rowsText)
-    .then(() => alert("تم نسخ البيانات! يمكنك لصقها في Excel."))
-    .catch(() => alert("حدث خطأ أثناء النسخ."));
+  navigator.clipboard.writeText(rowsText).then(() => alert("تم نسخ البيانات!")).catch(() => alert("حدث خطأ أثناء النسخ."));
 }
 
-// تصدير Excel
 function exportExcel() {
   const table = document.getElementById("resultTable");
   if (!table) return alert("لا توجد بيانات للتصدير!");
 
-  let html = `<table border='1' style='border-collapse:collapse; font-family:Arial; font-size:12px;'>` + table.innerHTML + `</table>`;
-  html += `<p style='font-weight:bold; color:#ff5722;'>Mousa</p>`;
+  // اليوم السابق
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const day = yesterday.getDate();
+  const monthNames = ["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
+  const month = monthNames[yesterday.getMonth()];
 
+  const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
+
+  let html = `<table border='1' style='border-collapse:collapse; font-family:Arial; font-size:12px; width:160%;'>` + table.innerHTML + `</table>`;
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "financial_report.xls";
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
