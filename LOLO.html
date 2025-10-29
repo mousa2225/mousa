@@ -86,7 +86,7 @@
     text-align: center;
     font-size: 14px;
   }
-  th { background-color: #1e88e5; color: white; }
+  th { background-color: #4CAF50; color: white; font-weight:bold; }
   td { background: #f9fcff; }
   tr:nth-child(even) td { background: #e8f0fe; }
 </style>
@@ -147,17 +147,20 @@ function calculateAll() {
 
   let tableHTML = `
   <table id="resultTable">
-    <tr>
-      <th>اسم العميل</th>
-      <th>رقم العميل</th>
-      <th>قيمة الباقة المشترك عليها</th>
-      <th>عدد الأيام المستفاد بها</th>
-      <th>اسم البنك</th>
-      <th>رقم الحساب البنكي</th>
-      <th>نوع الاشتراك</th>
-      <th>المبلغ المسترد</th>
-      <th>الملاحظات</th>
-    </tr>`;
+    <thead>
+      <tr>
+        <th>اسم العميل</th>
+        <th>رقم العميل</th>
+        <th>قيمة الباقة المشترك عليها</th>
+        <th>عدد الأيام المستفاد بها</th>
+        <th>اسم البنك</th>
+        <th>رقم الحساب البنكي</th>
+        <th>نوع الاشتراك</th>
+        <th>المبلغ المسترد</th>
+        <th>الملاحظات</th>
+      </tr>
+    </thead>
+    <tbody>`;
 
   clients.forEach((client) => {
     const name = client.querySelector('input[id^="name-"]').value || "";
@@ -192,7 +195,7 @@ function calculateAll() {
       </td>
     </tr>`;
 
-  tableHTML += `</table>`;
+  tableHTML += `</tbody></table>`;
   document.getElementById("results").innerHTML = tableHTML;
 }
 
@@ -202,7 +205,6 @@ function copyRows() {
   let rowsText = "";
   for (let i = 1; i < table.rows.length - 1; i++) {
     const cells = table.rows[i].cells;
-    // نسخ فقط 3 خانات: قيمة الباقة، الأيام المستفاد بها، المبلغ المسترد
     rowsText += cells[2].innerText + "\t" + cells[3].innerText + "\t" + cells[7].innerText + "\n";
   }
   navigator.clipboard.writeText(rowsText).then(() => alert("تم نسخ البيانات!")).catch(() => alert("حدث خطأ أثناء النسخ."));
@@ -212,21 +214,18 @@ function exportExcel() {
   const table = document.getElementById("resultTable");
   if (!table) return alert("لا توجد بيانات للتصدير!");
 
-  // اليوم السابق
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   const day = yesterday.getDate();
   const monthNames = ["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
   const month = monthNames[yesterday.getMonth()];
-
   const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
 
-  // جدول Excel منسق وجميل
   let html = `
-  <table border='1' style='border-collapse:collapse; font-family:Arial; font-size:11px; width:120%;'>
+  <table border='1' style='border-collapse:collapse; font-family:Arial; font-size:14px; width:140%;'>
     <thead>
-      <tr style='background-color:#4CAF50; color:white; font-weight:bold;'>
+      <tr style='background-color:#4CAF50; color:white; font-weight:bold; font-size:15px;'>
         <th>اسم العميل</th>
         <th>رقم العميل</th>
         <th>قيمة الباقة المشترك عليها</th>
@@ -242,17 +241,16 @@ function exportExcel() {
 
   for (let i = 1; i < table.rows.length - 1; i++) {
     const row = table.rows[i];
-    html += `<tr style='font-weight:bold; font-size:11px;'>`;
+    html += `<tr style='font-weight:bold; font-size:14px;'>`;
     for (let j = 0; j < row.cells.length; j++) {
       html += `<td>${row.cells[j].innerText}</td>`;
     }
     html += `</tr>`;
   }
 
-  // توقيع
   html += `
     <tr>
-      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:10px;">
+      <td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px; font-size:14px;">
         Accountant Mousa
       </td>
     </tr>`;
