@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حاسبة الاسترداد المالي - متعددة العملاء</title>
+<title>حاسبة الاسترداد المالي - نموذج العملاء</title>
 <style>
   body {
     font-family: 'Cairo', sans-serif;
-    background-color: #f0f6fa;
+    background-color: #f4f8fb;
     color: #333;
     padding: 30px;
   }
   h2 {
     text-align: center;
-    color: #1565c0;
+    color: #0d47a1;
     margin-bottom: 25px;
   }
   .calculator {
     background: #fff;
     padding: 25px;
-    border-radius: 14px;
-    max-width: 800px;
+    border-radius: 12px;
+    max-width: 950px;
     margin: auto;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
   .client-section {
     background: #e3f2fd;
@@ -32,14 +32,13 @@
     position: relative;
   }
   .client-section h3 {
-    color: #0d47a1;
+    color: #1565c0;
     margin-bottom: 10px;
   }
   label {
     display: block;
     margin-top: 10px;
     font-weight: bold;
-    color: #0d47a1;
   }
   input {
     width: 100%;
@@ -73,9 +72,7 @@
     margin: 10px 0;
   }
   button:hover { background: #1565c0; }
-  .add-btn {
-    background: #43a047;
-  }
+  .add-btn { background: #43a047; }
   .add-btn:hover { background: #2e7d32; }
   table {
     width: 100%;
@@ -88,30 +85,28 @@
     text-align: center;
   }
   th {
-    background-color: #1e88e5;
+    background-color: #1976d2;
     color: white;
   }
-  td {
-    background: #f9fcff;
+  td { background: #f9fcff; }
+  .copy-btn {
+    background: #ff9800;
   }
-  .result-section {
-    margin-top: 30px;
-  }
+  .copy-btn:hover { background: #fb8c00; }
 </style>
 </head>
 <body>
 
 <div class="calculator">
-  <h2>📊 حاسبة الاسترداد المالي لعدة عملاء</h2>
+  <h2>📋 نموذج حاسبة الاسترداد المالي لعدة عملاء</h2>
 
-  <div id="clientsContainer">
-    <!-- يتم إدخال العملاء هنا -->
-  </div>
+  <div id="clientsContainer"></div>
 
   <button class="add-btn" onclick="addClient()">➕ إضافة عميل</button>
   <button onclick="calculateAll()">💰 احسب لجميع العملاء</button>
+  <button class="copy-btn" onclick="copyTable()">📋 نسخ الجدول</button>
 
-  <div class="result-section" id="results"></div>
+  <div id="results"></div>
 </div>
 
 <script>
@@ -123,23 +118,39 @@ function addClient() {
   <div class="client-section" id="client-${clientCount}">
     <button class="remove-btn" onclick="removeClient(${clientCount})">×</button>
     <h3>👤 بيانات العميل ${clientCount}</h3>
-    <label>اسم العميل:</label>
+    
+    <label>الاسم:</label>
     <input type="text" id="name-${clientCount}" placeholder="مثال: أحمد محمد">
 
-    <label>سعر الباقة:</label>
-    <input type="number" id="price-${clientCount}" placeholder="مثال: 1295">
+    <label>حالة الاسترداد:</label>
+    <input type="text" id="status-${clientCount}" placeholder="مثال: قيد المعالجة">
+
+    <label>تاريخ الاسترداد:</label>
+    <input type="date" id="date-${clientCount}">
+
+    <label>اسم البنك:</label>
+    <input type="text" id="bank-${clientCount}" placeholder="مثال: الراجحي">
+
+    <label>بداية الاشتراك الملغي أو المسترد منه:</label>
+    <input type="date" id="start-${clientCount}">
+
+    <label>رقم الجوال:</label>
+    <input type="text" id="phone-${clientCount}" placeholder="05XXXXXXXX">
+
+    <label>رقم حساب البنك:</label>
+    <input type="text" id="account-${clientCount}" placeholder="مثال: 1234567890">
+
+    <label>نوع العميل:</label>
+    <input type="text" id="type-${clientCount}" placeholder="مثال: جديد / تجديد">
+
+    <label>قيمة الباقة:</label>
+    <input type="number" id="price-${clientCount}" placeholder="مثال: 1200">
+
+    <label>عدد الأيام المستفاد منها:</label>
+    <input type="number" id="used-${clientCount}" placeholder="مثال: 18">
 
     <label>عدد أيام الباقة:</label>
     <input type="number" id="days-${clientCount}" placeholder="مثال: 24">
-
-    <label>عدد أيام التعويضات:</label>
-    <input type="number" id="comp-${clientCount}" placeholder="مثال: 1">
-
-    <label>عدد الأيام المستبعدة:</label>
-    <input type="number" id="excl-${clientCount}" placeholder="مثال: 1">
-
-    <label>عدد الأيام المستخدمة:</label>
-    <input type="number" id="used-${clientCount}" placeholder="مثال: 19">
   </div>`;
   document.getElementById("clientsContainer").insertAdjacentHTML("beforeend", clientHTML);
 }
@@ -158,41 +169,77 @@ function calculateAll() {
   }
 
   let tableHTML = `
-  <table>
+  <table id="resultTable">
     <tr>
-      <th>اسم العميل</th>
-      <th>سعر الباقة</th>
-      <th>عدد الأيام الكلية</th>
-      <th>الأيام المتبقية</th>
-      <th>مبلغ الاسترداد</th>
+      <th>الاسم</th>
+      <th>حاله الاسترداد</th>
+      <th>تاريخ الاسترداد</th>
+      <th>اسم البنك</th>
+      <th>بداية الاشتراك الملغي أو المسترد منه</th>
+      <th>رقم الجوال</th>
+      <th>رقم حساب البنك</th>
+      <th>نوع العميل</th>
+      <th>المبلغ المسترد</th>
+      <th>عدد الأيام المستفاد</th>
+      <th>قيمة الباقة</th>
     </tr>`;
 
   clients.forEach((client, index) => {
     const id = index + 1;
-    const name = document.getElementById(`name-${id}`)?.value || "غير محدد";
-    const price = parseFloat(document.getElementById(`price-${id}`)?.value) || 0;
-    const totalDays = parseFloat(document.getElementById(`days-${id}`)?.value) || 0;
-    const comp = parseFloat(document.getElementById(`comp-${id}`)?.value) || 0;
-    const excl = parseFloat(document.getElementById(`excl-${id}`)?.value) || 0;
-    const used = parseFloat(document.getElementById(`used-${id}`)?.value) || 0;
+    const name = getVal(`name-${id}`);
+    const status = getVal(`status-${id}`);
+    const date = getVal(`date-${id}`);
+    const bank = getVal(`bank-${id}`);
+    const start = getVal(`start-${id}`);
+    const phone = getVal(`phone-${id}`);
+    const account = getVal(`account-${id}`);
+    const type = getVal(`type-${id}`);
+    const price = parseFloat(getVal(`price-${id}`)) || 0;
+    const used = parseFloat(getVal(`used-${id}`)) || 0;
+    const days = parseFloat(getVal(`days-${id}`)) || 0;
 
-    const netDays = totalDays + comp - excl;
-    const remaining = netDays - used;
-    const dailyRate = totalDays > 0 ? price / totalDays : 0;
+    const remaining = days - used;
+    const dailyRate = days > 0 ? price / days : 0;
     const refund = remaining * dailyRate;
 
     tableHTML += `
     <tr>
       <td>${name}</td>
-      <td>${price.toFixed(2)} ريال</td>
-      <td>${netDays}</td>
-      <td>${remaining}</td>
-      <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)} ريال</td>
+      <td>${status}</td>
+      <td>${date}</td>
+      <td>${bank}</td>
+      <td>${start}</td>
+      <td>${phone}</td>
+      <td>${account}</td>
+      <td>${type}</td>
+      <td style="color:${refund>0?'#2e7d32':'#d32f2f'};font-weight:bold;">${refund.toFixed(2)} ريال</td>
+      <td>${used}</td>
+      <td>${price.toFixed(2)}</td>
     </tr>`;
   });
 
   tableHTML += `</table>`;
   document.getElementById("results").innerHTML = tableHTML;
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function copyTable() {
+  const table = document.getElementById("resultTable");
+  if (!table) {
+    alert("لا يوجد جدول لنسخه بعد.");
+    return;
+  }
+  const range = document.createRange();
+  range.selectNode(table);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  document.execCommand("copy");
+  window.getSelection().removeAllRanges();
+  alert("✅ تم نسخ الجدول بنجاح! يمكنك الآن لصقه في Excel أو Word.");
 }
 </script>
 
