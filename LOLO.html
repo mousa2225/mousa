@@ -9,18 +9,18 @@
     font-family: 'Cairo', sans-serif;
     background-color: #f0f6fa;
     color: #333;
-    padding: 30px;
+    padding: 20px;
   }
   h2 {
     text-align: center;
     color: #1565c0;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
   .calculator {
     background: #fff;
-    padding: 25px;
+    padding: 20px;
     border-radius: 14px;
-    max-width: 800px;
+    max-width: 900px;
     margin: auto;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
   }
@@ -66,11 +66,11 @@
     background: #1e88e5;
     border: none;
     color: white;
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
-    margin: 10px 5px 10px 0;
+    margin: 5px 5px 10px 0;
   }
   button:hover { background: #1565c0; }
   .add-btn {
@@ -80,12 +80,13 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 25px;
+    margin-top: 20px;
   }
   th, td {
     border: 1px solid #bbdefb;
     padding: 10px;
     text-align: center;
+    font-size: 14px;
   }
   th {
     background-color: #1e88e5;
@@ -94,8 +95,13 @@
   td {
     background: #f9fcff;
   }
-  .result-section {
-    margin-top: 30px;
+  tr:nth-child(even) td { background: #e8f0fe; }
+  .signature {
+    margin-top: 20px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+    color: #ff5722;
   }
 </style>
 </head>
@@ -109,8 +115,10 @@
   <button class="add-btn" onclick="addClient()">➕ إضافة عميل</button>
   <button onclick="calculateAll()">💰 احسب لجميع العملاء</button>
   <button onclick="copyRows()">📋 نسخ النتائج</button>
+  <button onclick="exportExcel()">📥 تصدير إلى Excel</button>
 
   <div class="result-section" id="results"></div>
+  <div class="signature" id="signature">Mousa</div>
 </div>
 
 <script>
@@ -125,14 +133,26 @@ function addClient() {
     <label>اسم العميل:</label>
     <input type="text" id="name-${clientCount}" placeholder="مثال: أحمد محمد">
 
-    <label>قيمة الباقة (ريال):</label>
+    <label>رقم العميل:</label>
+    <input type="text" id="id-${clientCount}" placeholder="مثال: 123456">
+
+    <label>قيمة الباقة المشترك عليها (ريال):</label>
     <input type="number" id="price-${clientCount}" placeholder="مثال: 1295">
 
-    <label>عدد أيام الباقة:</label>
-    <input type="number" id="days-${clientCount}" placeholder="مثال: 24">
-
-    <label>عدد الأيام المستفاد منها:</label>
+    <label>عدد الأيام المستفاد بها:</label>
     <input type="number" id="used-${clientCount}" placeholder="مثال: 19">
+
+    <label>اسم البنك:</label>
+    <input type="text" id="bank-${clientCount}" placeholder="مثال: Alinma">
+
+    <label>رقم الحساب البنكي:</label>
+    <input type="text" id="account-${clientCount}" placeholder="مثال: 1234567890">
+
+    <label>نوع الاشتراك:</label>
+    <input type="text" id="subscription-${clientCount}" placeholder="مثال: شهرية">
+
+    <label>الملاحظات:</label>
+    <input type="text" id="notes-${clientCount}" placeholder="مثال: بدون ملاحظات">
   </div>`;
   document.getElementById("clientsContainer").insertAdjacentHTML("beforeend", clientHTML);
 }
@@ -153,25 +173,40 @@ function calculateAll() {
   let tableHTML = `
   <table id="resultTable">
     <tr>
+      <th>اسم العميل</th>
+      <th>رقم العميل</th>
+      <th>قيمة الباقة المشترك عليها</th>
+      <th>عدد الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب البنكي</th>
+      <th>نوع الاشتراك</th>
       <th>المبلغ المسترد</th>
-      <th>عدد الأيام المستفاد منها</th>
-      <th>قيمة الباقة</th>
+      <th>الملاحظات</th>
     </tr>`;
 
   clients.forEach((client) => {
+    const name = client.querySelector('input[id^="name-"]').value || "";
+    const id = client.querySelector('input[id^="id-"]').value || "";
     const price = parseFloat(client.querySelector('input[id^="price-"]')?.value) || 0;
-    const totalDays = parseFloat(client.querySelector('input[id^="days-"]')?.value) || 0;
     const used = parseFloat(client.querySelector('input[id^="used-"]')?.value) || 0;
+    const bank = client.querySelector('input[id^="bank-"]').value || "";
+    const account = client.querySelector('input[id^="account-"]').value || "";
+    const subscription = client.querySelector('input[id^="subscription-"]').value || "";
+    const notes = client.querySelector('input[id^="notes-"]').value || "";
 
-    const remaining = totalDays - used;
-    const dailyRate = totalDays > 0 ? price / totalDays : 0;
-    const refund = remaining * dailyRate;
+    const refund = price - ((price / 30) * used); // مثال احتساب المبلغ المسترد
 
     tableHTML += `
     <tr>
-      <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)}</td>
-      <td>${used}</td>
+      <td>${name}</td>
+      <td>${id}</td>
       <td>${price.toFixed(2)}</td>
+      <td>${used}</td>
+      <td>${bank}</td>
+      <td>${account}</td>
+      <td>${subscription}</td>
+      <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)}</td>
+      <td>${notes}</td>
     </tr>`;
   });
 
@@ -179,6 +214,7 @@ function calculateAll() {
   document.getElementById("results").innerHTML = tableHTML;
 }
 
+// نسخ البيانات
 function copyRows() {
   const table = document.getElementById("resultTable");
   if (!table) return alert("لا توجد نتائج للنسخ!");
@@ -186,12 +222,33 @@ function copyRows() {
   let rowsText = "";
   for (let i = 1; i < table.rows.length; i++) { // نتجاوز العنوان
     const cells = table.rows[i].cells;
-    rowsText += `${cells[0].innerText}\t${cells[1].innerText}\t${cells[2].innerText}\n`;
+    for (let j = 0; j < cells.length; j++) {
+      rowsText += cells[j].innerText + (j < cells.length - 1 ? "\t" : "");
+    }
+    rowsText += "\n";
   }
 
   navigator.clipboard.writeText(rowsText)
     .then(() => alert("تم نسخ البيانات! يمكنك لصقها في Excel."))
     .catch(() => alert("حدث خطأ أثناء النسخ."));
+}
+
+// تصدير Excel
+function exportExcel() {
+  const table = document.getElementById("resultTable");
+  if (!table) return alert("لا توجد بيانات للتصدير!");
+
+  let html = `<table border='1' style='border-collapse:collapse; font-family:Arial; font-size:12px;'>` + table.innerHTML + `</table>`;
+  html += `<p style='font-weight:bold; color:#ff5722;'>Mousa</p>`;
+
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "financial_report.xls";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 </script>
 
