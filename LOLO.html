@@ -44,7 +44,7 @@
 
   .input-section {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(9, 1fr);
     gap: 12px;
     justify-content: center;
     margin-bottom: 15px;
@@ -101,15 +101,17 @@
 <div class="input-section">
   <input type="text" id="clientName" placeholder="اسم العميل">
   <input type="text" id="clientNumber" placeholder="رقم العميل">
-  <input type="number" id="packageValue" placeholder="قيمة الباقة" oninput="calculateRefund()">
-  <input type="number" id="daysUsed" placeholder="عدد الأيام المستفاد بها" oninput="calculateRefund()">
+  <input type="number" id="packageValue" placeholder="قيمة الباقة">
+  <input type="number" id="daysUsed" placeholder="عدد الأيام المستفاد بها">
   <input type="text" id="bankName" placeholder="اسم البنك">
   <input type="text" id="bankAccount" placeholder="رقم الحساب البنكي">
   <input type="text" id="subscriptionType" placeholder="نوع الاشتراك">
   <input type="number" id="refundAmount" placeholder="المبلغ المسترد" readonly>
   <input type="text" id="notes" placeholder="الملاحظات">
-  <button onclick="addClient()">➕ إضافة عميل</button>
 </div>
+
+<button onclick="calculateRefund()">💰 إحسب الاسترداد</button>
+<button onclick="addClient()">➕ إضافة عميل</button>
 
 <table id="clientsTable">
   <tr>
@@ -133,7 +135,6 @@
 <script>
 let clients = [];
 
-// حساب المبلغ المسترد تلقائيًا
 function calculateRefund() {
   const packageValue = parseFloat(document.getElementById('packageValue').value);
   const daysUsed = parseFloat(document.getElementById('daysUsed').value);
