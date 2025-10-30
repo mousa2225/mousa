@@ -68,17 +68,18 @@ function removeClient(id) {
 function calculateAll() {
   if (clientsData.length === 0) { alert("الرجاء إضافة عميل واحد على الأقل."); return; }
 
-  let tableHTML = `<table id="resultTable" style="border-collapse:collapse; width:100%; table-layout:fixed;"><thead>
+  let tableHTML = `<table id="resultTable" style="border-collapse:collapse; width:100%; table-layout:fixed;">
+  <thead>
   <tr style="background-color:#4CAF50; color:white; font-weight:bold; font-size:18px;">
-  <th style="width:120px;">اسم العميل</th>
-  <th style="width:100px;">رقم العميل</th>
-  <th style="width:130px;">قيمة الباقة المشترك عليها</th>
-  <th style="width:120px;">عدد الأيام المستفاد بها</th>
-  <th style="width:120px;">اسم البنك</th>
-  <th style="width:130px;">رقم الحساب البنكي</th>
-  <th style="width:120px;">نوع الاشتراك</th>
-  <th style="width:120px;">المبلغ المسترد</th>
-  <th style="width:150px;">الملاحظات</th>
+  <th>اسم العميل</th>
+  <th>رقم العميل</th>
+  <th>قيمة الباقة المشترك عليها</th>
+  <th>عدد الأيام المستفاد بها</th>
+  <th>اسم البنك</th>
+  <th>رقم الحساب البنكي</th>
+  <th>نوع الاشتراك</th>
+  <th>المبلغ المسترد</th>
+  <th>الملاحظات</th>
   </tr></thead><tbody>`;
 
   clientsData.forEach((id,index)=>{
@@ -95,9 +96,10 @@ function calculateAll() {
 
     const remaining = Math.max(days-used,0);
     const refund = (price/days)*remaining;
-    const bg = index%2===0?'#f9fcff':'#e8f0fe';
-    tableHTML+=`<tr style="background-color:${bg}; font-weight:bold; font-size:16px;">
-    <td>${name}</td><td>${cid}</td><td>${price.toFixed(2)}(${days})</td><td>${used}</td>
+    const priceDisplay = `${price.toFixed(2)}(${days})`;
+
+    tableHTML+=`<tr style="font-weight:bold; font-size:16px;">
+    <td>${name}</td><td>${cid}</td><td>${priceDisplay}</td><td>${used}</td>
     <td>${bank}</td><td>${account}</td><td>${subscription}</td>
     <td>${refund.toFixed(2)}</td><td>${notes}</td></tr>`;
   });
@@ -127,20 +129,21 @@ function exportExcel(){
   const month=monthNames[yesterday.getMonth()];
   const fileName=`ملف الاسترداد اليومي ${day} ${month}.xls`;
 
-  let excelHtml=`<table border="1" style="border-collapse:collapse; font-family:Arial; font-size:16px; table-layout:fixed; width:100%;">
+  // تصميم أنيق بدون خلفية فارغة
+  let excelHtml=`<table border="1" style="border-collapse:collapse; font-family:Arial; font-size:16px; width:100%;">
   <tr style="background-color:#4CAF50; color:white; font-weight:bold; font-size:18px;">
-  <th style="width:120px;">اسم العميل</th>
-  <th style="width:100px;">رقم العميل</th>
-  <th style="width:130px;">قيمة الباقة المشترك عليها</th>
-  <th style="width:120px;">عدد الأيام المستفاد بها</th>
-  <th style="width:120px;">اسم البنك</th>
-  <th style="width:130px;">رقم الحساب البنكي</th>
-  <th style="width:120px;">نوع الاشتراك</th>
-  <th style="width:120px;">المبلغ المسترد</th>
-  <th style="width:150px;">الملاحظات</th>
+  <th>اسم العميل</th>
+  <th>رقم العميل</th>
+  <th>قيمة الباقة المشترك عليها</th>
+  <th>عدد الأيام المستفاد بها</th>
+  <th>اسم البنك</th>
+  <th>رقم الحساب البنكي</th>
+  <th>نوع الاشتراك</th>
+  <th>المبلغ المسترد</th>
+  <th>الملاحظات</th>
   </tr>`;
 
-  clientsData.forEach((id,index)=>{
+  clientsData.forEach(id=>{
     const c = document.getElementById(`client-${id}`);
     const name=c.querySelector(`#name-${id}`).value||"";
     const cid=c.querySelector(`#id-${id}`).value||"";
@@ -154,13 +157,18 @@ function exportExcel(){
 
     const remaining = Math.max(days-used,0);
     const refund = (price/days)*remaining;
-    const priceWithDays = `${price.toFixed(2)}(${days})`;
-    const bg = index%2===0?'#f9fcff':'#e8f0fe';
+    const priceDisplay = `${price.toFixed(2)}(${days})`;
 
-    excelHtml+=`<tr style="background-color:${bg}; font-weight:bold; font-size:16px;">
-    <td>${name}</td><td>${cid}</td><td>${priceWithDays}</td><td>${used}</td>
-    <td>${bank}</td><td>${account}</td><td>${subscription}</td>
-    <td>${refund.toFixed(2)}</td><td>${notes}</td></tr>`;
+    excelHtml+=`<tr style="font-weight:bold;">
+    <td style="background-color:#f9f9f9;">${name}</td>
+    <td style="background-color:#f9f9f9;">${cid}</td>
+    <td style="background-color:#f9f9f9;">${priceDisplay}</td>
+    <td style="background-color:#f9f9f9;">${used}</td>
+    <td style="background-color:#f9f9f9;">${bank}</td>
+    <td style="background-color:#f9f9f9;">${account}</td>
+    <td style="background-color:#f9f9f9;">${subscription}</td>
+    <td style="background-color:#f9f9f9;">${refund.toFixed(2)}</td>
+    <td style="background-color:#f9f9f9;">${notes}</td></tr>`;
   });
 
   excelHtml+=`<tr><td colspan="9" style="text-align:right; font-weight:bold; font-style:italic; color:#FF5722; padding:15px; font-size:16px;">Accountant Mousa</td></tr>`;
