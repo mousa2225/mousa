@@ -74,9 +74,7 @@
     margin: 10px 5px;
   }
   button:hover { background: #1565c0; }
-  .add-btn {
-    background: #43a047;
-  }
+  .add-btn { background: #43a047; }
   .add-btn:hover { background: #2e7d32; }
   table {
     width: 100%;
@@ -92,16 +90,9 @@
     font-weight: bold;
     font-size: 15px;
   }
-  th {
-    background-color: #1e88e5;
-    color: white;
-  }
-  td {
-    background: #f9fcff;
-  }
-  .result-section {
-    margin-top: 25px;
-  }
+  th { background-color: #1e88e5; color: white; }
+  td { background: #ffffff; } /* خلية فارغة بدون لون */
+  .result-section { margin-top: 25px; }
 </style>
 </head>
 <body>
@@ -137,13 +128,13 @@ function addClient() {
     <input type="text" id="id-${clientCount}">
 
     <label>قيمة الباقة:</label>
-    <input type="number" id="price-${clientCount}" oninput="calculateAll()">
+    <input type="number" id="price-${clientCount}">
 
     <label>عدد أيام الباقة:</label>
-    <input type="number" id="days-${clientCount}" oninput="calculateAll()">
+    <input type="number" id="days-${clientCount}">
 
     <label>عدد الأيام المستفاد بها:</label>
-    <input type="number" id="used-${clientCount}" oninput="calculateAll()">
+    <input type="number" id="used-${clientCount}">
 
     <label>اسم البنك:</label>
     <input type="text" id="bank-${clientCount}">
@@ -164,15 +155,10 @@ function removeClient(id) {
   const el = document.getElementById(`client-${id}`);
   if (el) el.remove();
   clientsData = clientsData.filter(c => c !== id);
-  calculateAll();
 }
 
 function calculateAll() {
-  const resultsDiv = document.getElementById("results");
-  if (clientsData.length === 0) {
-    resultsDiv.innerHTML = "";
-    return;
-  }
+  if (clientsData.length === 0) { document.getElementById("results").innerHTML = ""; return; }
 
   let tableHTML = `
   <table>
@@ -189,7 +175,6 @@ function calculateAll() {
     const used = parseFloat(document.getElementById(`used-${id}`)?.value) || 0;
     const remaining = Math.max(totalDays - used, 0);
     const refund = (price / totalDays) * remaining;
-
     tableHTML += `
     <tr>
       <td>${document.getElementById(`id-${id}`)?.value || ""}</td>
@@ -200,7 +185,7 @@ function calculateAll() {
   });
 
   tableHTML += "</table>";
-  resultsDiv.innerHTML = tableHTML;
+  document.getElementById("results").innerHTML = tableHTML;
 }
 
 function exportToExcel() {
@@ -212,9 +197,8 @@ function exportToExcel() {
   const month = today.toLocaleString('ar-SA', { month: 'long' });
   const fileName = `ملف الاسترداد اليومي ${day} ${month}.xls`;
 
-  let excelHtml = `
-  <table border="1" style="border-collapse:collapse; font-family:Arial; font-weight:bold; font-size:14px; width:100%;">
-  <tr style="background-color:#1e88e5; color:white;">
+  let excelHtml = `<table border="1" style="border-collapse:collapse; font-family:Arial; font-weight:bold; font-size:14px; width:100%;">`;
+  excelHtml += `<tr style="background-color:#1e88e5; color:white;">
     <th>اسم العميل</th>
     <th>رقم العميل</th>
     <th>قيمة الباقة المشترك عليها</th>
@@ -252,6 +236,7 @@ function exportToExcel() {
     </tr>`;
   });
 
+  // توقيع
   excelHtml += `<tr>
     <td colspan="9" style="text-align:right; font-weight:bold; color:#FF5722; font-size:16px;">
       ✒️ Accountant Mousa
