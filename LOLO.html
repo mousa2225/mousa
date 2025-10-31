@@ -6,22 +6,23 @@
 <title>حاسبة الاسترداد اليومي</title>
 <style>
   body {
-    font-family: "Tahoma", Arial, sans-serif;
-    background-color: #f4f7f8;
+    font-family: "Tahoma", sans-serif;
+    background: linear-gradient(180deg, #e8f2ff, #ffffff);
     padding: 20px;
     text-align: center;
   }
 
   h1 {
-    color: #004d4d;
+    color: #004080;
     margin-bottom: 25px;
+    text-shadow: 1px 1px 3px #aac8ff;
   }
 
   .form-container {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto 30px;
     padding: 25px;
     display: grid;
@@ -30,26 +31,32 @@
     text-align: right;
   }
 
+  @media (max-width: 700px) {
+    .form-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
   label {
     font-weight: bold;
-    color: #006b6b;
+    color: #004b8d;
     display: block;
     margin-bottom: 5px;
   }
 
-  input {
+  input, select {
     width: 100%;
-    padding: 9px;
-    border: 2px solid #009688;
+    padding: 10px;
+    border: 2px solid #4a90e2;
     border-radius: 8px;
     font-size: 15px;
     text-align: center;
     transition: 0.3s;
   }
 
-  input:focus {
-    background-color: #e0f7f6;
-    border-color: #006b6b;
+  input:focus, select:focus {
+    background-color: #eaf3ff;
+    border-color: #1a73e8;
     outline: none;
   }
 
@@ -62,11 +69,12 @@
     display: flex;
     justify-content: space-between;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   button {
     flex: 1;
-    background-color: #009688;
+    background-color: #1a73e8;
     color: white;
     border: none;
     padding: 10px 16px;
@@ -77,54 +85,53 @@
   }
 
   button:hover {
-    background-color: #00796b;
+    background-color: #155ab6;
   }
 
   button.export {
-    background-color: #f0b429;
+    background-color: #00aaff;
   }
 
   button.export:hover {
-    background-color: #d99c1a;
+    background-color: #008ecc;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 25px;
-    border: 2px solid #ccc;
+    border: 2px solid #cdddfc;
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
   }
 
   th, td {
-    border: 1px solid #eee;
+    border: 1px solid #e2edff;
     padding: 12px;
     text-align: center;
     font-size: 15px;
   }
 
   th {
-    background-color: #009688;
+    background-color: #1a73e8;
     color: white;
   }
 
   tr:nth-child(even) td {
-    background-color: #f9f9f9;
+    background-color: #f6faff;
   }
 
   .refund-result {
     margin-top: 25px;
     font-size: 20px;
     font-weight: bold;
-    color: #004d4d;
-    background: linear-gradient(135deg, #e0f7f6, #c8f3f1);
-    border: 2px dashed #009688;
-    display: inline-block;
+    color: #003366;
+    background: linear-gradient(135deg, #d6e9ff, #b5d4ff);
+    border: 2px dashed #1a73e8;
+    display: none;
     padding: 15px 25px;
     border-radius: 10px;
-    display: none;
     animation: fadeIn 0.6s ease;
   }
 
@@ -138,19 +145,19 @@
     text-align: left;
     font-weight: bold;
     font-size: 17px;
-    color: #444;
+    color: #004080;
     font-style: italic;
   }
 
   .signature::after {
     content: " ___________________";
-    color: #007b83;
+    color: #007bff;
   }
 </style>
 </head>
 <body>
 
-<h1>📊 حاسبة الاسترداد اليومي</h1>
+<h1>💙 حاسبة الاسترداد اليومي</h1>
 
 <div class="form-container">
   <div>
@@ -186,7 +193,11 @@
   </div>
   <div>
     <label>نوع الاشتراك</label>
-    <input type="text" id="subscriptionType" placeholder="نوع الاشتراك">
+    <select id="subscriptionType">
+      <option value="">اختر نوع الاشتراك</option>
+      <option value="جديد">جديد</option>
+      <option value="تجديد">تجديد</option>
+    </select>
   </div>
 
   <div class="full-width">
@@ -196,7 +207,7 @@
 
   <div class="button-group">
     <button onclick="calculateRefund()">💰 احسب الاسترداد</button>
-    <button onclick="addClient()">➕ إضافة عميل</button>
+    <button onclick="addClient()">💾 حفظ</button>
   </div>
 </div>
 
@@ -226,22 +237,26 @@
 let clients = [];
 let lastRefund = 0;
 
-// حساب المبلغ المسترد
 function calculateRefund() {
   const packageValue = parseFloat(document.getElementById('packageValue').value);
   const totalDays = parseFloat(document.getElementById('totalDays').value);
   const daysUsed = parseFloat(document.getElementById('daysUsed').value);
 
-  if (!isNaN(packageValue) && !isNaN(daysUsed) && !isNaN(totalDays) && daysUsed <= totalDays) {
-    const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
-    lastRefund = refund.toFixed(2);
-
-    const resultDiv = document.getElementById('refundResult');
-    resultDiv.style.display = 'inline-block';
-    resultDiv.innerHTML = `💵 المبلغ المسترد: <span style="color:#004d4d;">${lastRefund} ريال</span>`;
-  } else {
-    alert("يرجى إدخال البيانات بشكل صحيح (عدد الأيام لا يتجاوز عدد الأيام الأساسية).");
+  if (isNaN(packageValue) || isNaN(totalDays) || isNaN(daysUsed) || totalDays <= 0) {
+    alert("يرجى إدخال القيم بشكل صحيح.");
+    return;
   }
+  if (daysUsed > totalDays) {
+    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز الأيام الأساسية.");
+    return;
+  }
+
+  const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
+  lastRefund = refund.toFixed(2);
+
+  const resultDiv = document.getElementById('refundResult');
+  resultDiv.style.display = 'inline-block';
+  resultDiv.innerHTML = `💵 المبلغ المسترد: <span style="color:#003366;">${lastRefund} ريال</span>`;
 }
 
 function addClient() {
@@ -291,7 +306,7 @@ function renderTable() {
 
   clients.forEach((c, i) => {
     const row = `
-      <tr>
+      <tr style="animation:fadeIn 0.4s;">
         <td>${c.name}</td>
         <td>${c.number}</td>
         <td>${c.package}</td>
@@ -300,7 +315,7 @@ function renderTable() {
         <td>${c.bank}</td>
         <td>${c.account}</td>
         <td>${c.type}</td>
-        <td style="color:#004d4d; font-weight:bold;">${c.refund}</td>
+        <td style="color:#004080; font-weight:bold;">${c.refund}</td>
         <td>${c.notes}</td>
         <td><button onclick="removeClient(${i})" style="background:red; color:white; border:none; border-radius:5px; padding:3px 8px; cursor:pointer;">X</button></td>
       </tr>`;
@@ -310,6 +325,7 @@ function renderTable() {
 
 function clearInputs() {
   document.querySelectorAll('input').forEach(i => i.value = '');
+  document.getElementById('subscriptionType').value = '';
   lastRefund = 0;
 }
 
@@ -317,16 +333,16 @@ function exportToExcel() {
   let html = `
     <table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>
       <tr>
-        <th style='background-color:#009688; color:white;'>اسم العميل</th>
-        <th style='background-color:#009688; color:white;'>رقم العميل</th>
-        <th style='background-color:#009688; color:white;'>قيمة الباقة</th>
-        <th style='background-color:#009688; color:white;'>أيام الباقة</th>
-        <th style='background-color:#009688; color:white;'>الأيام المستفاد بها</th>
-        <th style='background-color:#009688; color:white;'>اسم البنك</th>
-        <th style='background-color:#009688; color:white;'>رقم الحساب</th>
-        <th style='background-color:#009688; color:white;'>نوع الاشتراك</th>
-        <th style='background-color:#009688; color:white;'>المبلغ المسترد</th>
-        <th style='background-color:#009688; color:white;'>ملاحظات</th>
+        <th style='background-color:#1a73e8; color:white;'>اسم العميل</th>
+        <th style='background-color:#1a73e8; color:white;'>رقم العميل</th>
+        <th style='background-color:#1a73e8; color:white;'>قيمة الباقة</th>
+        <th style='background-color:#1a73e8; color:white;'>أيام الباقة</th>
+        <th style='background-color:#1a73e8; color:white;'>الأيام المستفاد بها</th>
+        <th style='background-color:#1a73e8; color:white;'>اسم البنك</th>
+        <th style='background-color:#1a73e8; color:white;'>رقم الحساب</th>
+        <th style='background-color:#1a73e8; color:white;'>نوع الاشتراك</th>
+        <th style='background-color:#1a73e8; color:white;'>المبلغ المسترد</th>
+        <th style='background-color:#1a73e8; color:white;'>ملاحظات</th>
       </tr>
   `;
 
@@ -347,7 +363,7 @@ function exportToExcel() {
   });
 
   html += `
-      <tr><td colspan='10' style='text-align:left; font-weight:bold; color:#007b83;'>Accountant Mousa ________</td></tr>
+      <tr><td colspan='10' style='text-align:left; font-weight:bold; color:#1a73e8;'>Accountant Mousa ________</td></tr>
     </table>
   `;
 
