@@ -8,31 +8,37 @@
 body { font-family: "Tahoma", sans-serif; background: #eaf6ff; padding: 20px; text-align: center; }
 h1 { color: #004080; margin-bottom: 25px; }
 
+/* فورم العملاء */
 .form-container { background: white; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); max-width: 500px; margin: 0 auto 30px; padding: 25px; display: flex; flex-direction: column; gap: 15px; text-align: right; }
-
 label { font-weight: bold; color: #004b8d; display: block; margin-bottom: 5px; }
-
 input, select { width: 100%; padding: 10px; border: 2px solid #4fa3d1; border-radius: 8px; font-size: 15px; text-align: center; transition: 0.3s; }
 input:focus, select:focus { background-color: #e0f0ff; border-color: #1a73e8; outline: none; }
 
+/* أزرار */
 .button-group { display: flex; justify-content: flex-start; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 button { flex: 1; background-color: #1a73e8; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: 0.3s; }
 button:hover { background-color: #155ab6; }
-
 button.calculate { background-color: #00bfff; font-size: 14px; padding: 8px 12px; }
 button.calculate:hover { background-color: #0099cc; }
-
 button.export { background-color: #00aaff; }
 button.export:hover { background-color: #008ecc; }
 
+/* جدول العملاء */
 table { width: 100%; border-collapse: collapse; margin-top: 25px; border: 2px solid #cdddfc; background-color: white; border-radius: 10px; overflow: hidden; table-layout: fixed; word-wrap: break-word; }
 th, td { border: 1px solid #e2edff; padding: 12px; text-align: center; font-size: 15px; }
 th { background-color: #1a73e8; color: white; }
 tr:nth-child(even) td { background-color: #f6faff; }
 
-.signature { margin-top: 30px; text-align: left; font-weight: bold; font-size: 17px; color: #004080; font-style: italic; }
-.signature::after { content: " ___________________"; color: #007bff; }
+/* رسالة نجاح */
+.success-message { color: green; font-weight: bold; margin-bottom: 10px; display: none; }
 
+/* تحذير عدد الأيام */
+.warning { color: red; font-size: 13px; display: none; }
+
+/* توقيع */
+.signature { margin-top: 30px; text-align: left; font-weight: bold; font-size: 17px; color: #004080; font-style: italic; }
+
+/* نافذة العميل الاستثنائي */
 .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
 .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 12px; }
 .close { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -43,12 +49,15 @@ tr:nth-child(even) td { background-color: #f6faff; }
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
+<div class="success-message" id="successMessage">تم حفظ العميل بنجاح!</div>
+
 <div class="form-container">
   <label>اسم العميل</label><input type="text" id="clientName" placeholder="اكتب اسم العميل">
   <label>رقم العميل</label><input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
   <label>قيمة الباقة المشترك عليها</label><input type="number" id="packageValue" placeholder="قيمة الباقة">
   <label>عدد أيام الباقة الأساسية</label><input type="number" id="totalDays" placeholder="مثلاً 30">
   <label>عدد الأيام المستفاد بها</label><input type="number" id="daysUsed" placeholder="الأيام المستفاد بها">
+  <div class="warning" id="daysWarning">عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية</div>
   <label>اسم البنك</label><input type="text" id="bankName" placeholder="اسم البنك">
   <label>رقم الحساب البنكي</label><input type="text" id="bankAccount" placeholder="رقم الحساب">
   <label>نوع الاشتراك</label>
@@ -71,7 +80,7 @@ tr:nth-child(even) td { background-color: #f6faff; }
   <tr>
     <th>اسم العميل</th>
     <th>رقم العميل</th>
-    <th>قيمة الباقة</th>
+    <th>قيمة الباقة (الأيام)</th>
     <th>الأيام المستفاد بها</th>
     <th>اسم البنك</th>
     <th>رقم الحساب</th>
@@ -118,15 +127,16 @@ tr:nth-child(even) td { background-color: #f6faff; }
 <script>
 let clients = [];
 
-// إضافة عميل عادي
 function addClient() {
   const packageValue = parseFloat(document.getElementById('packageValue').value);
   const totalDays = parseFloat(document.getElementById('totalDays').value);
   const daysUsed = parseFloat(document.getElementById('daysUsed').value);
 
   if(daysUsed > totalDays){
-    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية");
+    document.getElementById('daysWarning').style.display = 'block';
     return;
+  } else {
+    document.getElementById('daysWarning').style.display = 'none';
   }
 
   const client = {
@@ -147,12 +157,20 @@ function addClient() {
   clients.push(client);
   renderTable();
   clearInputs();
+  showSuccessMessage();
+}
+
+// رسالة نجاح
+function showSuccessMessage() {
+  const msg = document.getElementById('successMessage');
+  msg.style.display = 'block';
+  setTimeout(()=>{msg.style.display='none';},2000);
 }
 
 // حساب الاسترداد مرة واحدة فقط لكل عميل عادي
 function calculateAllRefunds() {
   clients.forEach(c => {
-    if(c.isExceptional) return; 
+    if(c.isExceptional) return;
     if(c.refund === '') { 
       const refund = ((c.total - c.days)/c.total) * c.package;
       c.refund = refund.toFixed(2);
@@ -161,10 +179,12 @@ function calculateAllRefunds() {
   renderTable();
 }
 
-// إزالة عميل
+// إزالة عميل مع تأكيد
 function removeClient(index) {
-  clients.splice(index,1);
-  renderTable();
+  if(confirm("هل أنت متأكد من حذف هذا العميل؟")) {
+    clients.splice(index,1);
+    renderTable();
+  }
 }
 
 // إعادة رسم الجدول
@@ -172,15 +192,21 @@ function renderTable() {
   const table = document.getElementById("clientsTable");
   table.innerHTML = `
     <tr>
-      <th>اسم العميل</th><th>رقم العميل</th><th>قيمة الباقة</th><th>الأيام المستفاد بها</th>
+      <th>اسم العميل</th><th>رقم العميل</th><th>قيمة الباقة (الأيام)</th><th>الأيام المستفاد بها</th>
       <th>اسم البنك</th><th>رقم الحساب</th><th>نوع الاشتراك</th><th>المبلغ المسترد</th>
       <th>ملاحظات</th><th>❌</th>
     </tr>
   `;
   clients.forEach((c,i)=>{
     table.innerHTML += `<tr>
-      <td>${c.name}</td><td>${c.number}</td><td>${c.package}</td><td>${c.days}</td>
-      <td>${c.bank}</td><td>${c.account}</td><td>${c.type}</td><td>${c.refund}</td>
+      <td>${c.name}</td>
+      <td>${c.number}</td>
+      <td>${c.package}(${c.total})</td>
+      <td>${c.days}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.refund}</td>
       <td>${c.notes}</td>
       <td><button onclick="removeClient(${i})" style="background:red;color:white;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;">X</button></td>
     </tr>`;
@@ -218,6 +244,7 @@ function addExceptionalClient(){
   closeExceptionalModal();
   document.querySelectorAll('#exceptionalModal input').forEach(i=>i.value='');
   document.getElementById('exType').value='';
+  showSuccessMessage();
 }
 
 // تصدير Excel
@@ -226,7 +253,7 @@ function exportToExcel(){
     <tr>
       <th style='background-color:#1a73e8;color:white;'>اسم العميل</th>
       <th style='background-color:#1a73e8;color:white;'>رقم العميل</th>
-      <th style='background-color:#1a73e8;color:white;'>قيمة الباقة</th>
+      <th style='background-color:#1a73e8;color:white;'>قيمة الباقة (الأيام)</th>
       <th style='background-color:#1a73e8;color:white;'>الأيام المستفاد بها</th>
       <th style='background-color:#1a73e8;color:white;'>اسم البنك</th>
       <th style='background-color:#1a73e8;color:white;'>رقم الحساب</th>
@@ -236,7 +263,7 @@ function exportToExcel(){
     </tr>`;
   clients.forEach(c=>{
     html += `<tr>
-      <td>${c.name}</td><td>${c.number}</td><td>${c.package}</td><td>${c.days}</td>
+      <td>${c.name}</td><td>${c.number}</td><td>${c.package}(${c.total})</td><td>${c.days}</td>
       <td>${c.bank}</td><td>${c.account}</td><td>${c.type}</td><td>${c.refund}</td>
       <td>${c.notes}</td>
     </tr>`;
