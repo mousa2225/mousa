@@ -6,22 +6,22 @@
 <title>حاسبة الاسترداد اليومي</title>
 <style>
   body {
-    font-family: "Roboto", sans-serif;
-    background: #eaf6ff;
+    font-family: "Tahoma", Arial, sans-serif;
+    background: #f4f4f9; /* خلفية رمادي فاتح مريح للعين */
     padding: 20px;
     margin: 0;
   }
 
   h1 {
-    color: #004080;
+    color: #ff6f3c; /* برتقالي جذاب */
     text-align: center;
     margin-bottom: 25px;
   }
 
   .form-container {
-    background: white;
+    background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     max-width: 500px;
     margin: 0 auto 30px;
     padding: 25px;
@@ -32,7 +32,7 @@
 
   label {
     font-weight: bold;
-    color: #004b8d;
+    color: #444;
     display: block;
     margin-bottom: 5px;
   }
@@ -40,7 +40,7 @@
   input, select {
     width: 100%;
     padding: 10px;
-    border: 2px solid #4fa3d1;
+    border: 2px solid #ffa66b; /* برتقالي فاتح */
     border-radius: 8px;
     font-size: 15px;
     text-align: center;
@@ -48,13 +48,13 @@
   }
 
   input:focus, select:focus {
-    background-color: #e0f0ff;
-    border-color: #1a73e8;
+    background-color: #fff3e0;
+    border-color: #ff6f3c;
     outline: none;
   }
 
   button {
-    background-color: #1a73e8;
+    background-color: #ff6f3c;
     color: white;
     border: none;
     padding: 10px 16px;
@@ -65,11 +65,11 @@
   }
 
   button:hover {
-    background-color: #155ab6;
+    background-color: #e65a21;
   }
 
   button.calculate {
-    background-color: #00bfff;
+    background-color: #ffa66b;
     font-size: 13px;
     padding: 7px 10px;
     border-radius: 8px;
@@ -77,14 +77,14 @@
   }
 
   button.calculate:hover {
-    background-color: #0099cc;
+    background-color: #ff8a42;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 25px;
-    border: 2px solid #cdddfc;
+    border: 2px solid #ffd6b3; /* برتقالي فاتح */
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
@@ -93,19 +93,19 @@
   }
 
   th, td {
-    border: 1px solid #e2edff;
+    border: 1px solid #ffe6cc;
     padding: 12px;
     text-align: center;
     font-size: 15px;
   }
 
   th {
-    background-color: #1a73e8;
+    background-color: #ff6f3c;
     color: white;
   }
 
   tr:nth-child(even) td {
-    background-color: #f6faff;
+    background-color: #fff7f0;
   }
 
   .success-message {
@@ -209,7 +209,6 @@ function addClient() {
   const notes = document.getElementById('notes').value.trim();
 
   if(!name || !number) return alert("أدخل البيانات الأساسية للعميل");
-
   if(daysUsed > packageDays) {
     alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية");
     return;
@@ -267,7 +266,7 @@ function renderTable() {
 
 function exportToExcel() {
   let html = `
-    <table border='1' style='border-collapse:collapse; font-family:Roboto; font-size:14px;'>
+    <table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>
       <tr>
         <th>اسم العميل</th>
         <th>رقم العميل</th>
