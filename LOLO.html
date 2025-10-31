@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: "Tahoma", sans-serif;
-    background: linear-gradient(180deg, #e8f2ff, #ffffff);
+    background: #eaf6ff;
     padding: 20px;
     text-align: center;
   }
@@ -15,7 +15,6 @@
   h1 {
     color: #004080;
     margin-bottom: 25px;
-    text-shadow: 1px 1px 3px #aac8ff;
   }
 
   .form-container {
@@ -47,7 +46,7 @@
   input, select {
     width: 100%;
     padding: 10px;
-    border: 2px solid #4a90e2;
+    border: 2px solid #4fa3d1;
     border-radius: 8px;
     font-size: 15px;
     text-align: center;
@@ -55,7 +54,7 @@
   }
 
   input:focus, select:focus {
-    background-color: #eaf3ff;
+    background-color: #e0f0ff;
     border-color: #1a73e8;
     outline: none;
   }
@@ -122,24 +121,6 @@
     background-color: #f6faff;
   }
 
-  .refund-result {
-    margin-top: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #003366;
-    background: linear-gradient(135deg, #d6e9ff, #b5d4ff);
-    border: 2px dashed #1a73e8;
-    display: none;
-    padding: 15px 25px;
-    border-radius: 10px;
-    animation: fadeIn 0.6s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
   .signature {
     margin-top: 40px;
     text-align: left;
@@ -157,7 +138,7 @@
 </head>
 <body>
 
-<h1>💙 حاسبة الاسترداد اليومي</h1>
+<h1>حاسبة الاسترداد اليومي</h1>
 
 <div class="form-container">
   <div>
@@ -206,12 +187,10 @@
   </div>
 
   <div class="button-group">
-    <button onclick="calculateRefund()">💰 احسب الاسترداد</button>
     <button onclick="addClient()">💾 حفظ</button>
+    <button onclick="calculateAllRefunds()">📊 احسب الاسترداد للجميع</button>
   </div>
 </div>
-
-<div id="refundResult" class="refund-result"></div>
 
 <table id="clientsTable">
   <tr>
@@ -235,29 +214,6 @@
 
 <script>
 let clients = [];
-let lastRefund = 0;
-
-function calculateRefund() {
-  const packageValue = parseFloat(document.getElementById('packageValue').value);
-  const totalDays = parseFloat(document.getElementById('totalDays').value);
-  const daysUsed = parseFloat(document.getElementById('daysUsed').value);
-
-  if (isNaN(packageValue) || isNaN(totalDays) || isNaN(daysUsed) || totalDays <= 0) {
-    alert("يرجى إدخال القيم بشكل صحيح.");
-    return;
-  }
-  if (daysUsed > totalDays) {
-    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز الأيام الأساسية.");
-    return;
-  }
-
-  const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
-  lastRefund = refund.toFixed(2);
-
-  const resultDiv = document.getElementById('refundResult');
-  resultDiv.style.display = 'inline-block';
-  resultDiv.innerHTML = `💵 المبلغ المسترد: <span style="color:#003366;">${lastRefund} ريال</span>`;
-}
 
 function addClient() {
   const client = {
@@ -269,7 +225,7 @@ function addClient() {
     bank: document.getElementById('bankName').value.trim(),
     account: document.getElementById('bankAccount').value.trim(),
     type: document.getElementById('subscriptionType').value.trim(),
-    refund: lastRefund,
+    refund: '', // سيحسب لاحقًا
     notes: document.getElementById('notes').value.trim()
   };
 
@@ -278,7 +234,19 @@ function addClient() {
   clients.push(client);
   renderTable();
   clearInputs();
-  document.getElementById('refundResult').style.display = 'none';
+}
+
+function calculateAllRefunds() {
+  clients.forEach(c => {
+    const packageValue = parseFloat(c.package);
+    const totalDays = parseFloat(c.total);
+    const daysUsed = parseFloat(c.days);
+    if (!isNaN(packageValue) && !isNaN(totalDays) && !isNaN(daysUsed) && totalDays > 0) {
+      const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
+      c.refund = `سعر الباقة: ${packageValue}<br>الأيام: ${totalDays}<br>المسترد: ${refund.toFixed(2)} ريال`;
+    }
+  });
+  renderTable();
 }
 
 function removeClient(index) {
@@ -306,7 +274,7 @@ function renderTable() {
 
   clients.forEach((c, i) => {
     const row = `
-      <tr style="animation:fadeIn 0.4s;">
+      <tr>
         <td>${c.name}</td>
         <td>${c.number}</td>
         <td>${c.package}</td>
@@ -315,7 +283,7 @@ function renderTable() {
         <td>${c.bank}</td>
         <td>${c.account}</td>
         <td>${c.type}</td>
-        <td style="color:#004080; font-weight:bold;">${c.refund}</td>
+        <td style="text-align:left; color:#004080;">${c.refund}</td>
         <td>${c.notes}</td>
         <td><button onclick="removeClient(${i})" style="background:red; color:white; border:none; border-radius:5px; padding:3px 8px; cursor:pointer;">X</button></td>
       </tr>`;
@@ -326,7 +294,6 @@ function renderTable() {
 function clearInputs() {
   document.querySelectorAll('input').forEach(i => i.value = '');
   document.getElementById('subscriptionType').value = '';
-  lastRefund = 0;
 }
 
 function exportToExcel() {
@@ -357,7 +324,7 @@ function exportToExcel() {
         <td>${c.bank}</td>
         <td>${c.account}</td>
         <td>${c.type}</td>
-        <td>${c.refund}</td>
+        <td>${c.refund.replace(/<br>/g," ")}</td>
         <td>${c.notes}</td>
       </tr>`;
   });
