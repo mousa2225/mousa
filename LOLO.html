@@ -103,6 +103,8 @@
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
+    table-layout: fixed;
+    word-wrap: break-word;
   }
 
   th, td {
@@ -197,7 +199,6 @@
     <th>اسم العميل</th>
     <th>رقم العميل</th>
     <th>قيمة الباقة</th>
-    <th>أيام الباقة</th>
     <th>الأيام المستفاد بها</th>
     <th>اسم البنك</th>
     <th>رقم الحساب</th>
@@ -225,7 +226,7 @@ function addClient() {
     bank: document.getElementById('bankName').value.trim(),
     account: document.getElementById('bankAccount').value.trim(),
     type: document.getElementById('subscriptionType').value.trim(),
-    refund: '', // سيحسب لاحقًا
+    refund: '', 
     notes: document.getElementById('notes').value.trim()
   };
 
@@ -243,7 +244,9 @@ function calculateAllRefunds() {
     const daysUsed = parseFloat(c.days);
     if (!isNaN(packageValue) && !isNaN(totalDays) && !isNaN(daysUsed) && totalDays > 0) {
       const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
-      c.refund = `سعر الباقة: ${packageValue}<br>الأيام: ${totalDays}<br>المسترد: ${refund.toFixed(2)} ريال`;
+      c.refund = `${refund.toFixed(2)} ريال`;
+      // دمج قيمة الباقة مع عدد الأيام
+      c.package = `${packageValue} (${totalDays})`;
     }
   });
   renderTable();
@@ -261,7 +264,6 @@ function renderTable() {
       <th>اسم العميل</th>
       <th>رقم العميل</th>
       <th>قيمة الباقة</th>
-      <th>أيام الباقة</th>
       <th>الأيام المستفاد بها</th>
       <th>اسم البنك</th>
       <th>رقم الحساب</th>
@@ -278,12 +280,11 @@ function renderTable() {
         <td>${c.name}</td>
         <td>${c.number}</td>
         <td>${c.package}</td>
-        <td>${c.total}</td>
         <td>${c.days}</td>
         <td>${c.bank}</td>
         <td>${c.account}</td>
         <td>${c.type}</td>
-        <td style="text-align:left; color:#004080;">${c.refund}</td>
+        <td>${c.refund}</td>
         <td>${c.notes}</td>
         <td><button onclick="removeClient(${i})" style="background:red; color:white; border:none; border-radius:5px; padding:3px 8px; cursor:pointer;">X</button></td>
       </tr>`;
@@ -303,7 +304,6 @@ function exportToExcel() {
         <th style='background-color:#1a73e8; color:white;'>اسم العميل</th>
         <th style='background-color:#1a73e8; color:white;'>رقم العميل</th>
         <th style='background-color:#1a73e8; color:white;'>قيمة الباقة</th>
-        <th style='background-color:#1a73e8; color:white;'>أيام الباقة</th>
         <th style='background-color:#1a73e8; color:white;'>الأيام المستفاد بها</th>
         <th style='background-color:#1a73e8; color:white;'>اسم البنك</th>
         <th style='background-color:#1a73e8; color:white;'>رقم الحساب</th>
@@ -319,18 +319,17 @@ function exportToExcel() {
         <td>${c.name}</td>
         <td>${c.number}</td>
         <td>${c.package}</td>
-        <td>${c.total}</td>
         <td>${c.days}</td>
         <td>${c.bank}</td>
         <td>${c.account}</td>
         <td>${c.type}</td>
-        <td>${c.refund.replace(/<br>/g," ")}</td>
+        <td>${c.refund}</td>
         <td>${c.notes}</td>
       </tr>`;
   });
 
   html += `
-      <tr><td colspan='10' style='text-align:left; font-weight:bold; color:#1a73e8;'>Accountant Mousa ________</td></tr>
+      <tr><td colspan='9' style='text-align:left; font-weight:bold; color:#1a73e8;'>Accountant Mousa ________</td></tr>
     </table>
   `;
 
