@@ -317,19 +317,15 @@ function exportToExcel() {
       </tr>`;
   });
 
-  html += `
-      <tr><td colspan='9' style='text-align:left; font-weight:bold; color:#1a73e8;'>Accountant Mousa ________</td></tr>
-    </table>
-  `;
+  html += `</table>`; // حذف التوقيع من الملف
 
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
 
-  // تاريخ الملف بالأمس
   const today = new Date();
-  today.setDate(today.getDate() - 1);
+  today.setDate(today.getDate() - 1); // اسم الملف بالأمس
   const dateStr = today.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
 
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
