@@ -30,7 +30,8 @@ th { background-color: #1a73e8; color: white; }
 tr:nth-child(even) td { background-color: #f6faff; }
 
 /* رسالة نجاح */
-.success-message { color: green; font-weight: bold; margin-bottom: 10px; display: none; }
+.success-message { color: green; font-weight: bold; margin-bottom: 10px; display: none; text-align: center; font-size: 16px; }
+.success-message::before { content: "✔ "; }
 
 /* تحذير عدد الأيام */
 .warning { color: red; font-size: 13px; display: none; }
@@ -55,9 +56,9 @@ tr:nth-child(even) td { background-color: #f6faff; }
   <label>اسم العميل</label><input type="text" id="clientName" placeholder="اكتب اسم العميل">
   <label>رقم العميل</label><input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
   <label>قيمة الباقة المشترك عليها</label><input type="number" id="packageValue" placeholder="قيمة الباقة">
-  <label>عدد أيام الباقة الأساسية</label><input type="number" id="totalDays" placeholder="مثلاً 30">
+  <label>عدد أيام الباقة الكلي</label><input type="number" id="totalDays" placeholder="مثلاً 30">
   <label>عدد الأيام المستفاد بها</label><input type="number" id="daysUsed" placeholder="الأيام المستفاد بها">
-  <div class="warning" id="daysWarning">عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية</div>
+  <div class="warning" id="daysWarning">عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الكلي</div>
   <label>اسم البنك</label><input type="text" id="bankName" placeholder="اسم البنك">
   <label>رقم الحساب البنكي</label><input type="text" id="bankAccount" placeholder="رقم الحساب">
   <label>نوع الاشتراك</label>
@@ -107,7 +108,7 @@ tr:nth-child(even) td { background-color: #f6faff; }
     <label>اسم العميل</label><input type="text" id="exName">
     <label>رقم العميل</label><input type="text" id="exNumber">
     <label>قيمة الباقة</label><input type="number" id="exPackage">
-    <label>عدد أيام الباقة الأساسية</label><input type="number" id="exTotalDays">
+    <label>عدد أيام الباقة الكلي</label><input type="number" id="exTotalDays">
     <label>عدد الأيام المستفاد بها</label><input type="number" id="exDays">
     <label>اسم البنك</label><input type="text" id="exBank">
     <label>رقم الحساب البنكي</label><input type="text" id="exAccount">
@@ -158,14 +159,14 @@ function addClient() {
   clients.push(client);
   renderTable();
   clearInputs();
-  showSuccessMessage();
+  showSuccessMessage(); // ← تظهر رسالة نجاح
 }
 
 // رسالة نجاح
 function showSuccessMessage() {
   const msg = document.getElementById('successMessage');
   msg.style.display = 'block';
-  setTimeout(()=>{msg.style.display='none';},2000);
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
 }
 
 // حساب الاسترداد مرة واحدة فقط لكل عميل عادي
