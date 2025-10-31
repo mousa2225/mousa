@@ -20,23 +20,26 @@
   .form-container {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    max-width: 400px;
-    margin: 0 auto 25px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    max-width: 700px;
+    margin: 0 auto 30px;
     padding: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 20px;
     text-align: right;
   }
 
   label {
-    display: block;
     font-weight: bold;
-    margin: 10px 0 5px;
-    color: #005f5f;
+    color: #006b6b;
+    display: block;
+    margin-bottom: 5px;
   }
 
   input {
     width: 100%;
-    padding: 10px;
+    padding: 9px;
     border: 2px solid #009688;
     border-radius: 8px;
     font-size: 15px;
@@ -50,8 +53,12 @@
     outline: none;
   }
 
+  .full-width {
+    grid-column: span 2;
+  }
+
   .button-group {
-    margin-top: 15px;
+    grid-column: span 2;
     display: flex;
     justify-content: space-between;
     gap: 10px;
@@ -73,6 +80,14 @@
     background-color: #00796b;
   }
 
+  button.export {
+    background-color: #f0b429;
+  }
+
+  button.export:hover {
+    background-color: #d99c1a;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -84,8 +99,8 @@
   }
 
   th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid #eee;
+    padding: 12px;
     text-align: center;
     font-size: 15px;
   }
@@ -103,13 +118,19 @@
     margin-top: 25px;
     font-size: 20px;
     font-weight: bold;
-    color: #006b6b;
-    background-color: #e0f7f6;
+    color: #004d4d;
+    background: linear-gradient(135deg, #e0f7f6, #c8f3f1);
     border: 2px dashed #009688;
     display: inline-block;
     padding: 15px 25px;
     border-radius: 10px;
     display: none;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   .signature {
@@ -117,7 +138,8 @@
     text-align: left;
     font-weight: bold;
     font-size: 17px;
-    color: #007b83;
+    color: #444;
+    font-style: italic;
   }
 
   .signature::after {
@@ -131,38 +153,54 @@
 <h1>📊 حاسبة الاسترداد اليومي</h1>
 
 <div class="form-container">
-  <label>اسم العميل</label>
-  <input type="text" id="clientName" placeholder="اكتب اسم العميل">
+  <div>
+    <label>اسم العميل</label>
+    <input type="text" id="clientName" placeholder="اكتب اسم العميل">
+  </div>
+  <div>
+    <label>رقم العميل</label>
+    <input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
+  </div>
 
-  <label>رقم العميل</label>
-  <input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
+  <div>
+    <label>قيمة الباقة المشترك عليها</label>
+    <input type="number" id="packageValue" placeholder="قيمة الباقة">
+  </div>
+  <div>
+    <label>عدد أيام الباقة الأساسية</label>
+    <input type="number" id="totalDays" placeholder="مثلاً 30">
+  </div>
 
-  <label>قيمة الباقة المشترك عليها</label>
-  <input type="number" id="packageValue" placeholder="أدخل قيمة الباقة">
+  <div>
+    <label>عدد الأيام المستفاد بها</label>
+    <input type="number" id="daysUsed" placeholder="الأيام المستفاد بها">
+  </div>
+  <div>
+    <label>اسم البنك</label>
+    <input type="text" id="bankName" placeholder="اسم البنك">
+  </div>
 
-  <label>عدد أيام الباقة الأساسية</label>
-  <input type="number" id="totalDays" placeholder="مثلاً 30">
+  <div>
+    <label>رقم الحساب البنكي</label>
+    <input type="text" id="bankAccount" placeholder="رقم الحساب">
+  </div>
+  <div>
+    <label>نوع الاشتراك</label>
+    <input type="text" id="subscriptionType" placeholder="نوع الاشتراك">
+  </div>
 
-  <label>عدد الأيام المستفاد بها</label>
-  <input type="number" id="daysUsed" placeholder="أدخل الأيام المستفاد بها">
-
-  <label>اسم البنك</label>
-  <input type="text" id="bankName" placeholder="اسم البنك">
-
-  <label>رقم الحساب البنكي</label>
-  <input type="text" id="bankAccount" placeholder="رقم الحساب البنكي">
-
-  <label>نوع الاشتراك</label>
-  <input type="text" id="subscriptionType" placeholder="نوع الاشتراك">
-
-  <label>الملاحظات</label>
-  <input type="text" id="notes" placeholder="اكتب ملاحظات إن وجدت">
+  <div class="full-width">
+    <label>الملاحظات</label>
+    <input type="text" id="notes" placeholder="اكتب الملاحظات إن وجدت">
+  </div>
 
   <div class="button-group">
     <button onclick="calculateRefund()">💰 احسب الاسترداد</button>
     <button onclick="addClient()">➕ إضافة عميل</button>
   </div>
 </div>
+
+<div id="refundResult" class="refund-result"></div>
 
 <table id="clientsTable">
   <tr>
@@ -180,9 +218,7 @@
   </tr>
 </table>
 
-<div id="refundResult" class="refund-result"></div>
-
-<button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
+<button class="export" onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <div class="signature">Accountant Mousa</div>
 
@@ -204,7 +240,7 @@ function calculateRefund() {
     resultDiv.style.display = 'inline-block';
     resultDiv.innerHTML = `💵 المبلغ المسترد: <span style="color:#004d4d;">${lastRefund} ريال</span>`;
   } else {
-    alert("يرجى إدخال قيمة الباقة وعدد الأيام بشكل صحيح.");
+    alert("يرجى إدخال البيانات بشكل صحيح (عدد الأيام لا يتجاوز عدد الأيام الأساسية).");
   }
 }
 
