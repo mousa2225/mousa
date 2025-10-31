@@ -149,13 +149,14 @@ function addClient() {
   clearInputs();
 }
 
-// حساب الاسترداد لجميع العملاء العاديين فقط
+// حساب الاسترداد مرة واحدة فقط لكل عميل عادي
 function calculateAllRefunds() {
   clients.forEach(c => {
-    if(c.isExceptional) return; // تجاهل العملاء الاستثنائيين
-    const refund = ((c.total - c.days)/c.total) * c.package;
-    c.refund = refund.toFixed(2);
-    c.package = `${c.package} (${c.total})`;
+    if(c.isExceptional) return; 
+    if(c.refund === '') { // حساب الاسترداد فقط إذا لم يكن موجود
+      const refund = ((c.total - c.days)/c.total) * c.package;
+      c.refund = refund.toFixed(2);
+    }
   });
   renderTable();
 }
