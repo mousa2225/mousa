@@ -66,7 +66,7 @@
   .button-group {
     grid-column: span 2;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
     flex-wrap: wrap;
   }
@@ -136,6 +136,12 @@
     content: " ___________________";
     color: #007bff;
   }
+
+  .calculate-button {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+  }
 </style>
 </head>
 <body>
@@ -178,8 +184,10 @@
     <label>نوع الاشتراك</label>
     <select id="subscriptionType">
       <option value="">اختر نوع الاشتراك</option>
-      <option value="جديد">جديد</option>
-      <option value="تجديد">تجديد</option>
+      <option value="جديد تطبيق">جديد تطبيق</option>
+      <option value="تجديد تطبيق">تجديد تطبيق</option>
+      <option value="جديد يدوي">جديد يدوي</option>
+      <option value="تجديد يدوي">تجديد يدوي</option>
     </select>
   </div>
 
@@ -190,7 +198,6 @@
 
   <div class="button-group">
     <button onclick="addClient()">💾 حفظ</button>
-    <button onclick="calculateAllRefunds()">📊 احسب الاسترداد للجميع</button>
   </div>
 </div>
 
@@ -208,6 +215,10 @@
     <th>❌</th>
   </tr>
 </table>
+
+<div class="calculate-button">
+  <button onclick="calculateAllRefunds()">📊 احسب الاسترداد للجميع</button>
+</div>
 
 <button class="export" onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
@@ -244,8 +255,7 @@ function calculateAllRefunds() {
     const daysUsed = parseFloat(c.days);
     if (!isNaN(packageValue) && !isNaN(totalDays) && !isNaN(daysUsed) && totalDays > 0) {
       const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
-      c.refund = `${refund.toFixed(2)} ريال`;
-      // دمج قيمة الباقة مع عدد الأيام
+      c.refund = refund.toFixed(2); // رقم فقط بدون ريال
       c.package = `${packageValue} (${totalDays})`;
     }
   });
@@ -338,7 +348,7 @@ function exportToExcel() {
   const link = document.createElement("a");
   link.href = url;
   const today = new Date();
-  const dateStr = today.toLocaleDateString("ar-SA", { day: "2-digit", month: "long" });
+  const dateStr = today.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
   link.download = `ملف الاسترداد اليومي ${dateStr}.xls`;
   link.click();
 }
