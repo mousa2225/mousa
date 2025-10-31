@@ -139,7 +139,8 @@ function addClient() {
     account: document.getElementById('bankAccount').value.trim(),
     type: document.getElementById('subscriptionType').value.trim(),
     refund: '', 
-    notes: document.getElementById('notes').value.trim()
+    notes: document.getElementById('notes').value.trim(),
+    isExceptional: false
   };
 
   if (!client.name || !client.number) return alert("أدخل بيانات العميل الأساسية.");
@@ -148,9 +149,10 @@ function addClient() {
   clearInputs();
 }
 
-// حساب الاسترداد لجميع العملاء
+// حساب الاسترداد لجميع العملاء العاديين فقط
 function calculateAllRefunds() {
   clients.forEach(c => {
+    if(c.isExceptional) return; // تجاهل العملاء الاستثنائيين
     const refund = ((c.total - c.days)/c.total) * c.package;
     c.refund = refund.toFixed(2);
     c.package = `${c.package} (${c.total})`;
@@ -206,7 +208,8 @@ function addExceptionalClient(){
     account: document.getElementById('exAccount').value.trim(),
     type: document.getElementById('exType').value.trim(),
     refund: document.getElementById('exRefund').value.trim(),
-    notes: document.getElementById('exNotes').value.trim()
+    notes: document.getElementById('exNotes').value.trim(),
+    isExceptional: true
   };
   if(!exClient.name || !exClient.number) return alert("أدخل بيانات العميل الأساسية.");
   clients.push(exClient);
