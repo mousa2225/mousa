@@ -21,19 +21,13 @@
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    max-width: 800px;
+    max-width: 500px;
     margin: 0 auto 30px;
     padding: 25px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     text-align: right;
-  }
-
-  @media (max-width: 700px) {
-    .form-container {
-      grid-template-columns: 1fr;
-    }
   }
 
   label {
@@ -59,16 +53,12 @@
     outline: none;
   }
 
-  .full-width {
-    grid-column: span 2;
-  }
-
   .button-group {
-    grid-column: span 2;
     display: flex;
     justify-content: flex-start;
     gap: 10px;
     flex-wrap: wrap;
+    margin-top: 10px;
   }
 
   button {
@@ -85,6 +75,16 @@
 
   button:hover {
     background-color: #155ab6;
+  }
+
+  button.calculate {
+    background-color: #00bfff;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  button.calculate:hover {
+    background-color: #0099cc;
   }
 
   button.export {
@@ -124,7 +124,7 @@
   }
 
   .signature {
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: left;
     font-weight: bold;
     font-size: 17px;
@@ -136,12 +136,6 @@
     content: " ___________________";
     color: #007bff;
   }
-
-  .calculate-button {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-  }
 </style>
 </head>
 <body>
@@ -149,52 +143,38 @@
 <h1>حاسبة الاسترداد اليومي</h1>
 
 <div class="form-container">
-  <div>
-    <label>اسم العميل</label>
-    <input type="text" id="clientName" placeholder="اكتب اسم العميل">
-  </div>
-  <div>
-    <label>رقم العميل</label>
-    <input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
-  </div>
+  <label>اسم العميل</label>
+  <input type="text" id="clientName" placeholder="اكتب اسم العميل">
 
-  <div>
-    <label>قيمة الباقة المشترك عليها</label>
-    <input type="number" id="packageValue" placeholder="قيمة الباقة">
-  </div>
-  <div>
-    <label>عدد أيام الباقة الأساسية</label>
-    <input type="number" id="totalDays" placeholder="مثلاً 30">
-  </div>
+  <label>رقم العميل</label>
+  <input type="text" id="clientNumber" placeholder="اكتب رقم العميل">
 
-  <div>
-    <label>عدد الأيام المستفاد بها</label>
-    <input type="number" id="daysUsed" placeholder="الأيام المستفاد بها">
-  </div>
-  <div>
-    <label>اسم البنك</label>
-    <input type="text" id="bankName" placeholder="اسم البنك">
-  </div>
+  <label>قيمة الباقة المشترك عليها</label>
+  <input type="number" id="packageValue" placeholder="قيمة الباقة">
 
-  <div>
-    <label>رقم الحساب البنكي</label>
-    <input type="text" id="bankAccount" placeholder="رقم الحساب">
-  </div>
-  <div>
-    <label>نوع الاشتراك</label>
-    <select id="subscriptionType">
-      <option value="">اختر نوع الاشتراك</option>
-      <option value="جديد تطبيق">جديد تطبيق</option>
-      <option value="تجديد تطبيق">تجديد تطبيق</option>
-      <option value="جديد يدوي">جديد يدوي</option>
-      <option value="تجديد يدوي">تجديد يدوي</option>
-    </select>
-  </div>
+  <label>عدد أيام الباقة الأساسية</label>
+  <input type="number" id="totalDays" placeholder="مثلاً 30">
 
-  <div class="full-width">
-    <label>الملاحظات</label>
-    <input type="text" id="notes" placeholder="اكتب الملاحظات إن وجدت">
-  </div>
+  <label>عدد الأيام المستفاد بها</label>
+  <input type="number" id="daysUsed" placeholder="الأيام المستفاد بها">
+
+  <label>اسم البنك</label>
+  <input type="text" id="bankName" placeholder="اسم البنك">
+
+  <label>رقم الحساب البنكي</label>
+  <input type="text" id="bankAccount" placeholder="رقم الحساب">
+
+  <label>نوع الاشتراك</label>
+  <select id="subscriptionType">
+    <option value="">اختر نوع الاشتراك</option>
+    <option value="جديد تطبيق">جديد تطبيق</option>
+    <option value="تجديد تطبيق">تجديد تطبيق</option>
+    <option value="جديد يدوي">جديد يدوي</option>
+    <option value="تجديد يدوي">تجديد يدوي</option>
+  </select>
+
+  <label>الملاحظات</label>
+  <input type="text" id="notes" placeholder="اكتب الملاحظات إن وجدت">
 
   <div class="button-group">
     <button onclick="addClient()">💾 حفظ</button>
@@ -216,11 +196,10 @@
   </tr>
 </table>
 
-<div class="calculate-button">
-  <button onclick="calculateAllRefunds()">📊 احسب الاسترداد للجميع</button>
+<div class="button-group" style="margin-top:15px; justify-content:center;">
+  <button class="calculate" onclick="calculateAllRefunds()">📊 احسب الاسترداد للجميع</button>
+  <button class="export" onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 </div>
-
-<button class="export" onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <div class="signature">Accountant Mousa</div>
 
@@ -255,7 +234,7 @@ function calculateAllRefunds() {
     const daysUsed = parseFloat(c.days);
     if (!isNaN(packageValue) && !isNaN(totalDays) && !isNaN(daysUsed) && totalDays > 0) {
       const refund = ((totalDays - daysUsed) / totalDays) * packageValue;
-      c.refund = refund.toFixed(2); // رقم فقط بدون ريال
+      c.refund = refund.toFixed(2);
       c.package = `${packageValue} (${totalDays})`;
     }
   });
@@ -347,9 +326,13 @@ function exportToExcel() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
+
+  // تاريخ الملف بالأمس
   const today = new Date();
+  today.setDate(today.getDate() - 1);
   const dateStr = today.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
-  link.download = `ملف الاسترداد اليومي ${dateStr}.xls`;
+
+  link.download = `الاسترداد اليومي ${dateStr}.xls`;
   link.click();
 }
 </script>
