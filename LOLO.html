@@ -28,7 +28,8 @@ h1 {
   background: #ffffff; /* خلفية بيضاء لصندوق الإدخال */
   border-radius: 12px; /* حواف دائرية */
   box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف حول الصندوق */
-  width: 300px; /* عرض ثابت مناسب للعرض على الجوال */
+  width: 100%; /* عرض نسبي */
+  max-width: 350px; /* أقصى عرض للصندوق */
   padding: 20px;
   display: flex;
   flex-direction: column; /* ترتيب الحقول عمودي */
@@ -81,7 +82,8 @@ button.calculate {
 
 /* ======================== جدول العملاء ======================== */
 table {
-  width: 250px; /* أصغر من صندوق الإدخال */
+  width: 100%; /* عرض نسبي */
+  max-width: 320px; /* أقصى عرض للجدول */
   border-collapse: collapse; /* إزالة المسافات بين الحدود */
   margin-top: 20px;
   text-align: center;
@@ -117,13 +119,14 @@ tr:nth-child(even) td {
 }
 
 /* ======================== متجاوب مع أي شاشة ======================== */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   body {
     padding: 10px; /* تقليل الحواف للشاشات الصغيرة */
   }
 
   .form-container {
-    width: 95%; /* يغطي معظم عرض الجوال */
+    width: 100%; /* يغطي عرض الجوال بالكامل */
+    max-width: none; /* إزالة الحد الأقصى */
     padding: 15px; 
   }
 
@@ -133,7 +136,8 @@ tr:nth-child(even) td {
   }
 
   table {
-    width: 95%; /* الجدول يغطي معظم عرض الجوال */
+    width: 100%; /* الجدول يغطي عرض الجوال بالكامل */
+    max-width: none; /* إزالة الحد الأقصى */
     font-size: 12px; /* تصغير الخط */
   }
 
