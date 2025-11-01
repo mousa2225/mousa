@@ -8,140 +8,115 @@
 <style>
 /* ======================== إعدادات الصفحة العامة ======================== */
 body {
-  font-family: "Tahoma", Arial, sans-serif; /* الخط الافتراضي للصفحة */
-  background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%); /* خلفية متدرجة من الأعلى للأسفل */
-  margin: 0; /* إزالة الهوامش الافتراضية */
-  padding: 20px; /* مسافة داخلية من حواف الصفحة */
-  display: flex; /* استخدام Flexbox لترتيب العناصر */
-  flex-direction: column; /* ترتيب العناصر عمودي */
-  align-items: center; /* محاذاة العناصر أفقياً للوسط */
-  min-height: 100vh; /* ارتفاع الصفحة على الأقل يساوي ارتفاع الشاشة */
-  box-sizing: border-box; /* احتساب الحواف ضمن قياس العرض والارتفاع */
+  font-family: "Tahoma", Arial, sans-serif;
+  background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* ======================== العنوان الرئيسي ======================== */
 h1 {
-  color: #0288d1; /* لون النص أزرق */
-  text-align: center; /* توسيط النص */
-  margin-bottom: 25px; /* مسافة تحت العنوان */
-  font-size: 24px; /* حجم الخط */
+  color: #0288d1;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
 }
 
 /* ======================== الحاوية الرئيسية ======================== */
 .container {
-  width: 100%; /* العرض كامل الحاوية */
-  max-width: 480px; /* الحد الأقصى للعرض */
-  background: #fff; /* خلفية بيضاء */
-  border-radius: 14px; /* حواف دائرية */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل خفيف */
-  padding: 20px; /* مسافة داخلية */
-  box-sizing: border-box; /* تضمين الحواف ضمن القياس */
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  padding: 20px;
+  box-sizing: border-box;
   margin-bottom: 20px;
 }
 
 /* ======================== الحقول ======================== */
 label {
-  font-weight: bold; /* خط عريض */
-  color: #00796b; /* لون النص أخضر غامق */
-  font-size: 14px; /* حجم الخط */
-  margin-top: 10px; /* مسافة أعلى كل label */
+  font-weight: bold;
+  color: #00796b;
+  font-size: 14px;
+  margin-top: 10px;
 }
 
 input, select {
-  width: 100%; /* الحقل يملأ كامل العرض */
-  padding: 10px; /* مسافة داخلية داخل الحقل */
-  margin-top: 5px; /* مسافة بين الحقل وال label */
-  border: 2px solid #03a9f4; /* حدود زرقاء */
-  border-radius: 6px; /* حواف دائرية صغيرة */
-  font-size: 14px; /* حجم الخط داخل الحقل */
-  text-align: center; /* محاذاة النص في الوسط */
-  transition: 0.3s; /* تأثير سلس عند التغيير */
-  box-sizing: border-box; /* احتساب الحواف ضمن القياس */
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 2px solid #03a9f4;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  transition: 0.3s;
+  box-sizing: border-box;
 }
 
-/* تأثير عند التركيز داخل الحقل */
 input:focus, select:focus {
-  border-color: #0288d1; /* تغيير لون الحدود عند التركيز */
-  background-color: #e1f5fe; /* تغيير خلفية الحقل */
-  outline: none; /* إزالة الإطار الافتراضي */
+  border-color: #0288d1;
+  background-color: #e1f5fe;
+  outline: none;
 }
 
 /* ======================== الأزرار ======================== */
 button {
-  width: 100%; /* الزر كامل عرض الحاوية */
-  background-color: #03a9f4; /* لون الخلفية أزرق */
-  color: white; /* لون النص أبيض */
-  border: none; /* إزالة الحدود */
-  padding: 10px; /* مسافة داخلية */
-  border-radius: 6px; /* حواف دائرية */
-  cursor: pointer; /* شكل المؤشر يد عند المرور */
-  font-size: 15px; /* حجم الخط */
-  font-weight: bold; /* خط عريض */
-  margin-top: 10px; /* مسافة فوق الزر */
-  transition: 0.3s; /* تأثير سلس عند المرور */
+  width: 100%;
+  background-color: #03a9f4;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: 0.3s;
 }
 
-/* تغيير لون الزر عند المرور عليه */
-button:hover {
-  background-color: #0288d1;
-}
-
-/* زر الحساب بلون مميز */
-button.calculate {
-  background-color: #00bcd4;
-}
-
-/* زر الحذف بلون أحمر */
-button.delete {
-  background-color: #f44336;
-  font-size: 13px;
-  padding: 6px 8px;
-}
+button:hover { background-color: #0288d1; }
+button.calculate { background-color: #00bcd4; }
+button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 
 /* ======================== رسالة النجاح ======================== */
 .success-message {
-  color: green; /* لون النص أخضر */
+  color: green;
   font-weight: bold;
   text-align: center;
-  display: none; /* مخفية افتراضياً */
+  display: none;
   margin-top: 10px;
   font-size: 14px;
 }
-
-/* إضافة علامة صح قبل الرسالة */
-.success-message::before {
-  content: "✔ ";
-}
+.success-message::before { content: "✔ "; }
 
 /* ======================== الجدول ======================== */
 .table-wrapper {
-  width: 100%; /* العرض كامل الحاوية */
-  overflow-x: auto; /* شريط تمرير أفقي إذا انضغط الجدول */
+  width: 100%;
+  overflow-x: auto;
   margin-top: 20px;
 }
 
 table {
-  width: 100%; /* العرض كامل */
-  min-width: 400px; /* الحد الأدنى للعرض */
-  border-collapse: collapse; /* دمج الحدود */
-  text-align: center; /* محاذاة النص في الوسط */
-  font-size: 13px; /* حجم الخط */
+  width: 100%;
+  min-width: 400px;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 13px;
 }
 
 th, td {
-  border: 1px solid #03a9f4; /* حدود زرقاء للخلايا */
-  padding: 8px; /* مسافة داخلية للخلايا */
+  border: 1px solid #03a9f4;
+  padding: 8px;
 }
 
-th {
-  background-color: #03a9f4; /* خلفية العنوان أزرق */
-  color: white; /* نص أبيض */
-}
-
-/* تلوين الصفوف الزوجية */
-tr:nth-child(even) td {
-  background-color: #e1f5fe;
-}
+th { background-color: #03a9f4; color: white; }
+tr:nth-child(even) td { background-color: #e1f5fe; }
 
 /* ======================== استجابة للشاشات الصغيرة ======================== */
 @media (max-width: 600px) {
@@ -151,6 +126,23 @@ tr:nth-child(even) td {
   button { font-size: 14px; }
   table { font-size: 12px; }
 }
+
+/* ======================== حاوية العميل الاستثنائي ======================== */
+.exceptional-container {
+  width: 100%;
+  max-width: 480px;
+  background: #fff3e0; /* خلفية برتقالية فاتحة */
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  padding: 20px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+h2 {
+  color: #ff9800;
+  text-align: center;
+  margin-bottom: 15px;
+}
 </style>
 </head>
 
@@ -158,11 +150,10 @@ tr:nth-child(even) td {
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
+<!-- ======================== حاوية العملاء العاديين ======================== -->
 <div class="container">
-  <!-- رسالة نجاح عند حفظ العميل -->
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
-  <!-- ======================== حقول الإدخال ======================== -->
   <label>اسم العميل</label>
   <input type="text" id="clientName" placeholder="ادخل اسم العميل">
 
@@ -195,10 +186,24 @@ tr:nth-child(even) td {
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <!-- ======================== الأزرار ======================== -->
   <button onclick="addClient()">💾 حفظ العميل</button>
   <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
-  <button onclick="addExceptionalClient()">🌟 إضافة عميل مميز</button>
+</div>
+
+<!-- ======================== حاوية العملاء الاستثنائيين ======================== -->
+<div class="exceptional-container">
+  <h2>🌟 إضافة عميل مميز</h2>
+
+  <label>اسم العميل المميز</label>
+  <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+
+  <label>رقم العميل</label>
+  <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+
+  <label>المبلغ المسترد يدويًا</label>
+  <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+
+  <button onclick="saveExceptionalClient()">💾 حفظ العميل المميز</button>
 </div>
 
 <!-- ======================== جدول العملاء ======================== -->
@@ -218,11 +223,10 @@ tr:nth-child(even) td {
 
 <script>
 // ======================= مصفوفة لتخزين بيانات العملاء =======================
-let clients = []; // كل عنصر فيها يمثل عميل واحد كمجموعة خصائص (object)
+let clients = [];
 
-// ======================= دالة حفظ العميل =======================
+// ======================= دالة حفظ العميل العادي =======================
 function addClient() {
-  // قراءة القيم من الحقول
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
   const packageValue = parseFloat(document.getElementById('packageValue').value);
@@ -233,47 +237,32 @@ function addClient() {
   const type = document.getElementById('subscriptionType').value;
   const notes = document.getElementById('notes').value.trim();
 
-  // التحقق من صحة البيانات
-  if (!name || !number) {
-    alert("الرجاء إدخال اسم ورقم العميل");
-    return;
-  }
-  if (daysUsed > packageDays) {
-    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة");
-    return;
-  }
+  if (!name || !number) { alert("الرجاء إدخال اسم ورقم العميل"); return; }
+  if (daysUsed > packageDays) { alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
 
-  // إضافة العميل للمصفوفة
   clients.push({ 
     name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '', exceptional: false 
   });
 
-  // عرض رسالة نجاح مؤقتة
   document.getElementById('successMsg').style.display = 'block';
   setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
 
-  renderTable(); // تحديث الجدول
-  clearInputs(); // مسح الحقول بعد الحفظ
+  renderTable();
+  clearInputs();
 }
 
-// ======================= دالة مسح الحقول بعد الحفظ =======================
 function clearInputs() {
   document.querySelectorAll('input').forEach(i => i.value = '');
 }
 
-// ======================= إضافة عميل استثنائي =======================
-function addExceptionalClient() {
-  const name = prompt("ادخل اسم العميل المميز:");
-  if (!name) return;
+// ======================= دالة حفظ العميل الاستثنائي =======================
+function saveExceptionalClient() {
+  const name = document.getElementById('exceptionalName').value.trim();
+  const number = document.getElementById('exceptionalNumber').value.trim();
+  const refund = parseFloat(document.getElementById('exceptionalRefund').value);
 
-  const number = prompt("ادخل رقم العميل:");
-  const refund = parseFloat(prompt("ادخل المبلغ المسترد يدويًا:"));
-  if (isNaN(refund)) {
-    alert("المبلغ المسترد يجب أن يكون رقمًا");
-    return;
-  }
+  if (!name || !number || isNaN(refund)) { alert("الرجاء إدخال جميع البيانات بشكل صحيح"); return; }
 
-  // إضافة العميل الاستثنائي
   clients.push({
     name,
     number,
@@ -285,26 +274,28 @@ function addExceptionalClient() {
     type: 'عميل مميز',
     notes: '',
     refund: refund.toFixed(2),
-    exceptional: true // تمييز العميل الاستثنائي
+    exceptional: true
   });
 
   renderTable();
+  document.getElementById('exceptionalName').value = '';
+  document.getElementById('exceptionalNumber').value = '';
+  document.getElementById('exceptionalRefund').value = '';
 }
 
 // ======================= حساب المبلغ المسترد =======================
 function calculateRefund() {
   clients.forEach(c => {
-    if (!c.exceptional) { // لا نحسب للعملاء الاستثنائيين
+    if (!c.exceptional) {
       c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
     }
   });
-  renderTable(); // تحديث الجدول
+  renderTable();
 }
 
 // ======================= عرض الجدول =======================
 function renderTable() {
   const table = document.getElementById("clientsTable");
-  // إعادة بناء الجدول
   table.innerHTML = `
     <tr>
       <th>اسم العميل</th>
@@ -313,7 +304,6 @@ function renderTable() {
       <th>حذف</th>
     </tr>
   `;
-  // إضافة صف لكل عميل
   clients.forEach((c, index) => {
     table.innerHTML += `
       <tr>
