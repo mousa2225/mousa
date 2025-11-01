@@ -13,12 +13,12 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* جعل كل شيء في وسط الصفحة */
+  align-items: center; /* كل شيء في وسط الصفحة */
 }
 
 /* ======================== عنوان الصفحة ======================== */
 h1 {
-  color: #03a9f4; /* لون برّاق سماوي */
+  color: #03a9f4; /* لون عنوان برّاق سماوي */
   text-align: center;
   margin-bottom: 25px;
 }
@@ -27,8 +27,8 @@ h1 {
 .form-container {
   background: #ffffff; /* خلفية بيضاء لصندوق الإدخال */
   border-radius: 12px; /* حواف دائرية */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف */
-  width: 300px; /* عرض ثابت لصندوق الإدخال */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف حول الصندوق */
+  width: 300px; /* عرض ثابت مناسب للعرض على الجوال */
   padding: 20px;
   display: flex;
   flex-direction: column; /* ترتيب الحقول عمودي */
@@ -37,32 +37,32 @@ h1 {
 
 /* ======================== تسميات الحقول ======================== */
 label {
-  font-weight: bold;
-  color: #00796b; /* لون أخضر داكن */
+  font-weight: bold; /* خط غامق */
+  color: #00796b; /* أخضر داكن */
   font-size: 14px;
 }
 
 /* ======================== حقول الإدخال ======================== */
 input, select {
-  width: 100%; /* ملء الصندوق بالكامل */
+  width: 100%; /* الحقل يملأ عرض الصندوق */
   padding: 8px; /* مساحة داخل الحقل */
   border: 2px solid #03a9f4; /* إطار سماوي */
   border-radius: 6px;
   font-size: 14px;
   text-align: center; /* كتابة النص في وسط الحقل */
-  transition: 0.3s; /* تأثير تغيير اللون عند التركيز */
+  transition: 0.3s; /* تأثير سلس عند التركيز */
 }
 
 input:focus, select:focus {
   background-color: #e1f5fe; /* لون فاتح عند التركيز */
-  border-color: #0288d1; /* تغيير لون الإطار */
+  border-color: #0288d1; /* تغيير لون الإطار عند التركيز */
   outline: none;
 }
 
 /* ======================== أزرار ======================== */
 button {
-  background-color: #03a9f4; /* لون سماوي */
-  color: white;
+  background-color: #03a9f4; /* لون أزرق سماوي للزر */
+  color: white; /* لون الكتابة أبيض */
   border: none;
   padding: 10px;
   border-radius: 6px;
@@ -72,11 +72,11 @@ button {
 }
 
 button:hover {
-  background-color: #0288d1; /* تغيير لون عند المرور */
+  background-color: #0288d1; /* لون الزر عند المرور عليه */
 }
 
 button.calculate {
-  background-color: #00bcd4; /* لون أزرق سماوي مختلف */
+  background-color: #00bcd4; /* زر "احسب الاسترداد" بلون أزرق سماوي مختلف */
 }
 
 /* ======================== جدول العملاء ======================== */
@@ -95,54 +95,45 @@ th, td {
 
 th {
   background-color: #03a9f4; /* لون العنوان */
-  color: white;
+  color: white; /* نص العنوان أبيض */
 }
 
 /* صفوف متبادلة بلون فاتح */
 tr:nth-child(even) td {
-  background-color: #e1f5fe;
+  background-color: #e1f5fe; /* لون سماوي فاتح للصفوف الزوجية */
 }
 
-/* رسالة نجاح حفظ العميل */
+/* ======================== رسالة نجاح ======================== */
 .success-message {
-  color: green;
-  font-weight: bold;
+  color: green; /* اللون الأخضر */
+  font-weight: bold; /* خط غامق */
   margin-bottom: 5px;
-  display: none;
+  display: none; /* مخفية بشكل افتراضي */
   text-align: center;
   font-size: 14px;
 }
 .success-message::before {
-  content: "✔ "; /* إضافة علامة صح قبل الرسالة */
+  content: "✔ "; /* علامة صح قبل الرسالة */
 }
 
-/* ======================== استجابة الجوال ======================== */
-@media screen and (max-width: 400px) {
-  .form-container, table {
-    width: 95%; /* ملء عرض الجوال تقريبًا */
-  }
-  th, td, input, select, button {
-    font-size: 12px;
-    padding: 5px;
-  }
-}/* ===================== متجاوب مع أي شاشة ===================== */
+/* ======================== متجاوب مع أي شاشة ======================== */
 @media screen and (max-width: 600px) {
   body {
-    padding: 10px; /* تقليل الحواف في الشاشات الصغيرة */
+    padding: 10px; /* تقليل الحواف للشاشات الصغيرة */
   }
 
   .form-container {
-    width: 95%; /* يجعل صندوق الإدخال يغطي معظم عرض الشاشة */
+    width: 95%; /* يغطي معظم عرض الجوال */
     padding: 15px; 
   }
 
   input, select, button {
-    font-size: 13px; /* تصغير حجم الخطوص */
-    padding: 6px;
+    font-size: 13px; /* تصغير حجم الخط */
+    padding: 6px; /* تقليل المساحة داخل الحقول */
   }
 
   table {
-    width: 95%; /* جدول العملاء يصبح أصغر ويغطي العرض تقريبًا */
+    width: 95%; /* الجدول يغطي معظم عرض الجوال */
     font-size: 12px; /* تصغير الخط */
   }
 
@@ -150,14 +141,13 @@ tr:nth-child(even) td {
     padding: 5px; /* تقليل مساحة الخلية */
   }
 }
-
 </style>
 </head>
 <body>
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
-<!-- صندوق الإدخال -->
+<!-- ======================== صندوق الإدخال ======================== -->
 <div class="form-container">
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
@@ -193,19 +183,20 @@ tr:nth-child(even) td {
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <button onclick="addClient()">💾 حفظ العميل</button>
-  <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button>
+  <button onclick="addClient()">💾 حفظ العميل</button> <!-- زر لحفظ بيانات العميل -->
+  <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button> <!-- زر لحساب الاسترداد -->
 </div>
 
-<!-- الجدول الصغير تحت -->
+<!-- ======================== جدول العملاء المصغّر ======================== -->
 <table id="clientsTable">
   <tr>
-    <th>اسم العميل</th>
-    <th>قيمة الباقة(عدد الأيام)</th>
-    <th>المبلغ المسترد</th>
+    <th>اسم العميل</th> <!-- عنوان عمود اسم العميل -->
+    <th>قيمة الباقة(عدد الأيام)</th> <!-- عنوان عمود سعر الباقة وعدد الأيام -->
+    <th>المبلغ المسترد</th> <!-- عنوان عمود الاسترداد -->
   </tr>
 </table>
 
+<!-- زر تصدير الملف -->
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
@@ -214,16 +205,17 @@ let clients = [];
 
 // ======================= إضافة عميل =======================
 function addClient() {
-  const name = document.getElementById('clientName').value.trim();
-  const number = document.getElementById('clientNumber').value.trim();
-  const packageValue = document.getElementById('packageValue').value.trim();
-  const packageDays = document.getElementById('packageDays').value.trim();
-  const daysUsed = document.getElementById('daysUsed').value.trim();
+  const name = document.getElementById('clientName').value.trim(); // اسم العميل
+  const number = document.getElementById('clientNumber').value.trim(); // رقم العميل
+  const packageValue = document.getElementById('packageValue').value.trim(); // سعر الباقة
+  const packageDays = document.getElementById('packageDays').value.trim(); // عدد أيام الباقة
+  const daysUsed = document.getElementById('daysUsed').value.trim(); // الأيام المستفاد بها
   const bank = document.getElementById('bankName').value.trim();
   const account = document.getElementById('bankAccount').value.trim();
   const type = document.getElementById('subscriptionType').value;
   const notes = document.getElementById('notes').value.trim();
 
+  // تحقق من البيانات الأساسية
   if(!name || !number) {
     alert("أدخل البيانات الأساسية للعميل");
     return;
@@ -233,19 +225,23 @@ function addClient() {
     return;
   }
 
+  // إضافة العميل إلى المصفوفة
   clients.push({name, number, packageValue, packageDays, daysUsed, bank, account, type, refund:'', notes});
+
+  // عرض رسالة نجاح قصيرة
   document.getElementById('successMsg').style.display = 'block';
   setTimeout(()=>document.getElementById('successMsg').style.display='none',2000);
 
-  renderTable();
+  renderTable(); // تحديث الجدول الصغير أسفل الصفحة
 }
 
 // ======================= حساب الاسترداد =======================
 function calculateRefund() {
   clients.forEach(c => {
+    // حساب المبلغ المسترد: سعر الباقة / أيام الباقة * الأيام المستفاد بها
     c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
   });
-  renderTable();
+  renderTable(); // تحديث الجدول بعد الحساب
 }
 
 // ======================= عرض الجدول الصغير =======================
