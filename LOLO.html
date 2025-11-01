@@ -36,6 +36,7 @@ h1 {
   box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل خفيف */
   padding: 20px; /* مسافة داخلية */
   box-sizing: border-box; /* تضمين الحواف ضمن القياس */
+  margin-bottom: 20px;
 }
 
 /* ======================== الحقول ======================== */
@@ -197,6 +198,7 @@ tr:nth-child(even) td {
   <!-- ======================== الأزرار ======================== -->
   <button onclick="addClient()">💾 حفظ العميل</button>
   <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
+  <button onclick="addExceptionalClient()">🌟 إضافة عميل مميز</button>
 </div>
 
 <!-- ======================== جدول العملاء ======================== -->
@@ -221,9 +223,9 @@ let clients = []; // كل عنصر فيها يمثل عميل واحد كمجم�
 // ======================= دالة حفظ العميل =======================
 function addClient() {
   // قراءة القيم من الحقول
-  const name = document.getElementById('clientName').value.trim(); // trim لازالة الفراغات
+  const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
-  const packageValue = parseFloat(document.getElementById('packageValue').value); // تحويل النص لرقم
+  const packageValue = parseFloat(document.getElementById('packageValue').value);
   const packageDays = parseFloat(document.getElementById('packageDays').value);
   const daysUsed = parseFloat(document.getElementById('daysUsed').value);
   const bank = document.getElementById('bankName').value.trim();
@@ -234,7 +236,7 @@ function addClient() {
   // التحقق من صحة البيانات
   if (!name || !number) {
     alert("الرجاء إدخال اسم ورقم العميل");
-    return; // توقف الدالة إذا البيانات ناقصة
+    return;
   }
   if (daysUsed > packageDays) {
     alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة");
@@ -243,7 +245,7 @@ function addClient() {
 
   // إضافة العميل للمصفوفة
   clients.push({ 
-    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '' 
+    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '', exceptional: false 
   });
 
   // عرض رسالة نجاح مؤقتة
@@ -256,14 +258,45 @@ function addClient() {
 
 // ======================= دالة مسح الحقول بعد الحفظ =======================
 function clearInputs() {
-  document.querySelectorAll('input').forEach(i => i.value = ''); // كل الحقول نصية يتم مسحها
+  document.querySelectorAll('input').forEach(i => i.value = '');
+}
+
+// ======================= إضافة عميل استثنائي =======================
+function addExceptionalClient() {
+  const name = prompt("ادخل اسم العميل المميز:");
+  if (!name) return;
+
+  const number = prompt("ادخل رقم العميل:");
+  const refund = parseFloat(prompt("ادخل المبلغ المسترد يدويًا:"));
+  if (isNaN(refund)) {
+    alert("المبلغ المسترد يجب أن يكون رقمًا");
+    return;
+  }
+
+  // إضافة العميل الاستثنائي
+  clients.push({
+    name,
+    number,
+    packageValue: 0,
+    packageDays: 0,
+    daysUsed: 0,
+    bank: '',
+    account: '',
+    type: 'عميل مميز',
+    notes: '',
+    refund: refund.toFixed(2),
+    exceptional: true // تمييز العميل الاستثنائي
+  });
+
+  renderTable();
 }
 
 // ======================= حساب المبلغ المسترد =======================
 function calculateRefund() {
   clients.forEach(c => {
-    // قيمة اليوم الواحد * عدد الأيام المتبقية = المبلغ المسترد
-    c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
+    if (!c.exceptional) { // لا نحسب للعملاء الاستثنائيين
+      c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
+    }
   });
   renderTable(); // تحديث الجدول
 }
@@ -296,14 +329,13 @@ function renderTable() {
 // ======================= حذف عميل =======================
 function deleteClient(index) {
   if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
-    clients.splice(index, 1); // إزالة العميل من المصفوفة
-    renderTable(); // تحديث الجدول
+    clients.splice(index, 1);
+    renderTable();
   }
 }
 
 // ======================= تصدير إلى Excel =======================
 function exportToExcel() {
-  // إنشاء جدول HTML كنص
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>`;
   html += `<tr>
     <th>اسم العميل</th>
@@ -331,17 +363,15 @@ function exportToExcel() {
   });
   html += "</table>";
 
-  const blob = new Blob([html], { type: "application/vnd.ms-excel" }); // تحويل النص لملف Excel
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-
-  // إضافة تاريخ اليوم للملف
   const today = new Date();
   const dateStr = today.toLocaleDateString('ar-EG', { day: '2-digit', month: 'long', year:'numeric' });
 
   link.href = url;
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
-  link.click(); // تنزيل الملف
+  link.click();
 }
 </script>
 
