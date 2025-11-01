@@ -185,14 +185,8 @@
   <table id="clientsTable">
     <tr>
       <th>اسم العميل</th>
-      <th>رقم العميل</th>
       <th>قيمة الباقة(عدد الأيام)</th>
-      <th>عدد الأيام المستفاد بها</th>
-      <th>اسم البنك</th>
-      <th>رقم الحساب البنكي</th>
-      <th>نوع الاشتراك</th>
       <th>المبلغ المسترد</th>
-      <th>الملاحظات</th>
     </tr>
   </table>
 </div>
@@ -241,28 +235,16 @@ function renderTable() {
   table.innerHTML = `
     <tr>
       <th>اسم العميل</th>
-      <th>رقم العميل</th>
       <th>قيمة الباقة(عدد الأيام)</th>
-      <th>عدد الأيام المستفاد بها</th>
-      <th>اسم البنك</th>
-      <th>رقم الحساب البنكي</th>
-      <th>نوع الاشتراك</th>
       <th>المبلغ المسترد</th>
-      <th>الملاحظات</th>
     </tr>
   `;
 
   clients.forEach(c => {
     table.innerHTML += `<tr>
       <td>${c.name}</td>
-      <td>${c.number}</td>
       <td>${c.packageValue}(${c.packageDays})</td>
-      <td>${c.daysUsed}</td>
-      <td>${c.bank}</td>
-      <td>${c.account}</td>
-      <td>${c.type}</td>
       <td>${c.refund}</td>
-      <td>${c.notes}</td>
     </tr>`;
   });
 }
