@@ -125,7 +125,32 @@ tr:nth-child(even) td {
     font-size: 12px;
     padding: 5px;
   }
+}/* ===================== متجاوب مع أي شاشة ===================== */
+@media screen and (max-width: 600px) {
+  body {
+    padding: 10px; /* تقليل الحواف في الشاشات الصغيرة */
+  }
+
+  .form-container {
+    width: 95%; /* يجعل صندوق الإدخال يغطي معظم عرض الشاشة */
+    padding: 15px; 
+  }
+
+  input, select, button {
+    font-size: 13px; /* تصغير حجم الخطوص */
+    padding: 6px;
+  }
+
+  table {
+    width: 95%; /* جدول العملاء يصبح أصغر ويغطي العرض تقريبًا */
+    font-size: 12px; /* تصغير الخط */
+  }
+
+  th, td {
+    padding: 5px; /* تقليل مساحة الخلية */
+  }
 }
+
 </style>
 </head>
 <body>
