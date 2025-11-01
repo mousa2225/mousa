@@ -7,44 +7,46 @@
 <style>
   body {
     font-family: "Tahoma", Arial, sans-serif;
-    background: #e0f7fa; /* سماوي فاتح */
-    padding: 20px;
+    background: #e0f7fa;
+    padding: 10px;
     margin: 0;
   }
 
   h1 {
-    color: #0288d1; /* سماوي غامق */
+    color: #0288d1;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    font-size: 20px;
   }
 
   .form-container {
     background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-width: 500px;
-    margin: 0 auto 20px;
-    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 100%;
+    margin: 0 auto 15px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
   }
 
   label {
     font-weight: bold;
     color: #444;
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
+    font-size: 12px;
   }
 
   input, select {
     width: 100%;
-    padding: 8px;
-    border: 2px solid #4fc3f7;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 4px;
+    border: 1px solid #4fc3f7;
+    border-radius: 5px;
+    font-size: 12px;
     text-align: center;
-    transition: 0.3s;
+    transition: 0.2s;
   }
 
   input:focus, select:focus {
@@ -57,10 +59,10 @@
     background-color: #0288d1;
     color: white;
     border: none;
-    padding: 10px 14px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     transition: 0.3s;
   }
 
@@ -70,10 +72,10 @@
 
   button.calculate {
     background-color: #4fc3f7;
-    font-size: 13px;
-    padding: 7px 10px;
-    border-radius: 6px;
-    margin-top: 8px;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    margin-top: 5px;
   }
 
   button.calculate:hover {
@@ -82,28 +84,29 @@
 
   .table-wrapper {
     overflow-x: auto;
-    margin-top: 15px;
+    margin-top: 10px;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    border: 2px solid #4fc3f7;
+    border: 1px solid #4fc3f7;
     background-color: white;
     table-layout: fixed;
     word-wrap: break-word;
+    font-size: 12px;
   }
 
   th, td {
     border: 1px solid #b3e5fc;
-    padding: 10px;
+    padding: 4px;
     text-align: center;
-    font-size: 14px;
   }
 
   th {
     background-color: #0288d1;
     color: white;
+    font-size: 12px;
   }
 
   tr:nth-child(even) td {
@@ -113,10 +116,10 @@
   .success-message {
     color: #0277bd;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     display: none;
     text-align: center;
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .success-message::before {
@@ -125,15 +128,18 @@
 
   @media screen and (max-width: 600px) {
     .form-container {
-      padding: 15px;
+      padding: 10px;
     }
     input, select, button {
-      font-size: 13px;
-      padding: 6px;
+      font-size: 11px;
+      padding: 3px;
     }
     th, td {
-      font-size: 12px;
-      padding: 6px;
+      font-size: 11px;
+      padding: 3px;
+    }
+    h1 {
+      font-size: 18px;
     }
   }
 </style>
