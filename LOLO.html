@@ -59,8 +59,9 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
 
 @media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 20px; } .container { padding: 15px; } button { font-size: 14px; } table { font-size: 12px; } }
 
+/* ======================== نافذة العميل الاستثنائي ======================== */
 .modal {
-  display: none;
+  display: none; 
   position: fixed;
   z-index: 999;
   left: 0; top: 0;
@@ -107,13 +108,13 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
   <label>رقم الحساب البنكي</label>
   <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
   <label>نوع الاشتراك</label>
-<select id="subscriptionType">
-  <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
-  <option value="تطبيق جديد">تطبيق جديد</option>
-  <option value="تطبيق تجديد">تطبيق تجديد</option>
-  <option value="جديد يدوي">جديد يدوي</option>
-  <option value="تجديد يدوي">تجديد يدوي</option>
-</select>
+  <select id="subscriptionType">
+    <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
+    <option value="تطبيق جديد">تطبيق جديد</option>
+    <option value="تطبيق تجديد">تطبيق تجديد</option>
+    <option value="جديد يدوي">جديد يدوي</option>
+    <option value="تجديد يدوي">تجديد يدوي</option>
+  </select>
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
@@ -129,37 +130,28 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
 
     <label>اسم العميل</label>
     <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
-
     <label>رقم العميل</label>
     <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
-
     <label>قيمة الباقة (اختياري)</label>
     <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
-
     <label>عدد أيام الباقة (اختياري)</label>
     <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
-
     <label>عدد الأيام المستفاد بها (اختياري)</label>
     <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
-
     <label>اسم البنك</label>
     <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
-
     <label>رقم الحساب البنكي</label>
     <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
-
-   <label>نوع الاشتراك</label>
-<select id="subscriptionType">
-  <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
-  <option value="تطبيق جديد">تطبيق جديد</option>
-  <option value="تطبيق تجديد">تطبيق تجديد</option>
-  <option value="جديد يدوي">جديد يدوي</option>
-  <option value="تجديد يدوي">تجديد يدوي</option>
-</select>
-
+    <label>نوع الاشتراك</label>
+    <select id="exceptionalType">
+      <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
+      <option value="تطبيق جديد">تطبيق جديد</option>
+      <option value="تطبيق تجديد">تطبيق تجديد</option>
+      <option value="جديد يدوي">جديد يدوي</option>
+      <option value="تجديد يدوي">تجديد يدوي</option>
+    </select>
     <label>المبلغ المسترد يدويًا</label>
     <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
-
     <label>الملاحظات</label>
     <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
 
@@ -240,6 +232,7 @@ function saveExceptionalClient() {
 
   renderTable();
   closeExceptionalModal();
+
   document.getElementById('exceptionalName').value = '';
   document.getElementById('exceptionalNumber').value = '';
   document.getElementById('exceptionalPackageValue').value = '';
@@ -290,31 +283,31 @@ function deleteClient(index) {
 }
 
 function exportToExcel() {
-  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:30px;'>`;
+  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:18px;'>`;
   html += `<tr>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">اسم العميل</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">رقم العميل</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">قيمة الباقة (عدد الأيام)</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">عدد الأيام المستفاد بها</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">اسم البنك</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">رقم الحساب البنكي</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">نوع الاشتراك</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">المبلغ المسترد</th>
-    <th style="padding:16px; text-align:center; vertical-align:middle; background-color:#0288d1; color:white;">الملاحظات</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">اسم العميل</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">رقم العميل</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">قيمة الباقة (عدد الأيام)</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">عدد الأيام المستفاد بها</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">اسم البنك</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">رقم الحساب البنكي</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">نوع الاشتراك</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">المبلغ المسترد</th>
+    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">الملاحظات</th>
   </tr>`;
 
-  clients.forEach((c,i) => {
-    const bgColor = i % 2 === 0 ? '#f3e5f5' : '#ffffff'; // أرجواني فاتح وابيض
-    html += `<tr style="background-color:${bgColor};">
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.name}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.number}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.packageValue} (${c.packageDays})</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.daysUsed}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.bank}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.account}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.type}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.refund}</td>
-      <td style="padding:12px; text-align:center; vertical-align:middle;">${c.notes}</td>
+  clients.forEach(c => {
+    let bgColor = c.exceptional ? '#fff3e0' : '#f3e5f5';
+    html += `<tr>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.name}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.number}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.packageValue} (${c.packageDays})</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.daysUsed}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.bank}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.account}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.type}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.refund}</td>
+      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.notes}</td>
     </tr>`;
   });
 
