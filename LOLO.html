@@ -15,34 +15,34 @@
   h1 {
     color: #0288d1; /* سماوي غامق */
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .form-container {
-    background: #ffffff; /* أبيض */
+    background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     max-width: 500px;
-    margin: 0 auto 30px;
-    padding: 25px;
+    margin: 0 auto 20px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
   }
 
   label {
     font-weight: bold;
     color: #444;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   input, select {
     width: 100%;
-    padding: 10px;
-    border: 2px solid #4fc3f7; /* سماوي فاتح */
-    border-radius: 8px;
-    font-size: 15px;
+    padding: 8px;
+    border: 2px solid #4fc3f7;
+    border-radius: 6px;
+    font-size: 14px;
     text-align: center;
     transition: 0.3s;
   }
@@ -54,13 +54,13 @@
   }
 
   button {
-    background-color: #0288d1; /* سماوي غامق */
+    background-color: #0288d1;
     color: white;
     border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     transition: 0.3s;
   }
 
@@ -69,34 +69,36 @@
   }
 
   button.calculate {
-    background-color: #4fc3f7; /* سماوي فاتح */
+    background-color: #4fc3f7;
     font-size: 13px;
     padding: 7px 10px;
-    border-radius: 8px;
-    margin-top: 10px;
+    border-radius: 6px;
+    margin-top: 8px;
   }
 
   button.calculate:hover {
     background-color: #03a9f4;
   }
 
+  .table-wrapper {
+    overflow-x: auto;
+    margin-top: 15px;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 25px;
     border: 2px solid #4fc3f7;
     background-color: white;
-    border-radius: 10px;
-    overflow: hidden;
     table-layout: fixed;
     word-wrap: break-word;
   }
 
   th, td {
     border: 1px solid #b3e5fc;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   th {
@@ -111,10 +113,10 @@
   .success-message {
     color: #0277bd;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: none;
     text-align: center;
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .success-message::before {
@@ -126,11 +128,12 @@
       padding: 15px;
     }
     input, select, button {
-      font-size: 14px;
+      font-size: 13px;
+      padding: 6px;
     }
     th, td {
-      font-size: 13px;
-      padding: 8px;
+      font-size: 12px;
+      padding: 6px;
     }
   }
 </style>
@@ -178,19 +181,21 @@
   <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button>
 </div>
 
-<table id="clientsTable">
-  <tr>
-    <th>اسم العميل</th>
-    <th>رقم العميل</th>
-    <th>قيمة الباقة(عدد الأيام)</th>
-    <th>عدد الأيام المستفاد بها</th>
-    <th>اسم البنك</th>
-    <th>رقم الحساب البنكي</th>
-    <th>نوع الاشتراك</th>
-    <th>المبلغ المسترد</th>
-    <th>الملاحظات</th>
-  </tr>
-</table>
+<div class="table-wrapper">
+  <table id="clientsTable">
+    <tr>
+      <th>اسم العميل</th>
+      <th>رقم العميل</th>
+      <th>قيمة الباقة(عدد الأيام)</th>
+      <th>عدد الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب البنكي</th>
+      <th>نوع الاشتراك</th>
+      <th>المبلغ المسترد</th>
+      <th>الملاحظات</th>
+    </tr>
+  </table>
+</div>
 
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
@@ -226,9 +231,7 @@ function addClient() {
 
 function calculateRefund() {
   clients.forEach(c => {
-    if(c.refund === '') {
-      c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
-    }
+    c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
   });
   renderTable();
 }
@@ -265,33 +268,31 @@ function renderTable() {
 }
 
 function exportToExcel() {
-  let html = `
-    <table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>
-      <tr>
-        <th>اسم العميل</th>
-        <th>رقم العميل</th>
-        <th>قيمة الباقة(عدد الأيام)</th>
-        <th>عدد الأيام المستفاد بها</th>
-        <th>اسم البنك</th>
-        <th>رقم الحساب البنكي</th>
-        <th>نوع الاشتراك</th>
-        <th>المبلغ المسترد</th>
-        <th>الملاحظات</th>
-      </tr>
-  `;
+  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>`;
+  html += `<tr>
+    <th>اسم العميل</th>
+    <th>رقم العميل</th>
+    <th>قيمة الباقة(عدد الأيام)</th>
+    <th>عدد الأيام المستفاد بها</th>
+    <th>اسم البنك</th>
+    <th>رقم الحساب البنكي</th>
+    <th>نوع الاشتراك</th>
+    <th>المبلغ المسترد</th>
+    <th>الملاحظات</th>
+  </tr>`;
 
   clients.forEach(c => {
-    html += "<tr>";
-    html += `<td>${c.name}</td>`;
-    html += `<td>${c.number}</td>`;
-    html += `<td>${c.packageValue}(${c.packageDays})</td>`;
-    html += `<td>${c.daysUsed}</td>`;
-    html += `<td>${c.bank}</td>`;
-    html += `<td>${c.account}</td>`;
-    html += `<td>${c.type}</td>`;
-    html += `<td>${c.refund}</td>`;
-    html += `<td>${c.notes}</td>`;
-    html += "</tr>";
+    html += `<tr>
+      <td>${c.name}</td>
+      <td>${c.number}</td>
+      <td>${c.packageValue}(${c.packageDays})</td>
+      <td>${c.daysUsed}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.refund}</td>
+      <td>${c.notes}</td>
+    </tr>`;
   });
 
   html += "</table>";
