@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"> <!-- ترميز الحروف UTF-8 لدعم العربية -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- لجعل الصفحة متجاوبة مع الهواتف -->
-<title>حاسبة الاسترداد اليومي</title> <!-- عنوان الصفحة في التبويب -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة الاسترداد اليومي</title>
 
 <style>
 /* ======================== إعدادات الصفحة العامة ======================== */
@@ -19,15 +19,8 @@ body {
   box-sizing: border-box;
 }
 
-/* ======================== العنوان الرئيسي ======================== */
-h1 {
-  color: #0288d1;
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 24px;
-}
+h1 { color: #0288d1; text-align: center; margin-bottom: 25px; font-size: 24px; }
 
-/* ======================== الحاوية الرئيسية ======================== */
 .container {
   width: 100%;
   max-width: 480px;
@@ -39,110 +32,53 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* ======================== الحقول ======================== */
-label {
-  font-weight: bold;
-  color: #00796b;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
+label { font-weight: bold; color: #00796b; font-size: 14px; margin-top: 10px; }
 input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 2px solid #03a9f4;
-  border-radius: 6px;
-  font-size: 14px;
-  text-align: center;
-  transition: 0.3s;
+  width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #03a9f4;
+  border-radius: 6px; font-size: 14px; text-align: center; transition: 0.3s;
   box-sizing: border-box;
 }
+input:focus, select:focus { border-color: #0288d1; background-color: #e1f5fe; outline: none; }
 
-input:focus, select:focus {
-  border-color: #0288d1;
-  background-color: #e1f5fe;
-  outline: none;
-}
-
-/* ======================== الأزرار ======================== */
 button {
-  width: 100%;
-  background-color: #03a9f4;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  margin-top: 10px;
-  transition: 0.3s;
+  width: 100%; background-color: #03a9f4; color: white; border: none;
+  padding: 10px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: bold;
+  margin-top: 10px; transition: 0.3s;
 }
-
 button:hover { background-color: #0288d1; }
 button.calculate { background-color: #00bcd4; }
 button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 
-/* ======================== رسالة النجاح ======================== */
-.success-message {
-  color: green;
-  font-weight: bold;
-  text-align: center;
-  display: none;
-  margin-top: 10px;
-  font-size: 14px;
-}
+.success-message { color: green; font-weight: bold; text-align: center; display: none; margin-top: 10px; font-size: 14px; }
 .success-message::before { content: "✔ "; }
 
-/* ======================== الجدول ======================== */
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  margin-top: 20px;
-}
-
-table {
-  width: 100%;
-  min-width: 400px;
-  border-collapse: collapse;
-  text-align: center;
-  font-size: 13px;
-}
-
-th, td {
-  border: 1px solid #03a9f4;
-  padding: 8px;
-}
-
+.table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; }
+table { width: 100%; min-width: 400px; border-collapse: collapse; text-align: center; font-size: 13px; }
+th, td { border: 1px solid #03a9f4; padding: 8px; }
 th { background-color: #03a9f4; color: white; }
 tr:nth-child(even) td { background-color: #e1f5fe; }
 
-/* ======================== استجابة للشاشات الصغيرة ======================== */
-@media (max-width: 600px) {
-  body { padding: 10px; }
-  h1 { font-size: 20px; }
-  .container { padding: 15px; }
-  button { font-size: 14px; }
-  table { font-size: 12px; }
-}
+@media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 20px; } .container { padding: 15px; } button { font-size: 14px; } table { font-size: 12px; } }
 
-/* ======================== حاوية العميل الاستثنائي ======================== */
-.exceptional-container {
-  width: 100%;
-  max-width: 480px;
-  background: #fff3e0; /* خلفية برتقالية فاتحة */
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* ======================== نافذة العميل الاستثنائي ======================== */
+.modal {
+  display: none; /* مخفية افتراضياً */
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
   padding: 20px;
-  box-sizing: border-box;
-  margin-bottom: 20px;
+  border-radius: 14px;
+  max-width: 400px;
+  position: relative;
 }
-h2 {
-  color: #ff9800;
-  text-align: center;
-  margin-bottom: 15px;
-}
+.close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
 </style>
 </head>
 
@@ -156,25 +92,18 @@ h2 {
 
   <label>اسم العميل</label>
   <input type="text" id="clientName" placeholder="ادخل اسم العميل">
-
   <label>رقم العميل</label>
   <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
-
   <label>قيمة الباقة</label>
   <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
-
   <label>عدد أيام الباقة الأساسية</label>
   <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
-
   <label>عدد الأيام المستفاد بها</label>
   <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
-
   <label>اسم البنك</label>
   <input type="text" id="bankName" placeholder="ادخل اسم البنك">
-
   <label>رقم الحساب البنكي</label>
   <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
-
   <label>نوع الاشتراك</label>
   <select id="subscriptionType">
     <option value="جديد تطبيق">جديد تطبيق</option>
@@ -182,28 +111,27 @@ h2 {
     <option value="جديد يدوي">جديد يدوي</option>
     <option value="تجديد يدوي">تجديد يدوي</option>
   </select>
-
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
   <button onclick="addClient()">💾 حفظ العميل</button>
   <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
+  <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
 </div>
 
-<!-- ======================== حاوية العملاء الاستثنائيين ======================== -->
-<div class="exceptional-container">
-  <h2>🌟 إضافة عميل مميز</h2>
-
-  <label>اسم العميل المميز</label>
-  <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
-
-  <label>رقم العميل</label>
-  <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
-
-  <label>المبلغ المسترد يدويًا</label>
-  <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
-
-  <button onclick="saveExceptionalClient()">💾 حفظ العميل المميز</button>
+<!-- ======================== نافذة العميل الاستثنائي ======================== -->
+<div id="exceptionalModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeExceptionalModal()">&times;</span>
+    <h2>إضافة عميل استثنائي</h2>
+    <label>اسم العميل</label>
+    <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+    <label>رقم العميل</label>
+    <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+    <label>المبلغ المسترد</label>
+    <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+    <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
+  </div>
 </div>
 
 <!-- ======================== جدول العملاء ======================== -->
@@ -218,7 +146,6 @@ h2 {
   </table>
 </div>
 
-<!-- زر تصدير إلى Excel -->
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
@@ -240,9 +167,7 @@ function addClient() {
   if (!name || !number) { alert("الرجاء إدخال اسم ورقم العميل"); return; }
   if (daysUsed > packageDays) { alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
 
-  clients.push({ 
-    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '', exceptional: false 
-  });
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '', exceptional: false });
 
   document.getElementById('successMsg').style.display = 'block';
   setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
@@ -250,12 +175,13 @@ function addClient() {
   renderTable();
   clearInputs();
 }
+function clearInputs() { document.querySelectorAll('input').forEach(i => i.value = ''); }
 
-function clearInputs() {
-  document.querySelectorAll('input').forEach(i => i.value = '');
-}
+// ======================= فتح وإغلاق نافذة العميل الاستثنائي =======================
+function openExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'block'; }
+function closeExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'none'; }
 
-// ======================= دالة حفظ العميل الاستثنائي =======================
+// ======================= حفظ العميل الاستثنائي =======================
 function saveExceptionalClient() {
   const name = document.getElementById('exceptionalName').value.trim();
   const number = document.getElementById('exceptionalNumber').value.trim();
@@ -263,21 +189,10 @@ function saveExceptionalClient() {
 
   if (!name || !number || isNaN(refund)) { alert("الرجاء إدخال جميع البيانات بشكل صحيح"); return; }
 
-  clients.push({
-    name,
-    number,
-    packageValue: 0,
-    packageDays: 0,
-    daysUsed: 0,
-    bank: '',
-    account: '',
-    type: 'عميل مميز',
-    notes: '',
-    refund: refund.toFixed(2),
-    exceptional: true
-  });
+  clients.push({ name, number, packageValue: 0, packageDays: 0, daysUsed: 0, bank: '', account: '', type: 'عميل استثنائي', notes: '', refund: refund.toFixed(2), exceptional: true });
 
   renderTable();
+  closeExceptionalModal();
   document.getElementById('exceptionalName').value = '';
   document.getElementById('exceptionalNumber').value = '';
   document.getElementById('exceptionalRefund').value = '';
@@ -285,11 +200,7 @@ function saveExceptionalClient() {
 
 // ======================= حساب المبلغ المسترد =======================
 function calculateRefund() {
-  clients.forEach(c => {
-    if (!c.exceptional) {
-      c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
-    }
-  });
+  clients.forEach(c => { if (!c.exceptional) { c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2); } });
   renderTable();
 }
 
@@ -317,12 +228,7 @@ function renderTable() {
 }
 
 // ======================= حذف عميل =======================
-function deleteClient(index) {
-  if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
-    clients.splice(index, 1);
-    renderTable();
-  }
-}
+function deleteClient(index) { if (confirm("هل أنت متأكد من حذف هذا العميل؟")) { clients.splice(index, 1); renderTable(); } }
 
 // ======================= تصدير إلى Excel =======================
 function exportToExcel() {
@@ -358,7 +264,6 @@ function exportToExcel() {
   const link = document.createElement("a");
   const today = new Date();
   const dateStr = today.toLocaleDateString('ar-EG', { day: '2-digit', month: 'long', year:'numeric' });
-
   link.href = url;
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
   link.click();
