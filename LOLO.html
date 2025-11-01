@@ -1,172 +1,167 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حاسبة الاسترداد اليومي</title>
+<meta charset="UTF-8"> <!-- ترميز الحروف UTF-8 لدعم العربية -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- لجعل الصفحة متجاوبة مع الهواتف -->
+<title>حاسبة الاسترداد اليومي</title> <!-- عنوان الصفحة في التبويب -->
 
 <style>
-/* ======================== إعدادات الصفحة ======================== */
+/* ======================== إعدادات الصفحة العامة ======================== */
 body {
-  font-family: "Tahoma", Arial, sans-serif; /* خط الصفحة */
-  background: #e0f7fa; /* خلفية سماوي فاتح مريح للعين */
-  margin: 0; 
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* كل شيء في وسط الصفحة */
-  min-height: 100vh; /* يجعل الصفحة تمتد على كامل الشاشة */
+  font-family: "Tahoma", Arial, sans-serif; /* الخط الافتراضي للصفحة */
+  background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%); /* خلفية متدرجة من الأعلى للأسفل */
+  margin: 0; /* إزالة الهوامش الافتراضية */
+  padding: 20px; /* مسافة داخلية من حواف الصفحة */
+  display: flex; /* استخدام Flexbox لترتيب العناصر */
+  flex-direction: column; /* ترتيب العناصر عمودي */
+  align-items: center; /* محاذاة العناصر أفقياً للوسط */
+  min-height: 100vh; /* ارتفاع الصفحة على الأقل يساوي ارتفاع الشاشة */
+  box-sizing: border-box; /* احتساب الحواف ضمن قياس العرض والارتفاع */
 }
 
-/* ======================== عنوان الصفحة ======================== */
+/* ======================== العنوان الرئيسي ======================== */
 h1 {
-  color: #03a9f4; /* لون عنوان برّاق سماوي */
-  text-align: center;
-  margin-bottom: 25px;
+  color: #0288d1; /* لون النص أزرق */
+  text-align: center; /* توسيط النص */
+  margin-bottom: 25px; /* مسافة تحت العنوان */
+  font-size: 24px; /* حجم الخط */
 }
 
-/* ======================== صندوق الإدخال ======================== */
-.form-container {
-  background: #ffffff; /* خلفية بيضاء لصندوق الإدخال */
-  border-radius: 12px; /* حواف دائرية */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف حول الصندوق */
-  width: 100%; /* العرض يتكيف مع الشاشة */
-  max-width: 400px; /* الحد الأقصى للعرض */
-  padding: 20px;
-  display: flex;
-  flex-direction: column; /* ترتيب الحقول عمودي */
-  gap: 12px; /* مسافة بين الحقول */
-  box-sizing: border-box; /* يمنع تجاوز المحتوى */
+/* ======================== الحاوية الرئيسية ======================== */
+.container {
+  width: 100%; /* العرض كامل الحاوية */
+  max-width: 480px; /* الحد الأقصى للعرض */
+  background: #fff; /* خلفية بيضاء */
+  border-radius: 14px; /* حواف دائرية */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل خفيف */
+  padding: 20px; /* مسافة داخلية */
+  box-sizing: border-box; /* تضمين الحواف ضمن القياس */
 }
 
-/* ======================== تسميات الحقول ======================== */
+/* ======================== الحقول ======================== */
 label {
-  font-weight: bold; /* خط غامق */
-  color: #00796b; /* أخضر داكن */
-  font-size: 14px;
+  font-weight: bold; /* خط عريض */
+  color: #00796b; /* لون النص أخضر غامق */
+  font-size: 14px; /* حجم الخط */
+  margin-top: 10px; /* مسافة أعلى كل label */
 }
 
-/* ======================== حقول الإدخال ======================== */
 input, select {
-  width: 100%; /* الحقل يملأ عرض الصندوق */
-  padding: 10px; /* مساحة داخل الحقل */
-  border: 2px solid #03a9f4; /* إطار سماوي */
-  border-radius: 6px;
-  font-size: 14px;
-  text-align: center; /* كتابة النص في وسط الحقل */
-  transition: 0.3s; /* تأثير سلس عند التركيز */
-  box-sizing: border-box;
+  width: 100%; /* الحقل يملأ كامل العرض */
+  padding: 10px; /* مسافة داخلية داخل الحقل */
+  margin-top: 5px; /* مسافة بين الحقل وال label */
+  border: 2px solid #03a9f4; /* حدود زرقاء */
+  border-radius: 6px; /* حواف دائرية صغيرة */
+  font-size: 14px; /* حجم الخط داخل الحقل */
+  text-align: center; /* محاذاة النص في الوسط */
+  transition: 0.3s; /* تأثير سلس عند التغيير */
+  box-sizing: border-box; /* احتساب الحواف ضمن القياس */
 }
 
+/* تأثير عند التركيز داخل الحقل */
 input:focus, select:focus {
-  background-color: #e1f5fe; /* لون فاتح عند التركيز */
-  border-color: #0288d1; /* تغيير لون الإطار عند التركيز */
-  outline: none;
+  border-color: #0288d1; /* تغيير لون الحدود عند التركيز */
+  background-color: #e1f5fe; /* تغيير خلفية الحقل */
+  outline: none; /* إزالة الإطار الافتراضي */
 }
 
-/* ======================== أزرار ======================== */
+/* ======================== الأزرار ======================== */
 button {
-  background-color: #03a9f4; /* لون أزرق سماوي للزر */
-  color: white; /* لون الكتابة أبيض */
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.3s;
+  width: 100%; /* الزر كامل عرض الحاوية */
+  background-color: #03a9f4; /* لون الخلفية أزرق */
+  color: white; /* لون النص أبيض */
+  border: none; /* إزالة الحدود */
+  padding: 10px; /* مسافة داخلية */
+  border-radius: 6px; /* حواف دائرية */
+  cursor: pointer; /* شكل المؤشر يد عند المرور */
+  font-size: 15px; /* حجم الخط */
+  font-weight: bold; /* خط عريض */
+  margin-top: 10px; /* مسافة فوق الزر */
+  transition: 0.3s; /* تأثير سلس عند المرور */
 }
 
+/* تغيير لون الزر عند المرور عليه */
 button:hover {
-  background-color: #0288d1; /* لون الزر عند المرور عليه */
+  background-color: #0288d1;
 }
 
+/* زر الحساب بلون مميز */
 button.calculate {
-  background-color: #00bcd4; /* زر "احسب الاسترداد" بلون مختلف */
+  background-color: #00bcd4;
 }
 
-/* ======================== جدول العملاء ======================== */
+/* زر الحذف بلون أحمر */
+button.delete {
+  background-color: #f44336;
+  font-size: 13px;
+  padding: 6px 8px;
+}
+
+/* ======================== رسالة النجاح ======================== */
+.success-message {
+  color: green; /* لون النص أخضر */
+  font-weight: bold;
+  text-align: center;
+  display: none; /* مخفية افتراضياً */
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* إضافة علامة صح قبل الرسالة */
+.success-message::before {
+  content: "✔ ";
+}
+
+/* ======================== الجدول ======================== */
 .table-wrapper {
-  width: 100%;
-  overflow-x: auto; /* يسمح بالتمرير الأفقي على الجوال */
+  width: 100%; /* العرض كامل الحاوية */
+  overflow-x: auto; /* شريط تمرير أفقي إذا انضغط الجدول */
+  margin-top: 20px;
 }
 
 table {
-  width: 100%;
-  max-width: 500px;
-  border-collapse: collapse; /* إزالة المسافات بين الحدود */
-  margin-top: 20px;
-  text-align: center;
-  font-size: 13px;
-  box-sizing: border-box;
+  width: 100%; /* العرض كامل */
+  min-width: 400px; /* الحد الأدنى للعرض */
+  border-collapse: collapse; /* دمج الحدود */
+  text-align: center; /* محاذاة النص في الوسط */
+  font-size: 13px; /* حجم الخط */
 }
 
 th, td {
-  border: 1px solid #03a9f4; /* حدود سماوي */
-  padding: 6px;
+  border: 1px solid #03a9f4; /* حدود زرقاء للخلايا */
+  padding: 8px; /* مسافة داخلية للخلايا */
 }
 
 th {
-  background-color: #03a9f4; /* لون العنوان */
-  color: white; /* نص العنوان أبيض */
+  background-color: #03a9f4; /* خلفية العنوان أزرق */
+  color: white; /* نص أبيض */
 }
 
-/* صفوف متبادلة بلون فاتح */
+/* تلوين الصفوف الزوجية */
 tr:nth-child(even) td {
-  background-color: #e1f5fe; /* لون سماوي فاتح للصفوف الزوجية */
+  background-color: #e1f5fe;
 }
 
-/* ======================== رسالة نجاح ======================== */
-.success-message {
-  color: green; /* اللون الأخضر */
-  font-weight: bold; /* خط غامق */
-  margin-bottom: 5px;
-  display: none; /* مخفية بشكل افتراضي */
-  text-align: center;
-  font-size: 14px;
-}
-.success-message::before {
-  content: "✔ "; /* علامة صح قبل الرسالة */
-}
-
-/* ======================== متجاوب مع أي شاشة ======================== */
-@media screen and (max-width: 600px) {
-  body {
-    padding: 10px; /* تقليل الحواف للشاشات الصغيرة */
-  }
-
-  h1 {
-    font-size: 18px; /* تصغير عنوان الصفحة */
-  }
-
-  .form-container {
-    width: 100%;
-    padding: 15px; 
-  }
-
-  input, select, button {
-    font-size: 13px; /* تصغير حجم الخط */
-    padding: 8px;
-  }
-
-  table {
-    width: 100%; /* الجدول يغطي عرض الشاشة بالكامل */
-    font-size: 12px;
-  }
-
-  th, td {
-    padding: 5px; /* تقليل مساحة الخلية */
-  }
+/* ======================== استجابة للشاشات الصغيرة ======================== */
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  h1 { font-size: 20px; }
+  .container { padding: 15px; }
+  button { font-size: 14px; }
+  table { font-size: 12px; }
 }
 </style>
 </head>
+
 <body>
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
-<!-- ======================== صندوق الإدخال ======================== -->
-<div class="form-container">
+<div class="container">
+  <!-- رسالة نجاح عند حفظ العميل -->
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
+  <!-- ======================== حقول الإدخال ======================== -->
   <label>اسم العميل</label>
   <input type="text" id="clientName" placeholder="ادخل اسم العميل">
 
@@ -177,10 +172,10 @@ tr:nth-child(even) td {
   <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
 
   <label>عدد أيام الباقة الأساسية</label>
-  <input type="number" id="packageDays" placeholder="ادخل عدد أيام الباقة">
+  <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
 
   <label>عدد الأيام المستفاد بها</label>
-  <input type="number" id="daysUsed" placeholder="ادخل عدد الأيام المستفاد بها">
+  <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
 
   <label>اسم البنك</label>
   <input type="text" id="bankName" placeholder="ادخل اسم البنك">
@@ -199,8 +194,9 @@ tr:nth-child(even) td {
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <button onclick="addClient()">💾 حفظ العميل</button> <!-- زر لحفظ بيانات العميل -->
-  <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button> <!-- زر لحساب الاسترداد -->
+  <!-- ======================== الأزرار ======================== -->
+  <button onclick="addClient()">💾 حفظ العميل</button>
+  <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
 </div>
 
 <!-- ======================== جدول العملاء ======================== -->
@@ -208,86 +204,111 @@ tr:nth-child(even) td {
   <table id="clientsTable">
     <tr>
       <th>اسم العميل</th>
-      <th>قيمة الباقة(عدد الأيام)</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
       <th>المبلغ المسترد</th>
+      <th>حذف</th>
     </tr>
   </table>
 </div>
 
-<!-- زر تصدير الملف -->
+<!-- زر تصدير إلى Excel -->
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
-/* ======================= مصفوفة لتخزين بيانات العملاء ======================= */
-let clients = [];
+// ======================= مصفوفة لتخزين بيانات العملاء =======================
+let clients = []; // كل عنصر فيها يمثل عميل واحد كمجموعة خصائص (object)
 
-/* ======================= إضافة عميل ======================= */
+// ======================= دالة حفظ العميل =======================
 function addClient() {
-  const name = document.getElementById('clientName').value.trim(); // اسم العميل
-  const number = document.getElementById('clientNumber').value.trim(); // رقم العميل
-  const packageValue = parseFloat(document.getElementById('packageValue').value.trim()); // سعر الباقة
-  const packageDays = parseFloat(document.getElementById('packageDays').value.trim()); // عدد أيام الباقة
-  const daysUsed = parseFloat(document.getElementById('daysUsed').value.trim()); // الأيام المستفاد بها
-  const bank = document.getElementById('bankName').value.trim(); // اسم البنك
-  const account = document.getElementById('bankAccount').value.trim(); // رقم الحساب
-  const type = document.getElementById('subscriptionType').value; // نوع الاشتراك
-  const notes = document.getElementById('notes').value.trim(); // الملاحظات
+  // قراءة القيم من الحقول
+  const name = document.getElementById('clientName').value.trim(); // trim لازالة الفراغات
+  const number = document.getElementById('clientNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('packageValue').value); // تحويل النص لرقم
+  const packageDays = parseFloat(document.getElementById('packageDays').value);
+  const daysUsed = parseFloat(document.getElementById('daysUsed').value);
+  const bank = document.getElementById('bankName').value.trim();
+  const account = document.getElementById('bankAccount').value.trim();
+  const type = document.getElementById('subscriptionType').value;
+  const notes = document.getElementById('notes').value.trim();
 
-  // تحقق من البيانات الأساسية
-  if(!name || !number) {
-    alert("أدخل البيانات الأساسية للعميل");
+  // التحقق من صحة البيانات
+  if (!name || !number) {
+    alert("الرجاء إدخال اسم ورقم العميل");
+    return; // توقف الدالة إذا البيانات ناقصة
+  }
+  if (daysUsed > packageDays) {
+    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة");
     return;
   }
-  if(daysUsed > packageDays) {
-    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية");
-    return;
-  }
 
-  // إضافة العميل إلى المصفوفة
-  clients.push({name, number, packageValue, packageDays, daysUsed, bank, account, type, refund:'', notes});
+  // إضافة العميل للمصفوفة
+  clients.push({ 
+    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '' 
+  });
 
-  // عرض رسالة نجاح قصيرة
+  // عرض رسالة نجاح مؤقتة
   document.getElementById('successMsg').style.display = 'block';
-  setTimeout(()=>document.getElementById('successMsg').style.display='none',2000);
+  setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
 
-  renderTable(); // تحديث الجدول الصغير أسفل الصفحة
+  renderTable(); // تحديث الجدول
+  clearInputs(); // مسح الحقول بعد الحفظ
 }
 
-/* ======================= حساب الاسترداد ======================= */
+// ======================= دالة مسح الحقول بعد الحفظ =======================
+function clearInputs() {
+  document.querySelectorAll('input').forEach(i => i.value = ''); // كل الحقول نصية يتم مسحها
+}
+
+// ======================= حساب المبلغ المسترد =======================
 function calculateRefund() {
   clients.forEach(c => {
-    // حساب المبلغ المسترد = قيمة اليوم * (الأيام غير المستخدمة)
+    // قيمة اليوم الواحد * عدد الأيام المتبقية = المبلغ المسترد
     c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
   });
-  renderTable(); // تحديث الجدول بعد الحساب
+  renderTable(); // تحديث الجدول
 }
 
-/* ======================= عرض الجدول الصغير ======================= */
+// ======================= عرض الجدول =======================
 function renderTable() {
   const table = document.getElementById("clientsTable");
+  // إعادة بناء الجدول
   table.innerHTML = `
     <tr>
       <th>اسم العميل</th>
-      <th>قيمة الباقة(عدد الأيام)</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
       <th>المبلغ المسترد</th>
+      <th>حذف</th>
     </tr>
   `;
-  clients.forEach(c => {
-    table.innerHTML += `<tr>
-      <td>${c.name}</td>
-      <td>${c.packageValue} (${c.packageDays})</td>
-      <td>${c.refund}</td>
-    </tr>`;
+  // إضافة صف لكل عميل
+  clients.forEach((c, index) => {
+    table.innerHTML += `
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.packageValue} (${c.packageDays})</td>
+        <td>${c.refund || "-"}</td>
+        <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
+      </tr>
+    `;
   });
 }
 
-/* ======================= تصدير Excel ======================= */
+// ======================= حذف عميل =======================
+function deleteClient(index) {
+  if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
+    clients.splice(index, 1); // إزالة العميل من المصفوفة
+    renderTable(); // تحديث الجدول
+  }
+}
+
+// ======================= تصدير إلى Excel =======================
 function exportToExcel() {
+  // إنشاء جدول HTML كنص
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>`;
   html += `<tr>
     <th>اسم العميل</th>
     <th>رقم العميل</th>
-    <th>قيمة الباقة(عدد الأيام)</th>
+    <th>قيمة الباقة (عدد الأيام)</th>
     <th>عدد الأيام المستفاد بها</th>
     <th>اسم البنك</th>
     <th>رقم الحساب البنكي</th>
@@ -310,16 +331,17 @@ function exportToExcel() {
   });
   html += "</table>";
 
-  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" }); // تحويل النص لملف Excel
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
+  // إضافة تاريخ اليوم للملف
   const today = new Date();
-  const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year:'numeric' });
+  const dateStr = today.toLocaleDateString('ar-EG', { day: '2-digit', month: 'long', year:'numeric' });
 
   link.href = url;
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
-  link.click();
+  link.click(); // تنزيل الملف
 }
 </script>
 
