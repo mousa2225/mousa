@@ -3,315 +3,311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حاسبة الاسترداد المالي - متعددة العملاء</title>
+<title>حاسبة الاسترداد اليومي</title>
 <style>
   body {
-    font-family: 'Cairo', sans-serif;
-    background: linear-gradient(135deg, #fff8f0, #ffe0b2, #ffccbc);
-    color: #333;
-    padding: 30px;
+    font-family: "Tahoma", Arial, sans-serif;
+    background: #e0f7fa; /* سماوي فاتح */
+    padding: 20px;
+    margin: 0;
   }
-  h2 {
+
+  h1 {
+    color: #0288d1; /* سماوي غامق */
     text-align: center;
-    color: #d84315;
     margin-bottom: 25px;
   }
-  .calculator {
-    background: #ffffffcc;
+
+  .form-container {
+    background: #ffffff; /* أبيض */
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto 30px;
     padding: 25px;
-    border-radius: 14px;
-    max-width: 850px;
-    margin: auto;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
-  .client-section {
-    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    position: relative;
-    transition: all 0.4s ease;
-    border: 1px solid #ffb74d;
-  }
-  .client-section:hover {
-    background: linear-gradient(135deg, #ffccbc, #ffe0b2);
-    transform: scale(1.01);
-  }
-  .client-section h3 {
-    color: #e65100;
-    margin-bottom: 10px;
-  }
+
   label {
-    display: block;
-    margin-top: 10px;
     font-weight: bold;
-    color: #bf360c;
+    color: #444;
+    display: block;
+    margin-bottom: 5px;
   }
-  input {
+
+  input, select {
     width: 100%;
-    padding: 8px;
-    margin-top: 4px;
-    border: 1px solid #ffcc80;
+    padding: 10px;
+    border: 2px solid #4fc3f7; /* سماوي فاتح */
     border-radius: 8px;
     font-size: 15px;
+    text-align: center;
+    transition: 0.3s;
   }
-  .remove-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #e53935;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    font-weight: bold;
-    cursor: pointer;
+
+  input:focus, select:focus {
+    background-color: #b3e5fc;
+    border-color: #0288d1;
+    outline: none;
   }
+
   button {
-    background: #ef6c00;
-    border: none;
+    background-color: #0288d1; /* سماوي غامق */
     color: white;
-    padding: 12px 20px;
+    border: none;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 16px;
     cursor: pointer;
-    margin: 10px 5px;
+    font-size: 15px;
+    transition: 0.3s;
   }
-  button:hover { background: #e65100; }
-  .add-btn {
-    background: #ff7043;
+
+  button:hover {
+    background-color: #0277bd;
   }
-  .add-btn:hover { background: #f4511e; }
+
+  button.calculate {
+    background-color: #4fc3f7; /* سماوي فاتح */
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  button.calculate:hover {
+    background-color: #03a9f4;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 25px;
+    border: 2px solid #4fc3f7;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    table-layout: fixed;
+    word-wrap: break-word;
   }
+
   th, td {
-    border: 2px solid #f57c00;
-    padding: 10px;
+    border: 1px solid #b3e5fc;
+    padding: 12px;
     text-align: center;
-    font-size: 17px;
+    font-size: 15px;
   }
+
   th {
-    background-color: #ffb74d;
-    color: #4e342e;
+    background-color: #0288d1;
+    color: white;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #e1f5fe;
+  }
+
+  .success-message {
+    color: #0277bd;
     font-weight: bold;
+    margin-bottom: 10px;
+    display: none;
+    text-align: center;
+    font-size: 16px;
   }
-  td {
-    background: #fff8f0;
+
+  .success-message::before {
+    content: "✔ ";
   }
-  .signature {
-    margin-top: 25px;
-    text-align: left;
-    color: #6d4c41;
-    font-weight: bold;
-    font-size: 20px;
-  }
-  .signature span {
-    color: #ef6c00;
-    font-size: 22px;
+
+  @media screen and (max-width: 600px) {
+    .form-container {
+      padding: 15px;
+    }
+    input, select, button {
+      font-size: 14px;
+    }
+    th, td {
+      font-size: 13px;
+      padding: 8px;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="calculator">
-  <h2>📊 حاسبة الاسترداد المالي لعدة عملاء</h2>
+<h1>حاسبة الاسترداد اليومي</h1>
 
-  <div id="clientsContainer"></div>
+<div class="form-container">
+  <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
-  <button class="add-btn" onclick="addClient()">➕ إضافة عميل</button>
-  <button onclick="calculateAll()">💰 احسب لجميع العملاء</button>
-  <button onclick="exportToExcel()">📤 إصدار ملف Excel</button>
+  <label>اسم العميل</label>
+  <input type="text" id="clientName" placeholder="ادخل اسم العميل">
 
-  <div class="result-section" id="results"></div>
-  <div class="signature">✒️ <span>Accountant Mousa</span></div>
+  <label>رقم العميل</label>
+  <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
+
+  <label>قيمة الباقة</label>
+  <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
+
+  <label>عدد أيام الباقة الأساسية</label>
+  <input type="number" id="packageDays" placeholder="ادخل عدد أيام الباقة">
+
+  <label>عدد الأيام المستفاد بها</label>
+  <input type="number" id="daysUsed" placeholder="ادخل عدد الأيام المستفاد بها">
+
+  <label>اسم البنك</label>
+  <input type="text" id="bankName" placeholder="ادخل اسم البنك">
+
+  <label>رقم الحساب البنكي</label>
+  <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
+
+  <label>نوع الاشتراك</label>
+  <select id="subscriptionType">
+    <option value="جديد تطبيق">جديد تطبيق</option>
+    <option value="تجديد تطبيق">تجديد تطبيق</option>
+    <option value="جديد يدوي">جديد يدوي</option>
+    <option value="تجديد يدوي">تجديد يدوي</option>
+  </select>
+
+  <label>الملاحظات</label>
+  <input type="text" id="notes" placeholder="ادخل ملاحظات">
+
+  <button onclick="addClient()">💾 حفظ العميل</button>
+  <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.19.3/xlsx.full.min.js"></script>
+<table id="clientsTable">
+  <tr>
+    <th>اسم العميل</th>
+    <th>رقم العميل</th>
+    <th>قيمة الباقة(عدد الأيام)</th>
+    <th>عدد الأيام المستفاد بها</th>
+    <th>اسم البنك</th>
+    <th>رقم الحساب البنكي</th>
+    <th>نوع الاشتراك</th>
+    <th>المبلغ المسترد</th>
+    <th>الملاحظات</th>
+  </tr>
+</table>
+
+<button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
+
 <script>
-let clientCount = 0;
+let clients = [];
 
 function addClient() {
-  clientCount++;
-  const clientHTML = `
-  <div class="client-section" id="client-${clientCount}">
-    <button class="remove-btn" onclick="removeClient(${clientCount})">×</button>
-    <h3>👤 بيانات العميل ${clientCount}</h3>
-    
-    <label>اسم العميل:</label>
-    <input type="text" id="name-${clientCount}" placeholder="مثال: أحمد محمد">
+  const name = document.getElementById('clientName').value.trim();
+  const number = document.getElementById('clientNumber').value.trim();
+  const packageValue = document.getElementById('packageValue').value.trim();
+  const packageDays = document.getElementById('packageDays').value.trim();
+  const daysUsed = document.getElementById('daysUsed').value.trim();
+  const bank = document.getElementById('bankName').value.trim();
+  const account = document.getElementById('bankAccount').value.trim();
+  const type = document.getElementById('subscriptionType').value;
+  const notes = document.getElementById('notes').value.trim();
 
-    <label>رقم العميل:</label>
-    <input type="text" id="number-${clientCount}" placeholder="مثال: 0551234567">
-
-    <label>قيمة الباقة المشترك عليها (ريال):</label>
-    <input type="number" id="price-${clientCount}" placeholder="مثال: 1295">
-
-    <label>عدد أيام الباقة:</label>
-    <input type="number" id="days-${clientCount}" placeholder="مثال: 24">
-
-    <label>عدد الأيام المستفاد بها:</label>
-    <input type="number" id="used-${clientCount}" placeholder="مثال: 19">
-
-    <label>اسم البنك:</label>
-    <input type="text" id="bank-${clientCount}" placeholder="مثال: الراجحي">
-
-    <label>رقم الحساب البنكي:</label>
-    <input type="text" id="iban-${clientCount}" placeholder="مثال: SA12300001234567890">
-
-    <label>نوع الاشتراك:</label>
-    <input type="text" id="type-${clientCount}" placeholder="مثال: شهري">
-
-    <label>الملاحظات:</label>
-    <input type="text" id="note-${clientCount}" placeholder="ملاحظات إضافية (اختياري)">
-  </div>`;
-  document.getElementById("clientsContainer").insertAdjacentHTML("beforeend", clientHTML);
-}
-
-function removeClient(id) {
-  const el = document.getElementById(`client-${id}`);
-  if (el) el.remove();
-}
-
-function calculateAll() {
-  const clients = document.querySelectorAll(".client-section");
-  if (clients.length === 0) {
-    alert("الرجاء إضافة عميل واحد على الأقل.");
+  if(!name || !number) return alert("أدخل البيانات الأساسية للعميل");
+  if(daysUsed > packageDays) {
+    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية");
     return;
   }
 
-  let tableHTML = `
-  <table>
+  clients.push({
+    name, number, packageValue, packageDays, daysUsed, bank, account, type, refund: '', notes
+  });
+
+  document.getElementById('successMsg').style.display = 'block';
+  setTimeout(()=>document.getElementById('successMsg').style.display='none',2000);
+
+  renderTable();
+}
+
+function calculateRefund() {
+  clients.forEach(c => {
+    if(c.refund === '') {
+      c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
+    }
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const table = document.getElementById("clientsTable");
+  table.innerHTML = `
     <tr>
+      <th>اسم العميل</th>
       <th>رقم العميل</th>
-      <th>قيمة الباقة المشترك عليها</th>
+      <th>قيمة الباقة(عدد الأيام)</th>
       <th>عدد الأيام المستفاد بها</th>
       <th>اسم البنك</th>
       <th>رقم الحساب البنكي</th>
       <th>نوع الاشتراك</th>
       <th>المبلغ المسترد</th>
       <th>الملاحظات</th>
-    </tr>`;
+    </tr>
+  `;
 
-  clients.forEach((client) => {
-    const id = client.id.split('-')[1];
-    const name = getValue(`name-${id}`);
-    const number = getValue(`number-${id}`);
-    const price = parseFloat(getValue(`price-${id}`)) || 0;
-    const totalDays = parseFloat(getValue(`days-${id}`)) || 0;
-    const used = parseFloat(getValue(`used-${id}`)) || 0;
-    const bank = getValue(`bank-${id}`);
-    const iban = getValue(`iban-${id}`);
-    const type = getValue(`type-${id}`);
-    const note = getValue(`note-${id}`);
-
-    const remaining = totalDays - used;
-    const dailyRate = totalDays > 0 ? price / totalDays : 0;
-    const refund = remaining * dailyRate;
-
-    tableHTML += `
-    <tr>
-      <td>${number}</td>
-      <td>${price.toFixed(2)} (${totalDays})</td>
-      <td>${used}</td>
-      <td>${bank}</td>
-      <td>${iban}</td>
-      <td>${type}</td>
-      <td style="color:${refund>0?'#2e7d32':'#d32f2f'}; font-weight:bold;">${refund.toFixed(2)}</td>
-      <td>${note}</td>
+  clients.forEach(c => {
+    table.innerHTML += `<tr>
+      <td>${c.name}</td>
+      <td>${c.number}</td>
+      <td>${c.packageValue}(${c.packageDays})</td>
+      <td>${c.daysUsed}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.refund}</td>
+      <td>${c.notes}</td>
     </tr>`;
   });
-
-  tableHTML += `</table>`;
-  document.getElementById("results").innerHTML = tableHTML;
-}
-
-function getValue(id) {
-  return document.getElementById(id)?.value || "";
 }
 
 function exportToExcel() {
-  const rows = [];
-  const headers = [
-    "رقم العميل",
-    "قيمة الباقة المشترك عليها (عدد الأيام)",
-    "عدد الأيام المستفاد بها",
-    "اسم البنك",
-    "رقم الحساب البنكي",
-    "نوع الاشتراك",
-    "المبلغ المسترد",
-    "الملاحظات"
-  ];
-  rows.push(headers);
+  let html = `
+    <table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>
+      <tr>
+        <th>اسم العميل</th>
+        <th>رقم العميل</th>
+        <th>قيمة الباقة(عدد الأيام)</th>
+        <th>عدد الأيام المستفاد بها</th>
+        <th>اسم البنك</th>
+        <th>رقم الحساب البنكي</th>
+        <th>نوع الاشتراك</th>
+        <th>المبلغ المسترد</th>
+        <th>الملاحظات</th>
+      </tr>
+  `;
 
-  const clients = document.querySelectorAll(".client-section");
-  clients.forEach((client) => {
-    const id = client.id.split('-')[1];
-    const number = getValue(`number-${id}`);
-    const price = parseFloat(getValue(`price-${id}`)) || 0;
-    const totalDays = parseFloat(getValue(`days-${id}`)) || 0;
-    const used = parseFloat(getValue(`used-${id}`)) || 0;
-    const bank = getValue(`bank-${id}`);
-    const iban = getValue(`iban-${id}`);
-    const type = getValue(`type-${id}`);
-    const note = getValue(`note-${id}`);
-
-    const remaining = totalDays - used;
-    const dailyRate = totalDays > 0 ? price / totalDays : 0;
-    const refund = remaining * dailyRate;
-
-    rows.push([
-      number,
-      `${price.toFixed(2)} (${totalDays})`,
-      used,
-      bank,
-      iban,
-      type,
-      refund.toFixed(2),
-      note
-    ]);
+  clients.forEach(c => {
+    html += "<tr>";
+    html += `<td>${c.name}</td>`;
+    html += `<td>${c.number}</td>`;
+    html += `<td>${c.packageValue}(${c.packageDays})</td>`;
+    html += `<td>${c.daysUsed}</td>`;
+    html += `<td>${c.bank}</td>`;
+    html += `<td>${c.account}</td>`;
+    html += `<td>${c.type}</td>`;
+    html += `<td>${c.refund}</td>`;
+    html += `<td>${c.notes}</td>`;
+    html += "</tr>";
   });
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+  html += "</table>";
 
-  // تنسيق الخط والعرض
-  const range = XLSX.utils.decode_range(ws['!ref']);
-  for(let C = range.s.c; C <= range.e.c; ++C) {
-    ws['!cols'] = ws['!cols'] || [];
-    ws['!cols'][C] = { wch: 25 }; // عرض أعرض
-  }
-
-  for(let R = range.s.r; R <= range.e.r; ++R) {
-    for(let C = range.s.c; C <= range.e.c; ++C) {
-      const cellAddress = XLSX.utils.encode_cell({r:R, c:C});
-      const cell = ws[cellAddress];
-      if (cell) {
-        cell.s = {
-          font: { bold: R === 0, sz: 16 },
-          alignment: { horizontal: "center", vertical: "center" },
-          border: {
-            top: { style: "thin", color: { rgb: "000000" } },
-            bottom: { style: "thin", color: { rgb: "000000" } },
-            left: { style: "thin", color: { rgb: "000000" } },
-            right: { style: "thin", color: { rgb: "000000" } }
-          },
-          fill: R === 0 ? { fgColor: { rgb: "FFE0B2" } } : {}
-        };
-      }
-    }
-  }
-
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
   const today = new Date();
-  today.setDate(today.getDate() - 1);
-  const dateStr = today.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "الاسترداد اليومي");
-  XLSX.writeFile(wb, `ملف الاسترداد اليومي ${dateStr}.xlsx`);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const dateStr = yesterday.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year:'numeric' });
+  link.href = url;
+  link.download = `الاسترداد اليومي ${dateStr}.xls`;
+  link.click();
 }
 </script>
+
 </body>
 </html>
