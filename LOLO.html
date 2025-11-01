@@ -5,150 +5,134 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حاسبة الاسترداد اليومي</title>
 <style>
-  body {
-    font-family: "Tahoma", Arial, sans-serif;
-    background: #e0f7fa;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-  }
+/* ======================== إعدادات الصفحة ======================== */
+body {
+  font-family: "Tahoma", Arial, sans-serif; /* خط الصفحة */
+  background: #e0f7fa; /* خلفية سماوي فاتح مريح للعين */
+  margin: 0; 
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* جعل كل شيء في وسط الصفحة */
+}
 
-  h1 {
-    color: #0288d1;
-    font-size: 18px;
-    text-align: center;
-    margin-bottom: 10px;
-  }
+/* ======================== عنوان الصفحة ======================== */
+h1 {
+  color: #03a9f4; /* لون برّاق سماوي */
+  text-align: center;
+  margin-bottom: 25px;
+}
 
-  .form-container {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    width: 300px; /* عرض الحقول */
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    align-items: center;
-  }
+/* ======================== صندوق الإدخال ======================== */
+.form-container {
+  background: #ffffff; /* خلفية بيضاء لصندوق الإدخال */
+  border-radius: 12px; /* حواف دائرية */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف */
+  width: 300px; /* عرض ثابت لصندوق الإدخال */
+  padding: 20px;
+  display: flex;
+  flex-direction: column; /* ترتيب الحقول عمودي */
+  gap: 12px; /* مسافة بين الحقول */
+}
 
-  label {
-    font-weight: bold;
-    color: #444;
-    font-size: 11px;
-    width: 100%;
-  }
+/* ======================== تسميات الحقول ======================== */
+label {
+  font-weight: bold;
+  color: #00796b; /* لون أخضر داكن */
+  font-size: 14px;
+}
 
-  input, select {
-    width: 100%;
-    padding: 3px;
-    border: 1px solid #4fc3f7;
-    border-radius: 4px;
-    font-size: 11px;
-    text-align: center;
-  }
+/* ======================== حقول الإدخال ======================== */
+input, select {
+  width: 100%; /* ملء الصندوق بالكامل */
+  padding: 8px; /* مساحة داخل الحقل */
+  border: 2px solid #03a9f4; /* إطار سماوي */
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center; /* كتابة النص في وسط الحقل */
+  transition: 0.3s; /* تأثير تغيير اللون عند التركيز */
+}
 
-  input:focus, select:focus {
-    background-color: #b3e5fc;
-    border-color: #0288d1;
-    outline: none;
-  }
+input:focus, select:focus {
+  background-color: #e1f5fe; /* لون فاتح عند التركيز */
+  border-color: #0288d1; /* تغيير لون الإطار */
+  outline: none;
+}
 
-  button {
-    background-color: #0288d1;
-    color: white;
-    border: none;
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-  }
+/* ======================== أزرار ======================== */
+button {
+  background-color: #03a9f4; /* لون سماوي */
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
 
-  button:hover {
-    background-color: #0277bd;
-  }
+button:hover {
+  background-color: #0288d1; /* تغيير لون عند المرور */
+}
 
-  button.calculate {
-    background-color: #4fc3f7;
-    font-size: 10px;
-    padding: 3px 5px;
-    margin-top: 3px;
-  }
+button.calculate {
+  background-color: #00bcd4; /* لون أزرق سماوي مختلف */
+}
 
-  button.calculate:hover {
-    background-color: #03a9f4;
-  }
+/* ======================== جدول العملاء ======================== */
+table {
+  width: 250px; /* أصغر من صندوق الإدخال */
+  border-collapse: collapse; /* إزالة المسافات بين الحدود */
+  margin-top: 20px;
+  text-align: center;
+}
 
-  .table-wrapper {
-    margin-top: 10px;
-    width: 250px; /* أصغر من عرض الإدخال */
-    overflow-x: auto;
-  }
+th, td {
+  border: 1px solid #03a9f4; /* حدود سماوي */
+  padding: 6px; /* مساحة صغيرة داخل الخلية */
+  font-size: 13px; /* حجم صغير لتقليل المساحة */
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 10px;
-    border: 1px solid #4fc3f7;
-    table-layout: fixed;
-    word-wrap: break-word;
-  }
+th {
+  background-color: #03a9f4; /* لون العنوان */
+  color: white;
+}
 
-  th, td {
-    border: 1px solid #b3e5fc;
-    padding: 2px;
-    text-align: center;
-  }
+/* صفوف متبادلة بلون فاتح */
+tr:nth-child(even) td {
+  background-color: #e1f5fe;
+}
 
-  th {
-    background-color: #0288d1;
-    color: white;
-  }
+/* رسالة نجاح حفظ العميل */
+.success-message {
+  color: green;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: none;
+  text-align: center;
+  font-size: 14px;
+}
+.success-message::before {
+  content: "✔ "; /* إضافة علامة صح قبل الرسالة */
+}
 
-  tr:nth-child(even) td {
-    background-color: #e1f5fe;
+/* ======================== استجابة الجوال ======================== */
+@media screen and (max-width: 400px) {
+  .form-container, table {
+    width: 95%; /* ملء عرض الجوال تقريبًا */
   }
-
-  .success-message {
-    color: #0277bd;
-    font-weight: bold;
-    margin-bottom: 3px;
-    display: none;
-    text-align: center;
+  th, td, input, select, button {
     font-size: 12px;
+    padding: 5px;
   }
-
-  .success-message::before {
-    content: "✔ ";
-  }
-
-  @media screen and (max-width: 600px) {
-    .form-container {
-      width: 90%;
-    }
-    .table-wrapper {
-      width: 90%;
-    }
-    input, select, button {
-      font-size: 10px;
-      padding: 2px;
-    }
-    th, td {
-      font-size: 9px;
-      padding: 1px;
-    }
-    h1 {
-      font-size: 16px;
-    }
-  }
+}
 </style>
 </head>
 <body>
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
+<!-- صندوق الإدخال -->
 <div class="form-container">
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
@@ -188,21 +172,22 @@
   <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button>
 </div>
 
-<div class="table-wrapper">
-  <table id="clientsTable">
-    <tr>
-      <th>اسم العميل</th>
-      <th>قيمة الباقة(عدد الأيام)</th>
-      <th>المبلغ المسترد</th>
-    </tr>
-  </table>
-</div>
+<!-- الجدول الصغير تحت -->
+<table id="clientsTable">
+  <tr>
+    <th>اسم العميل</th>
+    <th>قيمة الباقة(عدد الأيام)</th>
+    <th>المبلغ المسترد</th>
+  </tr>
+</table>
 
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
+// ======================= مصفوفة لتخزين بيانات العملاء =======================
 let clients = [];
 
+// ======================= إضافة عميل =======================
 function addClient() {
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
@@ -214,22 +199,23 @@ function addClient() {
   const type = document.getElementById('subscriptionType').value;
   const notes = document.getElementById('notes').value.trim();
 
-  if(!name || !number) return alert("أدخل البيانات الأساسية للعميل");
+  if(!name || !number) {
+    alert("أدخل البيانات الأساسية للعميل");
+    return;
+  }
   if(daysUsed > packageDays) {
     alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز أيام الباقة الأساسية");
     return;
   }
 
-  clients.push({
-    name, number, packageValue, packageDays, daysUsed, bank, account, type, refund: '', notes
-  });
-
+  clients.push({name, number, packageValue, packageDays, daysUsed, bank, account, type, refund:'', notes});
   document.getElementById('successMsg').style.display = 'block';
   setTimeout(()=>document.getElementById('successMsg').style.display='none',2000);
 
   renderTable();
 }
 
+// ======================= حساب الاسترداد =======================
 function calculateRefund() {
   clients.forEach(c => {
     c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
@@ -237,6 +223,7 @@ function calculateRefund() {
   renderTable();
 }
 
+// ======================= عرض الجدول الصغير =======================
 function renderTable() {
   const table = document.getElementById("clientsTable");
   table.innerHTML = `
@@ -246,7 +233,6 @@ function renderTable() {
       <th>المبلغ المسترد</th>
     </tr>
   `;
-
   clients.forEach(c => {
     table.innerHTML += `<tr>
       <td>${c.name}</td>
@@ -256,6 +242,7 @@ function renderTable() {
   });
 }
 
+// ======================= تصدير Excel =======================
 function exportToExcel() {
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>`;
   html += `<tr>
@@ -269,7 +256,6 @@ function exportToExcel() {
     <th>المبلغ المسترد</th>
     <th>الملاحظات</th>
   </tr>`;
-
   clients.forEach(c => {
     html += `<tr>
       <td>${c.name}</td>
@@ -283,16 +269,17 @@ function exportToExcel() {
       <td>${c.notes}</td>
     </tr>`;
   });
-
   html += "</table>";
 
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   const dateStr = yesterday.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year:'numeric' });
+
   link.href = url;
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
   link.click();
