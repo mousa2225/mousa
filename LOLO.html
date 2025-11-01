@@ -242,8 +242,9 @@ function addClient() {
 // ======================= حساب الاسترداد =======================
 function calculateRefund() {
   clients.forEach(c => {
-    // حساب المبلغ المسترد: سعر الباقة / أيام الباقة * الأيام المستفاد بها
-    c.refund = ((c.packageValue / c.packageDays) * c.daysUsed).toFixed(2);
+   // حساب المبلغ المسترد: سعر الباقة / أيام الباقة * الأيام غير المستفاد بها
+c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
+
   });
   renderTable(); // تحديث الجدول بعد الحساب
 }
