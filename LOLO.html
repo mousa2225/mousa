@@ -6,6 +6,7 @@
 <title>حاسبة الاسترداد اليومي</title>
 
 <style>
+/* ======================== إعدادات عامة ======================== */
 body {
   font-family: "Tahoma", Arial, sans-serif;
   background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
@@ -18,8 +19,14 @@ body {
   box-sizing: border-box;
 }
 
-h1 { color: #0288d1; text-align: center; margin-bottom: 25px; font-size: 24px; }
+h1 { 
+  color: #0288d1; 
+  text-align: center; 
+  margin-bottom: 25px; 
+  font-size: 24px; 
+}
 
+/* ======================== حاوية الادخالات ======================== */
 .container {
   width: 100%;
   max-width: 480px;
@@ -31,37 +38,97 @@ h1 { color: #0288d1; text-align: center; margin-bottom: 25px; font-size: 24px; }
   margin-bottom: 20px;
 }
 
-label { font-weight: bold; color: #00796b; font-size: 14px; margin-top: 10px; }
+label { 
+  font-weight: bold; 
+  color: #00796b; 
+  font-size: 14px; 
+  margin-top: 10px; 
+}
+
 input, select {
-  width: 100%; padding: 10px; margin-top: 5px; border: 2px solid #03a9f4;
-  border-radius: 6px; font-size: 14px; text-align: center; transition: 0.3s;
+  width: 100%; 
+  padding: 10px; 
+  margin-top: 5px; 
+  border: 2px solid #03a9f4;
+  border-radius: 6px; 
+  font-size: 14px; 
+  text-align: center; 
+  transition: 0.3s;
   box-sizing: border-box;
 }
-input:focus, select:focus { border-color: #0288d1; background-color: #e1f5fe; outline: none; }
+
+input:focus, select:focus { 
+  border-color: #0288d1; 
+  background-color: #e1f5fe; 
+  outline: none; 
+}
 
 button {
-  width: 100%; background-color: #03a9f4; color: white; border: none;
-  padding: 10px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: bold;
-  margin-top: 10px; transition: 0.3s;
+  width: 100%; 
+  background-color: #03a9f4; 
+  color: white; 
+  border: none;
+  padding: 10px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 15px; 
+  font-weight: bold;
+  margin-top: 10px; 
+  transition: 0.3s;
 }
 button:hover { background-color: #0288d1; }
 button.calculate { background-color: #00bcd4; }
 button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 
-.success-message { color: green; font-weight: bold; text-align: center; display: none; margin-top: 10px; font-size: 14px; }
+/* رسالة نجاح */
+.success-message { 
+  color: green; 
+  font-weight: bold; 
+  text-align: center; 
+  display: none; 
+  margin-top: 10px; 
+  font-size: 14px; 
+}
 .success-message::before { content: "✔ "; }
 
-.table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; }
-table { width: 100%; min-width: 400px; border-collapse: collapse; text-align: center; font-size: 13px; }
-th, td { border: 1px solid #03a9f4; padding: 8px; }
-th { background-color: #03a9f4; color: white; }
-tr:nth-child(even) td { background-color: #e1f5fe; }
+/* ======================== جدول العملاء ======================== */
+.table-wrapper { 
+  width: 100%; 
+  overflow-x: auto; 
+  margin-top: 20px; 
+}
+table { 
+  width: 100%; 
+  min-width: 400px; 
+  border-collapse: collapse; 
+  text-align: center; 
+  font-size: 13px; 
+}
+th, td { 
+  border: 1px solid #03a9f4; 
+  padding: 8px; 
+  text-align: center; 
+}
+th { 
+  background-color: #2196f3; /* لون عناوين الأعمدة */
+  color: white; 
+}
+tr:nth-child(even) td { 
+  background-color: #e1bee7; /* لون الصفوف البنفسجي الباهت */
+}
 
-@media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 20px; } .container { padding: 15px; } button { font-size: 14px; } table { font-size: 12px; } }
+/* ======================== استجابة الأجهزة الصغيرة ======================== */
+@media (max-width: 600px) { 
+  body { padding: 10px; } 
+  h1 { font-size: 20px; } 
+  .container { padding: 15px; } 
+  button { font-size: 14px; } 
+  table { font-size: 12px; } 
+}
 
 /* ======================== نافذة العميل الاستثنائي ======================== */
 .modal {
-  display: none; 
+  display: none; /* مخفية افتراضياً */
   position: fixed;
   z-index: 999;
   left: 0; top: 0;
@@ -82,7 +149,22 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
   flex-direction: column;
 }
 
-.close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
+.close { 
+  position: absolute; top: 10px; right: 15px; 
+  font-size: 22px; font-weight: bold; 
+  cursor: pointer; color:#f44336; 
+}
+
+/* ======================== توقيع المحاسب ======================== */
+.signature {
+  margin-top: 30px;
+  font-family: 'Brush Script MT', cursive, sans-serif; /* خط يشبه التوقيع */
+  font-size: 26px;
+  color: #2c3e50;
+  text-align: right; /* محاذاة التوقيع لليمين */
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
 </style>
 </head>
 
@@ -90,6 +172,7 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
+<!-- ======================== العملاء العاديين ======================== -->
 <div class="container">
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
@@ -121,8 +204,12 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
   <button onclick="addClient()">💾 حفظ العميل</button>
   <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
   <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
+
+  <!-- ======================== توقيع المحاسب ======================== -->
+  <div class="signature">Accountant Mousa Muhammad</div>
 </div>
 
+<!-- ======================== نافذة العميل الاستثنائي ======================== -->
 <div id="exceptionalModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
@@ -130,18 +217,25 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
 
     <label>اسم العميل</label>
     <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+
     <label>رقم العميل</label>
     <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+
     <label>قيمة الباقة (اختياري)</label>
     <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
+
     <label>عدد أيام الباقة (اختياري)</label>
     <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
+
     <label>عدد الأيام المستفاد بها (اختياري)</label>
     <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
+
     <label>اسم البنك</label>
     <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
+
     <label>رقم الحساب البنكي</label>
     <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
+
     <label>نوع الاشتراك</label>
     <select id="exceptionalType">
       <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
@@ -150,8 +244,10 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
       <option value="جديد يدوي">جديد يدوي</option>
       <option value="تجديد يدوي">تجديد يدوي</option>
     </select>
+
     <label>المبلغ المسترد يدويًا</label>
     <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+
     <label>الملاحظات</label>
     <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
 
@@ -159,6 +255,7 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
   </div>
 </div>
 
+<!-- ======================== جدول العملاء ======================== -->
 <div class="table-wrapper">
   <table id="clientsTable">
     <tr>
@@ -173,8 +270,10 @@ tr:nth-child(even) td { background-color: #e1f5fe; }
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
+/* ======================= مصفوفة لتخزين بيانات العملاء ======================= */
 let clients = [];
 
+/* ======================= دالة حفظ العميل العادي ======================= */
 function addClient() {
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
@@ -197,11 +296,14 @@ function addClient() {
   clearInputs();
 }
 
+/* ======================= مسح الحقول ======================= */
 function clearInputs() { document.querySelectorAll('.container input').forEach(i => i.value = ''); }
 
+/* ======================= فتح وإغلاق نافذة العميل الاستثنائي ======================= */
 function openExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'block'; }
 function closeExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'none'; }
 
+/* ======================= حفظ العميل الاستثنائي ======================= */
 function saveExceptionalClient() {
   const name = document.getElementById('exceptionalName').value.trim();
   const number = document.getElementById('exceptionalNumber').value.trim();
@@ -244,6 +346,7 @@ function saveExceptionalClient() {
   document.getElementById('exceptionalNotes').value = '';
 }
 
+/* ======================= حساب المبلغ المسترد للعملاء العاديين ======================= */
 function calculateRefund() {
   clients.forEach(c => {
     if (!c.exceptional) {
@@ -253,6 +356,7 @@ function calculateRefund() {
   renderTable();
 }
 
+/* ======================= عرض الجدول ======================= */
 function renderTable() {
   const table = document.getElementById("clientsTable");
   table.innerHTML = `
@@ -275,6 +379,7 @@ function renderTable() {
   });
 }
 
+/* ======================= حذف عميل ======================= */
 function deleteClient(index) {
   if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
     clients.splice(index, 1);
@@ -282,35 +387,33 @@ function deleteClient(index) {
   }
 }
 
+/* ======================= تصدير إلى Excel ======================= */
 function exportToExcel() {
-  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:18px;'>`;
+  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:30px;'>`;
   html += `<tr>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">اسم العميل</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">رقم العميل</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">قيمة الباقة (عدد الأيام)</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">عدد الأيام المستفاد بها</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">اسم البنك</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">رقم الحساب البنكي</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">نوع الاشتراك</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">المبلغ المسترد</th>
-    <th style="background-color:#03a9f4; color:white; text-align:center; padding:12px;">الملاحظات</th>
+    <th style="background-color:#2196f3; color:white;">اسم العميل</th>
+    <th style="background-color:#2196f3; color:white;">رقم العميل</th>
+    <th style="background-color:#2196f3; color:white;">قيمة الباقة (عدد الأيام)</th>
+    <th style="background-color:#2196f3; color:white;">عدد الأيام المستفاد بها</th>
+    <th style="background-color:#2196f3; color:white;">اسم البنك</th>
+    <th style="background-color:#2196f3; color:white;">رقم الحساب البنكي</th>
+    <th style="background-color:#2196f3; color:white;">نوع الاشتراك</th>
+    <th style="background-color:#2196f3; color:white;">المبلغ المسترد</th>
+    <th style="background-color:#2196f3; color:white;">الملاحظات</th>
   </tr>`;
-
   clients.forEach(c => {
-    let bgColor = c.exceptional ? '#fff3e0' : '#f3e5f5';
     html += `<tr>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.name}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.number}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.packageValue} (${c.packageDays})</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.daysUsed}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.bank}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.account}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.type}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.refund}</td>
-      <td style="background-color:${bgColor}; text-align:center; vertical-align:middle; padding:12px;">${c.notes}</td>
+      <td style="background-color:#e1bee7;">${c.name}</td>
+      <td style="background-color:#e1bee7;">${c.number}</td>
+      <td style="background-color:#e1bee7;">${c.packageValue} (${c.packageDays})</td>
+      <td style="background-color:#e1bee7;">${c.daysUsed}</td>
+      <td style="background-color:#e1bee7;">${c.bank}</td>
+      <td style="background-color:#e1bee7;">${c.account}</td>
+      <td style="background-color:#e1bee7;">${c.type}</td>
+      <td style="background-color:#e1bee7;">${c.refund}</td>
+      <td style="background-color:#e1bee7;">${c.notes}</td>
     </tr>`;
   });
-
   html += "</table>";
 
   const blob = new Blob([html], { type: "application/vnd.ms-excel" });
