@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حاسبة الاسترداد اليومي</title>
+
 <style>
 /* ======================== إعدادات الصفحة ======================== */
 body {
@@ -14,6 +15,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center; /* كل شيء في وسط الصفحة */
+  min-height: 100vh; /* يجعل الصفحة تمتد على كامل الشاشة */
 }
 
 /* ======================== عنوان الصفحة ======================== */
@@ -28,12 +30,13 @@ h1 {
   background: #ffffff; /* خلفية بيضاء لصندوق الإدخال */
   border-radius: 12px; /* حواف دائرية */
   box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* ظل خفيف حول الصندوق */
-  width: 100%; /* عرض نسبي */
-  max-width: 350px; /* أقصى عرض للصندوق */
+  width: 100%; /* العرض يتكيف مع الشاشة */
+  max-width: 400px; /* الحد الأقصى للعرض */
   padding: 20px;
   display: flex;
   flex-direction: column; /* ترتيب الحقول عمودي */
   gap: 12px; /* مسافة بين الحقول */
+  box-sizing: border-box; /* يمنع تجاوز المحتوى */
 }
 
 /* ======================== تسميات الحقول ======================== */
@@ -46,12 +49,13 @@ label {
 /* ======================== حقول الإدخال ======================== */
 input, select {
   width: 100%; /* الحقل يملأ عرض الصندوق */
-  padding: 8px; /* مساحة داخل الحقل */
+  padding: 10px; /* مساحة داخل الحقل */
   border: 2px solid #03a9f4; /* إطار سماوي */
   border-radius: 6px;
   font-size: 14px;
   text-align: center; /* كتابة النص في وسط الحقل */
   transition: 0.3s; /* تأثير سلس عند التركيز */
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
@@ -77,22 +81,28 @@ button:hover {
 }
 
 button.calculate {
-  background-color: #00bcd4; /* زر "احسب الاسترداد" بلون أزرق سماوي مختلف */
+  background-color: #00bcd4; /* زر "احسب الاسترداد" بلون مختلف */
 }
 
 /* ======================== جدول العملاء ======================== */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* يسمح بالتمرير الأفقي على الجوال */
+}
+
 table {
-  width: 100%; /* عرض نسبي */
-  max-width: 320px; /* أقصى عرض للجدول */
+  width: 100%;
+  max-width: 500px;
   border-collapse: collapse; /* إزالة المسافات بين الحدود */
   margin-top: 20px;
   text-align: center;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 
 th, td {
   border: 1px solid #03a9f4; /* حدود سماوي */
-  padding: 6px; /* مساحة صغيرة داخل الخلية */
-  font-size: 13px; /* حجم صغير لتقليل المساحة */
+  padding: 6px;
 }
 
 th {
@@ -119,26 +129,28 @@ tr:nth-child(even) td {
 }
 
 /* ======================== متجاوب مع أي شاشة ======================== */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
   body {
     padding: 10px; /* تقليل الحواف للشاشات الصغيرة */
   }
 
+  h1 {
+    font-size: 18px; /* تصغير عنوان الصفحة */
+  }
+
   .form-container {
-    width: 100%; /* يغطي عرض الجوال بالكامل */
-    max-width: none; /* إزالة الحد الأقصى */
+    width: 100%;
     padding: 15px; 
   }
 
   input, select, button {
     font-size: 13px; /* تصغير حجم الخط */
-    padding: 6px; /* تقليل المساحة داخل الحقول */
+    padding: 8px;
   }
 
   table {
-    width: 100%; /* الجدول يغطي عرض الجوال بالكامل */
-    max-width: none; /* إزالة الحد الأقصى */
-    font-size: 12px; /* تصغير الخط */
+    width: 100%; /* الجدول يغطي عرض الشاشة بالكامل */
+    font-size: 12px;
   }
 
   th, td {
@@ -191,33 +203,35 @@ tr:nth-child(even) td {
   <button class="calculate" onclick="calculateRefund()">احسب الاسترداد</button> <!-- زر لحساب الاسترداد -->
 </div>
 
-<!-- ======================== جدول العملاء المصغّر ======================== -->
-<table id="clientsTable">
-  <tr>
-    <th>اسم العميل</th> <!-- عنوان عمود اسم العميل -->
-    <th>قيمة الباقة(عدد الأيام)</th> <!-- عنوان عمود سعر الباقة وعدد الأيام -->
-    <th>المبلغ المسترد</th> <!-- عنوان عمود الاسترداد -->
-  </tr>
-</table>
+<!-- ======================== جدول العملاء ======================== -->
+<div class="table-wrapper">
+  <table id="clientsTable">
+    <tr>
+      <th>اسم العميل</th>
+      <th>قيمة الباقة(عدد الأيام)</th>
+      <th>المبلغ المسترد</th>
+    </tr>
+  </table>
+</div>
 
 <!-- زر تصدير الملف -->
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
-// ======================= مصفوفة لتخزين بيانات العملاء =======================
+/* ======================= مصفوفة لتخزين بيانات العملاء ======================= */
 let clients = [];
 
-// ======================= إضافة عميل =======================
+/* ======================= إضافة عميل ======================= */
 function addClient() {
   const name = document.getElementById('clientName').value.trim(); // اسم العميل
   const number = document.getElementById('clientNumber').value.trim(); // رقم العميل
-  const packageValue = document.getElementById('packageValue').value.trim(); // سعر الباقة
-  const packageDays = document.getElementById('packageDays').value.trim(); // عدد أيام الباقة
-  const daysUsed = document.getElementById('daysUsed').value.trim(); // الأيام المستفاد بها
-  const bank = document.getElementById('bankName').value.trim();
-  const account = document.getElementById('bankAccount').value.trim();
-  const type = document.getElementById('subscriptionType').value;
-  const notes = document.getElementById('notes').value.trim();
+  const packageValue = parseFloat(document.getElementById('packageValue').value.trim()); // سعر الباقة
+  const packageDays = parseFloat(document.getElementById('packageDays').value.trim()); // عدد أيام الباقة
+  const daysUsed = parseFloat(document.getElementById('daysUsed').value.trim()); // الأيام المستفاد بها
+  const bank = document.getElementById('bankName').value.trim(); // اسم البنك
+  const account = document.getElementById('bankAccount').value.trim(); // رقم الحساب
+  const type = document.getElementById('subscriptionType').value; // نوع الاشتراك
+  const notes = document.getElementById('notes').value.trim(); // الملاحظات
 
   // تحقق من البيانات الأساسية
   if(!name || !number) {
@@ -239,17 +253,16 @@ function addClient() {
   renderTable(); // تحديث الجدول الصغير أسفل الصفحة
 }
 
-// ======================= حساب الاسترداد =======================
+/* ======================= حساب الاسترداد ======================= */
 function calculateRefund() {
   clients.forEach(c => {
-   // حساب المبلغ المسترد: سعر الباقة / أيام الباقة * الأيام غير المستفاد بها
-c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
-
+    // حساب المبلغ المسترد = قيمة اليوم * (الأيام غير المستخدمة)
+    c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
   });
   renderTable(); // تحديث الجدول بعد الحساب
 }
 
-// ======================= عرض الجدول الصغير =======================
+/* ======================= عرض الجدول الصغير ======================= */
 function renderTable() {
   const table = document.getElementById("clientsTable");
   table.innerHTML = `
@@ -262,13 +275,13 @@ function renderTable() {
   clients.forEach(c => {
     table.innerHTML += `<tr>
       <td>${c.name}</td>
-      <td>${c.packageValue}(${c.packageDays})</td>
+      <td>${c.packageValue} (${c.packageDays})</td>
       <td>${c.refund}</td>
     </tr>`;
   });
 }
 
-// ======================= تصدير Excel =======================
+/* ======================= تصدير Excel ======================= */
 function exportToExcel() {
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:14px;'>`;
   html += `<tr>
@@ -286,7 +299,7 @@ function exportToExcel() {
     html += `<tr>
       <td>${c.name}</td>
       <td>${c.number}</td>
-      <td>${c.packageValue}(${c.packageDays})</td>
+      <td>${c.packageValue} (${c.packageDays})</td>
       <td>${c.daysUsed}</td>
       <td>${c.bank}</td>
       <td>${c.account}</td>
@@ -302,9 +315,7 @@ function exportToExcel() {
   const link = document.createElement("a");
 
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const dateStr = yesterday.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year:'numeric' });
+  const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year:'numeric' });
 
   link.href = url;
   link.download = `الاسترداد اليومي ${dateStr}.xls`;
