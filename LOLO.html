@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حاسبة الاسترداد اليومي</title>
 <style>
-/* ======================== إعدادات عامة ======================== */
 body {
   font-family: "Tahoma", Arial, sans-serif;
   background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
@@ -17,15 +16,12 @@ body {
   min-height: 100vh;
   box-sizing: border-box;
 }
-
 h1 { 
   color: #0288d1; 
   text-align: center; 
   margin-bottom: 25px; 
   font-size: 24px; 
 }
-
-/* ======================== حاوية الادخالات ======================== */
 .container {
   width: 100%;
   max-width: 480px;
@@ -36,14 +32,12 @@ h1 {
   box-sizing: border-box;
   margin-bottom: 20px;
 }
-
 label { 
   font-weight: bold; 
   color: #00796b; 
   font-size: 14px; 
   margin-top: 10px; 
 }
-
 input, select {
   width: 100%; 
   padding: 10px; 
@@ -55,13 +49,11 @@ input, select {
   transition: 0.3s;
   box-sizing: border-box;
 }
-
 input:focus, select:focus { 
   border-color: #0288d1; 
   background-color: #e1f5fe; 
   outline: none; 
 }
-
 button {
   width: 100%; 
   background-color: #03a9f4; 
@@ -75,11 +67,8 @@ button {
   margin-top: 10px; 
   transition: 0.3s;
 }
-
 button:hover { background-color: #0288d1; }
 button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
-
-/* رسالة نجاح */
 .success-message { 
   color: green; 
   font-weight: bold; 
@@ -89,8 +78,6 @@ button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
   font-size: 14px; 
 }
 .success-message::before { content: "✔ "; }
-
-/* ======================== جدول العملاء ======================== */
 .table-wrapper { 
   width: 100%; 
   overflow-x: auto; 
@@ -98,40 +85,36 @@ button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 }
 table { 
   width: 100%; 
-  min-width: 600px; 
+  min-width: 400px; 
   border-collapse: collapse; 
   text-align: center; 
-  font-size: 14px;
+  font-size: 13px; 
 }
 th, td { 
   border: 1px solid #03a9f4; 
-  padding: 10px; 
+  padding: 8px; 
   text-align: center; 
-  vertical-align: middle;
 }
 th { 
-  background-color: #2196f3; /* لون العناوين */
+  background-color: #2196f3; 
   color: white; 
 }
-tr:nth-child(odd):not(.exceptional) td { background-color: #ffffff; } /* الصفوف العادية فردي */
-tr:nth-child(even):not(.exceptional) td { background-color: #e1bee7; } /* الصفوف العادية زوجي */
-tr.exceptional td { background-color: #fff3e0 !important; } /* العميل الاستثنائي برتقالي باهت */
-
-/* ======================== استجابة الأجهزة الصغيرة ======================== */
+tr.exceptional td { 
+  background-color: #fff3e0; 
+}
+tr:nth-child(even):not(.exceptional) td { 
+  background-color: #e1bee7; 
+}
 @media (max-width: 600px) { 
   body { padding: 10px; } 
   h1 { font-size: 20px; } 
   .container { padding: 15px; } 
   button { font-size: 14px; } 
-  table { font-size: 12px; }
+  table { font-size: 12px; } 
 }
-
-/* ======================== نافذة العميل الاستثنائي ======================== */
 .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
 .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 14px; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; }
 .close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
-
-/* ======================== توقيع المحاسب ======================== */
 .signature {
   margin-top: 30px;
   font-family: 'Brush Script MT', cursive, sans-serif; 
@@ -181,7 +164,6 @@ tr.exceptional td { background-color: #fff3e0 !important; } /* العميل ال
   <div class="signature">Accountant Mousa Muhammad</div>
 </div>
 
-<!-- ======================== نافذة العميل الاستثنائي ======================== -->
 <div id="exceptionalModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
@@ -218,7 +200,6 @@ tr.exceptional td { background-color: #fff3e0 !important; } /* العميل ال
   </div>
 </div>
 
-<!-- ======================== جدول العملاء ======================== -->
 <div class="table-wrapper">
   <table id="clientsTable">
     <tr>
@@ -237,7 +218,6 @@ tr.exceptional td { background-color: #fff3e0 !important; } /* العميل ال
 <script>
 let clients = [];
 
-// حفظ العميل وحساب الاسترداد
 function addAndCalculate() {
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
@@ -285,11 +265,9 @@ function saveExceptionalClient() {
   clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: refund.toFixed(2), exceptional:true });
   renderTable();
   closeExceptionalModal();
-
   document.querySelectorAll('#exceptionalModal input').forEach(i=>i.value='');
 }
 
-// عرض الجدول
 function renderTable() {
   const table = document.getElementById('clientsTable');
   table.innerHTML = `<tr>
@@ -320,94 +298,39 @@ function deleteClient(index) {
   }
 }
 
-// ======================= تعديل العميل =======================
 function editClient(index){
   const c = clients[index];
-
-  if(c.exceptional){
-    // صفحة منبثقة للعميل الاستثنائي
-    const modalHTML = `
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('editModal').remove()">&times;</span>
-      <h2>تعديل العميل الاستثنائي</h2>
-
-      <label>اسم العميل</label><input type="text" id="editExceptionalName" value="${c.name}">
-      <label>رقم العميل</label><input type="text" id="editExceptionalNumber" value="${c.number}">
-      <label>قيمة الباقة (اختياري)</label><input type="number" id="editExceptionalPackageValue" value="${c.packageValue}">
-      <label>عدد أيام الباقة (اختياري)</label><input type="number" id="editExceptionalPackageDays" value="${c.packageDays}">
-      <label>عدد الأيام المستفاد بها (اختياري)</label><input type="number" id="editExceptionalDaysUsed" value="${c.daysUsed}">
-      <label>اسم البنك</label><input type="text" id="editExceptionalBank" value="${c.bank}">
-      <label>رقم الحساب البنكي</label><input type="text" id="editExceptionalAccount" value="${c.account}">
-      <label>نوع الاشتراك</label>
-      <select id="editExceptionalType">
-        <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
-        <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
-        <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
-        <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
-      </select>
-      <label>المبلغ المسترد يدويًا</label><input type="number" id="editExceptionalRefund" value="${c.refund}">
-      <label>الملاحظات</label><input type="text" id="editExceptionalNotes" value="${c.notes}">
-      <button onclick="saveExceptionalEdit(${index})">💾 حفظ التعديل</button>
-    </div>`;
-
-    let modalDiv = document.createElement('div');
-    modalDiv.className = 'modal';
-    modalDiv.id = 'editModal';
-    modalDiv.innerHTML = modalHTML;
-    document.body.appendChild(modalDiv);
-    modalDiv.style.display = 'block';
-  } else {
-    // صفحة تعديل العميل العادي
-    const modalHTML = `
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('editModal').remove()">&times;</span>
-      <h2>تعديل بيانات العميل</h2>
-      <label>اسم العميل</label><input id="editName" value="${c.name}">
-      <label>رقم العميل</label><input id="editNumber" value="${c.number}">
-      <label>قيمة الباقة</label><input type="number" id="editPackageValue" value="${c.packageValue}">
-      <label>عدد أيام الباقة الأساسية</label><input type="number" id="editPackageDays" value="${c.packageDays}">
-      <label>عدد الأيام المستفاد بها</label><input type="number" id="editDaysUsed" value="${c.daysUsed}">
-      <label>اسم البنك</label><input id="editBank" value="${c.bank}">
-      <label>رقم الحساب البنكي</label><input id="editAccount" value="${c.account}">
-      <label>نوع الاشتراك</label>
-      <select id="editType">
-        <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
-        <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
-        <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
-        <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
-      </select>
-      <label>الملاحظات</label><input id="editNotes" value="${c.notes}">
-      <button onclick="saveEdit(${index})">💾 حفظ التعديل</button>
-    </div>`;
-
-    let modalDiv = document.createElement('div');
-    modalDiv.className = 'modal';
-    modalDiv.id = 'editModal';
-    modalDiv.innerHTML = modalHTML;
-    document.body.appendChild(modalDiv);
-    modalDiv.style.display = 'block';
-  }
+  const modalHTML = `
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('editModal').remove()">&times;</span>
+    <h2>تعديل بيانات العميل${c.exceptional ? ' الاستثنائي' : ''}</h2>
+    <label>اسم العميل</label><input id="editName" value="${c.name}">
+    <label>رقم العميل</label><input id="editNumber" value="${c.number}">
+    <label>قيمة الباقة</label><input type="number" id="editPackageValue" value="${c.packageValue}">
+    <label>عدد أيام الباقة الأساسية</label><input type="number" id="editPackageDays" value="${c.packageDays}">
+    <label>عدد الأيام المستفاد بها</label><input type="number" id="editDaysUsed" value="${c.daysUsed}">
+    <label>اسم البنك</label><input id="editBank" value="${c.bank}">
+    <label>رقم الحساب البنكي</label><input id="editAccount" value="${c.account}">
+    <label>نوع الاشتراك</label>
+    <select id="editType">
+      <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
+      <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
+      <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
+      <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
+    </select>
+    <label>المبلغ المسترد${c.exceptional ? ' يدويًا' : ''}</label><input type="number" id="editRefund" value="${c.refund}">
+    <label>الملاحظات</label><input id="editNotes" value="${c.notes}">
+    <button onclick="saveEdit(${index})">💾 حفظ التعديل</button>
+  </div>`;
+  
+  let modalDiv = document.createElement('div');
+  modalDiv.className = 'modal';
+  modalDiv.id = 'editModal';
+  modalDiv.innerHTML = modalHTML;
+  document.body.appendChild(modalDiv);
+  modalDiv.style.display = 'block';
 }
 
-// حفظ تعديل العميل الاستثنائي
-function saveExceptionalEdit(index){
-  const c = clients[index];
-  c.name = document.getElementById('editExceptionalName').value.trim();
-  c.number = document.getElementById('editExceptionalNumber').value.trim();
-  c.packageValue = parseFloat(document.getElementById('editExceptionalPackageValue').value) || 0;
-  c.packageDays = parseFloat(document.getElementById('editExceptionalPackageDays').value) || 0;
-  c.daysUsed = parseFloat(document.getElementById('editExceptionalDaysUsed').value) || 0;
-  c.bank = document.getElementById('editExceptionalBank').value.trim();
-  c.account = document.getElementById('editExceptionalAccount').value.trim();
-  c.type = document.getElementById('editExceptionalType').value;
-  c.refund = parseFloat(document.getElementById('editExceptionalRefund').value).toFixed(2);
-  c.notes = document.getElementById('editExceptionalNotes').value.trim();
-
-  renderTable();
-  document.getElementById('editModal').remove();
-}
-
-// حفظ تعديل العميل العادي
 function saveEdit(index){
   const c = clients[index];
   c.name = document.getElementById('editName').value.trim();
@@ -419,15 +342,12 @@ function saveEdit(index){
   c.account = document.getElementById('editAccount').value.trim();
   c.type = document.getElementById('editType').value;
   c.notes = document.getElementById('editNotes').value.trim();
-
-  // إعادة حساب الاسترداد تلقائي
-  c.refund = ((c.packageValue / c.packageDays)*(c.packageDays-c.daysUsed)).toFixed(2);
+  c.refund = parseFloat(document.getElementById('editRefund').value).toFixed(2);
 
   renderTable();
   document.getElementById('editModal').remove();
 }
 
-// ======================= تصدير Excel =======================
 function exportToExcel() {
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; direction:rtl; text-align:center;'>`;
   html += `<tr>
@@ -442,8 +362,11 @@ function exportToExcel() {
     <th style="background-color:#2196f3; color:white;">الملاحظات</th>
   </tr>`;
 
-  clients.forEach((c,i)=>{
-    let bg = c.exceptional ? "#fff3e0" : (i%2===0 ? "#ffffff" : "#e1bee7");
+  let normalRowCount = 0;
+  clients.forEach(c => {
+    let bg = c.exceptional ? "#fff3e0" : (normalRowCount % 2 === 0 ? "#ffffff" : "#e1bee7");
+    if(!c.exceptional) normalRowCount++;
+
     html += `<tr style="background-color:${bg}; text-align:center;">
       <td>${c.name}</td>
       <td>${c.number}</td>
