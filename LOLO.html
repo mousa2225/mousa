@@ -3,278 +3,255 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حاسبة الاسترداد اليومي</title>
+<title>حاسبة استرداد العملاء</title>
 
 <style>
-/* ======================== إعدادات عامة ======================== */
-body {
-  font-family: "Tahoma", Arial, sans-serif;
-  background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
+  body {
+    font-family: "Tajawal", sans-serif;
+    background-color: #f9f9fb;
+    margin: 0;
+    padding: 0;
+  }
 
-h1 { 
-  color: #0288d1; 
-  text-align: center; 
-  margin-bottom: 25px; 
-  font-size: 24px; 
-}
+  .container {
+    width: 90%;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 30px;
+  }
 
-/* ======================== حاوية الادخالات ======================== */
-.container {
-  width: 100%;
-  max-width: 480px;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  padding: 20px;
-  box-sizing: border-box;
-  margin-bottom: 20px;
-}
+  h2 {
+    text-align: center;
+    color: #1a237e;
+  }
 
-label { 
-  font-weight: bold; 
-  color: #00796b; 
-  font-size: 14px; 
-  margin-top: 10px; 
-}
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+  }
 
-input, select {
-  width: 100%; 
-  padding: 10px; 
-  margin-top: 5px; 
-  border: 2px solid #03a9f4;
-  border-radius: 6px; 
-  font-size: 14px; 
-  text-align: center; 
-  transition: 0.3s;
-  box-sizing: border-box;
-}
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    font-size: 15px;
+  }
 
-input:focus, select:focus { 
-  border-color: #0288d1; 
-  background-color: #e1f5fe; 
-  outline: none; 
-}
+  button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+  }
 
-button {
-  width: 100%; 
-  background-color: #03a9f4; 
-  color: white; 
-  border: none;
-  padding: 10px; 
-  border-radius: 6px; 
-  cursor: pointer; 
-  font-size: 15px; 
-  font-weight: bold;
-  margin-top: 10px; 
-  transition: 0.3s;
-}
-button:hover { background-color: #0288d1; }
-button.calculate { background-color: #00bcd4; }
-button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
+  button:hover {
+    background-color: #0d47a1;
+  }
 
-/* رسالة نجاح */
-.success-message { 
-  color: green; 
-  font-weight: bold; 
-  text-align: center; 
-  display: none; 
-  margin-top: 10px; 
-  font-size: 14px; 
-}
-.success-message::before { content: "✔ "; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+  }
 
-/* ======================== جدول العملاء ======================== */
-.table-wrapper { 
-  width: 100%; 
-  overflow-x: auto; 
-  margin-top: 20px; 
-}
-table { 
-  width: 100%; 
-  min-width: 400px; 
-  border-collapse: collapse; 
-  text-align: center; 
-  font-size: 13px; 
-}
-th, td { 
-  border: 1px solid #03a9f4; 
-  padding: 8px; 
-  text-align: center; 
-}
-th { 
-  background-color: #2196f3; /* لون عناوين الأعمدة */
-  color: white; 
-}
-tr:nth-child(even) td { 
-  background-color: #e1bee7; /* لون الصفوف البنفسجي الباهت */
-}
+  th, td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+  }
 
-/* ======================== استجابة الأجهزة الصغيرة ======================== */
-@media (max-width: 600px) { 
-  body { padding: 10px; } 
-  h1 { font-size: 20px; } 
-  .container { padding: 15px; } 
-  button { font-size: 14px; } 
-  table { font-size: 12px; } 
-}
+  th {
+    background-color: #1565c0;
+    color: white;
+  }
 
-/* ======================== نافذة العميل الاستثنائي ======================== */
-.modal {
-  display: none; /* مخفية افتراضياً */
-  position: fixed;
-  z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.5);
-}
+  /* تلوين الصفوف بالتناوب مثل Excel */
+  tr:nth-child(even) td {
+    background-color: #f3e5f5; /* بنفسجي باهت */
+  }
 
-.modal-content {
-  background-color: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  border-radius: 14px;
-  max-width: 480px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
+  tr:nth-child(odd) td {
+    background-color: #ffffff;
+  }
 
-.close { 
-  position: absolute; top: 10px; right: 15px; 
-  font-size: 22px; font-weight: bold; 
-  cursor: pointer; color:#f44336; 
-}
+  /* رسالة نجاح */
+  #successMsg {
+    display: none;
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+  }
 
-/* ======================== توقيع المحاسب ======================== */
-.signature {
-  margin-top: 30px;
-  font-family: 'Brush Script MT', cursive, sans-serif; /* خط يشبه التوقيع */
-  font-size: 26px;
-  color: #2c3e50;
-  text-align: right; /* محاذاة التوقيع لليمين */
-  font-style: italic;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
+  /* توقيع أسفل الصفحة */
+  .signature {
+    margin-top: 40px;
+    font-family: 'Brush Script MT', cursive, sans-serif;
+    font-size: 28px;
+    color: #2c3e50;
+    text-align: right;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    border-top: 2px solid #03a9f4;
+    padding-top: 10px;
+  }
+
+  /* النافذة المنبثقة للعميل الاستثنائي */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 50%;
+  }
+
+  .close {
+    color: #aaa;
+    float: left;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: black;
+  }
 </style>
 </head>
-
 <body>
 
-<h1>حاسبة الاسترداد اليومي</h1>
-
-<!-- ======================== العملاء العاديين ======================== -->
 <div class="container">
-  <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
+  <h2>💰 حاسبة استرداد العملاء</h2>
 
-  <label>اسم العميل</label>
-  <input type="text" id="clientName" placeholder="ادخل اسم العميل">
-  <label>رقم العميل</label>
-  <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
-  <label>قيمة الباقة</label>
-  <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
-  <label>عدد أيام الباقة الأساسية</label>
-  <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
-  <label>عدد الأيام المستفاد بها</label>
-  <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
-  <label>اسم البنك</label>
-  <input type="text" id="bankName" placeholder="ادخل اسم البنك">
-  <label>رقم الحساب البنكي</label>
-  <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
-  <label>نوع الاشتراك</label>
+  <!-- ======================== الحقول ======================== -->
+  <label>اسم العميل:</label>
+  <input type="text" id="clientName">
+
+  <label>رقم العميل:</label>
+  <input type="text" id="clientNumber">
+
+  <label>قيمة الباقة:</label>
+  <input type="number" id="packageValue">
+
+  <label>عدد الأيام في الباقة:</label>
+  <input type="number" id="packageDays">
+
+  <label>عدد الأيام المستفاد بها:</label>
+  <input type="number" id="daysUsed">
+
+  <label>البنك:</label>
+  <input type="text" id="bankName">
+
+  <label>رقم الحساب البنكي:</label>
+  <input type="text" id="bankAccount">
+
+  <label>نوع الاشتراك:</label>
   <select id="subscriptionType">
-    <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
-    <option value="تطبيق جديد">تطبيق جديد</option>
-    <option value="تطبيق تجديد">تطبيق تجديد</option>
-    <option value="جديد يدوي">جديد يدوي</option>
-    <option value="تجديد يدوي">تجديد يدوي</option>
+    <option value="عادي">عادي</option>
+    <option value="شهري">شهري</option>
   </select>
-  <label>الملاحظات</label>
-  <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <button onclick="addClient()">💾 حفظ العميل</button>
-  <button class="calculate" onclick="calculateRefund()">💰 احسب الاسترداد</button>
+  <label>ملاحظات:</label>
+  <textarea id="notes"></textarea>
+
+  <!-- ======================== الأزرار ======================== -->
+  <button onclick="addClientAndCalculate()">✅ حفظ وحساب الاسترداد</button>
   <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
 
-  <!-- ======================== توقيع المحاسب ======================== -->
-  <div class="signature">Accountant Mousa Muhammad</div>
+  <div id="successMsg">✅ تم حفظ العميل وحساب المبلغ بنجاح</div>
+
+  <!-- ======================== الجدول ======================== -->
+  <table id="clientsTable">
+    <thead>
+      <tr>
+        <th>اسم العميل</th>
+        <th>رقم العميل</th>
+        <th>قيمة الباقة (أيام)</th>
+        <th>الأيام المستخدمة</th>
+        <th>البنك</th>
+        <th>رقم الحساب</th>
+        <th>نوع الاشتراك</th>
+        <th>المبلغ المسترد</th>
+        <th>ملاحظات</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- ======================== التوقيع ======================== -->
+  <div class="signature">
+    Accountant Mousa Muhammad
+  </div>
 </div>
 
-<!-- ======================== نافذة العميل الاستثنائي ======================== -->
+<!-- ======================== النافذة المنبثقة للعميل الاستثنائي ======================== -->
 <div id="exceptionalModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
-    <h2>إضافة عميل استثنائي</h2>
+    <h3>🌟 إضافة عميل استثنائي</h3>
 
-    <label>اسم العميل</label>
-    <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+    <label>اسم العميل:</label>
+    <input type="text" id="exName">
 
-    <label>رقم العميل</label>
-    <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+    <label>رقم العميل:</label>
+    <input type="text" id="exNumber">
 
-    <label>قيمة الباقة (اختياري)</label>
-    <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
+    <label>قيمة الباقة:</label>
+    <input type="number" id="exValue">
 
-    <label>عدد أيام الباقة (اختياري)</label>
-    <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
+    <label>عدد الأيام في الباقة:</label>
+    <input type="number" id="exDays">
 
-    <label>عدد الأيام المستفاد بها (اختياري)</label>
-    <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
+    <label>الأيام المستخدمة:</label>
+    <input type="number" id="exUsed">
 
-    <label>اسم البنك</label>
-    <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
+    <label>البنك:</label>
+    <input type="text" id="exBank">
 
-    <label>رقم الحساب البنكي</label>
-    <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
+    <label>رقم الحساب البنكي:</label>
+    <input type="text" id="exAccount">
 
-    <label>نوع الاشتراك</label>
-    <select id="exceptionalType">
-      <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
-      <option value="تطبيق جديد">تطبيق جديد</option>
-      <option value="تطبيق تجديد">تطبيق تجديد</option>
-      <option value="جديد يدوي">جديد يدوي</option>
-      <option value="تجديد يدوي">تجديد يدوي</option>
+    <label>نوع الاشتراك:</label>
+    <select id="exType">
+      <option value="عادي">عادي</option>
+      <option value="شهري">شهري</option>
     </select>
 
-    <label>المبلغ المسترد يدويًا</label>
-    <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
-
-    <label>الملاحظات</label>
-    <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
+    <label>ملاحظات:</label>
+    <textarea id="exNotes"></textarea>
 
     <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
   </div>
 </div>
 
-<!-- ======================== جدول العملاء ======================== -->
-<div class="table-wrapper">
-  <table id="clientsTable">
-    <tr>
-      <th>اسم العميل</th>
-      <th>قيمة الباقة (عدد الأيام)</th>
-      <th>المبلغ المسترد</th>
-      <th>حذف</th>
-    </tr>
-  </table>
-</div>
-
-<button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
-
 <script>
-/* ======================= مصفوفة لتخزين بيانات العملاء ======================= */
 let clients = [];
 
-/* ======================= دالة حفظ العميل العادي ======================= */
-function addClient() {
+/* ======================= دالة حفظ العميل + حساب المبلغ ======================= */
+function addClientAndCalculate() {
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
   const packageValue = parseFloat(document.getElementById('packageValue').value);
@@ -288,142 +265,68 @@ function addClient() {
   if (!name || !number) { alert("الرجاء إدخال اسم ورقم العميل"); return; }
   if (daysUsed > packageDays) { alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
 
-  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: '', exceptional: false });
-  document.getElementById('successMsg').style.display = 'block';
-  setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
+  const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
+
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: false });
+
+  const msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2000);
 
   renderTable();
   clearInputs();
 }
 
-/* ======================= مسح الحقول ======================= */
-function clearInputs() { document.querySelectorAll('.container input').forEach(i => i.value = ''); }
+/* ======================= دالة عرض العملاء في الجدول ======================= */
+function renderTable() {
+  const tbody = document.querySelector("#clientsTable tbody");
+  tbody.innerHTML = "";
+  clients.forEach(c => {
+    const row = `<tr>
+      <td>${c.name}</td>
+      <td>${c.number}</td>
+      <td>${c.packageValue} (${c.packageDays})</td>
+      <td>${c.daysUsed}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.refund}</td>
+      <td>${c.notes}</td>
+    </tr>`;
+    tbody.innerHTML += row;
+  });
+}
 
-/* ======================= فتح وإغلاق نافذة العميل الاستثنائي ======================= */
-function openExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'block'; }
-function closeExceptionalModal() { document.getElementById('exceptionalModal').style.display = 'none'; }
+/* ======================= تنظيف الحقول ======================= */
+function clearInputs() {
+  document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+}
+
+/* ======================= نافذة العميل الاستثنائي ======================= */
+function openExceptionalModal() {
+  document.getElementById("exceptionalModal").style.display = "block";
+}
+function closeExceptionalModal() {
+  document.getElementById("exceptionalModal").style.display = "none";
+}
 
 /* ======================= حفظ العميل الاستثنائي ======================= */
 function saveExceptionalClient() {
-  const name = document.getElementById('exceptionalName').value.trim();
-  const number = document.getElementById('exceptionalNumber').value.trim();
-  const packageValue = parseFloat(document.getElementById('exceptionalPackageValue').value) || 0;
-  const packageDays = parseFloat(document.getElementById('exceptionalPackageDays').value) || 0;
-  const daysUsed = parseFloat(document.getElementById('exceptionalDaysUsed').value) || 0;
-  const bank = document.getElementById('exceptionalBank').value.trim();
-  const account = document.getElementById('exceptionalAccount').value.trim();
-  const type = document.getElementById('exceptionalType').value;
-  const refund = parseFloat(document.getElementById('exceptionalRefund').value);
-  const notes = document.getElementById('exceptionalNotes').value.trim();
+  const name = document.getElementById('exName').value.trim();
+  const number = document.getElementById('exNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('exValue').value);
+  const packageDays = parseFloat(document.getElementById('exDays').value);
+  const daysUsed = parseFloat(document.getElementById('exUsed').value);
+  const bank = document.getElementById('exBank').value.trim();
+  const account = document.getElementById('exAccount').value.trim();
+  const type = document.getElementById('exType').value;
+  const notes = document.getElementById('exNotes').value.trim();
 
-  if (!name || !number || isNaN(refund)) { alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد"); return; }
+  const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: true });
 
-  clients.push({
-    name,
-    number,
-    packageValue,
-    packageDays,
-    daysUsed,
-    bank,
-    account,
-    type,
-    notes,
-    refund: refund.toFixed(2),
-    exceptional: true
-  });
-
-  renderTable();
   closeExceptionalModal();
-
-  document.getElementById('exceptionalName').value = '';
-  document.getElementById('exceptionalNumber').value = '';
-  document.getElementById('exceptionalPackageValue').value = '';
-  document.getElementById('exceptionalPackageDays').value = '';
-  document.getElementById('exceptionalDaysUsed').value = '';
-  document.getElementById('exceptionalBank').value = '';
-  document.getElementById('exceptionalAccount').value = '';
-  document.getElementById('exceptionalRefund').value = '';
-  document.getElementById('exceptionalNotes').value = '';
-}
-
-/* ======================= حساب المبلغ المسترد للعملاء العاديين ======================= */
-function calculateRefund() {
-  clients.forEach(c => {
-    if (!c.exceptional) {
-      c.refund = ((c.packageValue / c.packageDays) * (c.packageDays - c.daysUsed)).toFixed(2);
-    }
-  });
   renderTable();
-}
-
-/* ======================= عرض الجدول ======================= */
-function renderTable() {
-  const table = document.getElementById("clientsTable");
-  table.innerHTML = `
-    <tr>
-      <th>اسم العميل</th>
-      <th>قيمة الباقة (عدد الأيام)</th>
-      <th>المبلغ المسترد</th>
-      <th>حذف</th>
-    </tr>
-  `;
-  clients.forEach((c, index) => {
-    table.innerHTML += `
-      <tr ${c.exceptional ? 'style="background-color:#fff3e0;"' : ''}>
-        <td>${c.name}</td>
-        <td>${c.packageValue} (${c.packageDays})</td>
-        <td>${c.refund || "-"}</td>
-        <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
-      </tr>
-    `;
-  });
-}
-
-/* ======================= حذف عميل ======================= */
-function deleteClient(index) {
-  if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
-    clients.splice(index, 1);
-    renderTable();
-  }
-}
-
-/* ======================= تصدير إلى Excel ======================= */
-function exportToExcel() {
-  let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:30px;'>`;
-  html += `<tr>
-    <th style="background-color:#2196f3; color:white;">اسم العميل</th>
-    <th style="background-color:#2196f3; color:white;">رقم العميل</th>
-    <th style="background-color:#2196f3; color:white;">قيمة الباقة (عدد الأيام)</th>
-    <th style="background-color:#2196f3; color:white;">عدد الأيام المستفاد بها</th>
-    <th style="background-color:#2196f3; color:white;">اسم البنك</th>
-    <th style="background-color:#2196f3; color:white;">رقم الحساب البنكي</th>
-    <th style="background-color:#2196f3; color:white;">نوع الاشتراك</th>
-    <th style="background-color:#2196f3; color:white;">المبلغ المسترد</th>
-    <th style="background-color:#2196f3; color:white;">الملاحظات</th>
-  </tr>`;
-  clients.forEach(c => {
-    html += `<tr>
-      <td style="background-color:#e1bee7;">${c.name}</td>
-      <td style="background-color:#e1bee7;">${c.number}</td>
-      <td style="background-color:#e1bee7;">${c.packageValue} (${c.packageDays})</td>
-      <td style="background-color:#e1bee7;">${c.daysUsed}</td>
-      <td style="background-color:#e1bee7;">${c.bank}</td>
-      <td style="background-color:#e1bee7;">${c.account}</td>
-      <td style="background-color:#e1bee7;">${c.type}</td>
-      <td style="background-color:#e1bee7;">${c.refund}</td>
-      <td style="background-color:#e1bee7;">${c.notes}</td>
-    </tr>`;
-  });
-  html += "</table>";
-
-  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  const today = new Date();
-  const dateStr = today.toLocaleDateString('ar-EG', { day: '2-digit', month: 'long', year:'numeric' });
-  link.href = url;
-  link.download = `الاسترداد اليومي ${dateStr}.xls`;
-  link.click();
 }
 </script>
 
