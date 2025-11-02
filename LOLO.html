@@ -98,22 +98,26 @@ button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 }
 table { 
   width: 100%; 
-  min-width: 400px; 
+  min-width: 800px; /* تكبير الجدول */
   border-collapse: collapse; 
   text-align: center; 
-  font-size: 13px; 
+  font-size: 16px; /* تكبير الخط */
 }
 th, td { 
   border: 1px solid #03a9f4; 
-  padding: 8px; 
+  padding: 12px; /* تكبير الخلايا */
   text-align: center; 
+  vertical-align: middle;
 }
 th { 
   background-color: #2196f3; /* لون عناوين الأعمدة */
   color: white; 
 }
+tr:nth-child(odd) td { 
+  background-color: #ffffff; /* الصفوف الفردية أبيض */
+}
 tr:nth-child(even) td { 
-  background-color: #e1bee7; /* لون الصفوف البنفسجي الباهت */
+  background-color: #e1bee7; /* الصفوف الزوجية بنفسجي باهت */
 }
 
 /* ======================== استجابة الأجهزة الصغيرة ======================== */
@@ -122,7 +126,7 @@ tr:nth-child(even) td {
   h1 { font-size: 20px; } 
   .container { padding: 15px; } 
   button { font-size: 14px; } 
-  table { font-size: 12px; } 
+  table { font-size: 14px; min-width: 600px; }
 }
 
 /* ======================== نافذة العميل الاستثنائي ======================== */
@@ -174,7 +178,6 @@ tr:nth-child(even) td {
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <!-- الزر الجديد لحفظ وحساب الاسترداد مباشرة -->
   <button onclick="addAndCalculate()">💾 حفظ وحساب الاسترداد</button>
   <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
 
@@ -235,6 +238,7 @@ tr:nth-child(even) td {
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
 
 <script>
+// ======================= بيانات العملاء =======================
 let clients = [];
 
 // حفظ العميل وحساب الاسترداد مباشرة
