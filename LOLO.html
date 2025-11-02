@@ -75,9 +75,9 @@ button {
   margin-top: 10px; 
   transition: 0.3s;
 }
+
 button:hover { background-color: #0288d1; }
 button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
-button.edit { background-color: #ffa726; font-size: 13px; padding: 6px 8px; margin-left:5px; }
 
 /* رسالة نجاح */
 .success-message { 
@@ -109,11 +109,11 @@ th, td {
   text-align: center; 
 }
 th { 
-  background-color: #2196f3; 
+  background-color: #2196f3; /* لون عناوين الأعمدة */
   color: white; 
 }
 tr:nth-child(even) td { 
-  background-color: #e1bee7; 
+  background-color: #e1bee7; /* لون الصفوف البنفسجي الباهت */
 }
 
 /* ======================== استجابة الأجهزة الصغيرة ======================== */
@@ -125,39 +125,15 @@ tr:nth-child(even) td {
   table { font-size: 12px; } 
 }
 
-/* ======================== نافذة العميل الاستثنائي / تعديل ======================== */
-.modal {
-  display: none; 
-  position: fixed;
-  z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-  background-color: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  border-radius: 14px;
-  max-width: 480px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.close { 
-  position: absolute; top: 10px; right: 15px; 
-  font-size: 22px; font-weight: bold; 
-  cursor: pointer; color:#f44336; 
-}
+/* ======================== نافذة العميل الاستثنائي ======================== */
+.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 14px; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; }
+.close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
 
 /* ======================== توقيع المحاسب ======================== */
 .signature {
   margin-top: 30px;
-  font-family: 'Brush Script MT', cursive, sans-serif;
+  font-family: 'Brush Script MT', cursive, sans-serif; 
   font-size: 26px;
   color: #2c3e50;
   text-align: right; 
@@ -170,7 +146,6 @@ tr:nth-child(even) td {
 
 <h1>حاسبة الاسترداد اليومي</h1>
 
-<!-- ======================== العملاء العاديين ======================== -->
 <div class="container">
   <div class="success-message" id="successMsg">تم حفظ العميل وحساب الاسترداد بنجاح</div>
 
@@ -199,45 +174,11 @@ tr:nth-child(even) td {
   <label>الملاحظات</label>
   <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <button onclick="addClientWithRefund()">💾 حفظ وحساب الاسترداد</button>
+  <!-- الزر الجديد لحفظ وحساب الاسترداد مباشرة -->
+  <button onclick="addAndCalculate()">💾 حفظ وحساب الاسترداد</button>
   <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
 
-  <!-- ======================== توقيع المحاسب ======================== -->
   <div class="signature">Accountant Mousa Muhammad</div>
-</div>
-
-<!-- ======================== نافذة تعديل العميل ======================== -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeEditModal()">&times;</span>
-    <h2>تعديل بيانات العميل</h2>
-    <label>اسم العميل</label>
-    <input type="text" id="editName" placeholder="ادخل اسم العميل">
-    <label>رقم العميل</label>
-    <input type="text" id="editNumber" placeholder="ادخل رقم العميل">
-    <label>قيمة الباقة</label>
-    <input type="number" id="editPackageValue" placeholder="ادخل قيمة الباقة">
-    <label>عدد أيام الباقة الأساسية</label>
-    <input type="number" id="editPackageDays" placeholder="ادخل عدد الأيام">
-    <label>عدد الأيام المستفاد بها</label>
-    <input type="number" id="editDaysUsed" placeholder="ادخل الأيام المستفاد بها">
-    <label>اسم البنك</label>
-    <input type="text" id="editBank" placeholder="ادخل اسم البنك">
-    <label>رقم الحساب البنكي</label>
-    <input type="text" id="editAccount" placeholder="ادخل رقم الحساب">
-    <label>نوع الاشتراك</label>
-    <select id="editType">
-      <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
-      <option value="تطبيق جديد">تطبيق جديد</option>
-      <option value="تطبيق تجديد">تطبيق تجديد</option>
-      <option value="جديد يدوي">جديد يدوي</option>
-      <option value="تجديد يدوي">تجديد يدوي</option>
-    </select>
-    <label>الملاحظات</label>
-    <input type="text" id="editNotes" placeholder="ادخل ملاحظات">
-    <button onclick="saveEditClient()">💾 حفظ التعديلات</button>
-    <button onclick="closeEditModal()">✖ إلغاء</button>
-  </div>
 </div>
 
 <!-- ======================== نافذة العميل الاستثنائي ======================== -->
@@ -245,6 +186,7 @@ tr:nth-child(even) td {
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
     <h2>إضافة عميل استثنائي</h2>
+
     <label>اسم العميل</label>
     <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
     <label>رقم العميل</label>
@@ -271,6 +213,7 @@ tr:nth-child(even) td {
     <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
     <label>الملاحظات</label>
     <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
+
     <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
   </div>
 </div>
@@ -293,10 +236,9 @@ tr:nth-child(even) td {
 
 <script>
 let clients = [];
-let editIndex = -1;
 
-/* ======================= إضافة العميل وحساب الاسترداد ======================= */
-function addClientWithRefund() {
+// حفظ العميل وحساب الاسترداد مباشرة
+function addAndCalculate() {
   const name = document.getElementById('clientName').value.trim();
   const number = document.getElementById('clientNumber').value.trim();
   const packageValue = parseFloat(document.getElementById('packageValue').value);
@@ -312,85 +254,45 @@ function addClientWithRefund() {
 
   const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
 
-  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional:false });
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: false });
+  
+  document.getElementById('successMsg').style.display = 'block';
+  setTimeout(()=>document.getElementById('successMsg').style.display='none', 2000);
+
   renderTable();
   clearInputs();
-  document.getElementById('successMsg').style.display = 'block';
-  setTimeout(()=>document.getElementById('successMsg').style.display='none',2000);
 }
 
-/* ======================= مسح الحقول ======================= */
-function clearInputs() {
-  document.querySelectorAll('.container input').forEach(i=>i.value='');
-  document.querySelectorAll('.container select').forEach(s=>s.selectedIndex=0);
-}
+function clearInputs() { document.querySelectorAll('.container input').forEach(i=>i.value=''); }
 
-/* ======================= فتح/اغلاق تعديل العميل ======================= */
-function openEditModal(index){
-  editIndex = index;
-  const c = clients[index];
-  document.getElementById('editName').value = c.name;
-  document.getElementById('editNumber').value = c.number;
-  document.getElementById('editPackageValue').value = c.packageValue;
-  document.getElementById('editPackageDays').value = c.packageDays;
-  document.getElementById('editDaysUsed').value = c.daysUsed;
-  document.getElementById('editBank').value = c.bank;
-  document.getElementById('editAccount').value = c.account;
-  document.getElementById('editType').value = c.type;
-  document.getElementById('editNotes').value = c.notes;
-  document.getElementById('editModal').style.display='block';
-}
-function closeEditModal(){ document.getElementById('editModal').style.display='none'; }
+function openExceptionalModal() { document.getElementById('exceptionalModal').style.display='block'; }
+function closeExceptionalModal() { document.getElementById('exceptionalModal').style.display='none'; }
 
-/* ======================= حفظ تعديل العميل ======================= */
-function saveEditClient(){
-  const c = clients[editIndex];
-  c.name = document.getElementById('editName').value.trim();
-  c.number = document.getElementById('editNumber').value.trim();
-  c.packageValue = parseFloat(document.getElementById('editPackageValue').value);
-  c.packageDays = parseFloat(document.getElementById('editPackageDays').value);
-  c.daysUsed = parseFloat(document.getElementById('editDaysUsed').value);
-  c.bank = document.getElementById('editBank').value.trim();
-  c.account = document.getElementById('editAccount').value.trim();
-  c.type = document.getElementById('editType').value;
-  c.notes = document.getElementById('editNotes').value.trim();
-
-  c.refund = ((c.packageValue / c.packageDays)*(c.packageDays-c.daysUsed)).toFixed(2);
-
-  renderTable();
-  closeEditModal();
-}
-
-/* ======================= فتح/اغلاق العميل الاستثنائي ======================= */
-function openExceptionalModal(){ document.getElementById('exceptionalModal').style.display='block'; }
-function closeExceptionalModal(){ document.getElementById('exceptionalModal').style.display='none'; }
-
-/* ======================= حفظ العميل الاستثنائي ======================= */
-function saveExceptionalClient(){
+function saveExceptionalClient() {
   const name = document.getElementById('exceptionalName').value.trim();
   const number = document.getElementById('exceptionalNumber').value.trim();
-  const packageValue = parseFloat(document.getElementById('exceptionalPackageValue').value)||0;
-  const packageDays = parseFloat(document.getElementById('exceptionalPackageDays').value)||0;
-  const daysUsed = parseFloat(document.getElementById('exceptionalDaysUsed').value)||0;
+  const packageValue = parseFloat(document.getElementById('exceptionalPackageValue').value) || 0;
+  const packageDays = parseFloat(document.getElementById('exceptionalPackageDays').value) || 0;
+  const daysUsed = parseFloat(document.getElementById('exceptionalDaysUsed').value) || 0;
   const bank = document.getElementById('exceptionalBank').value.trim();
   const account = document.getElementById('exceptionalAccount').value.trim();
   const type = document.getElementById('exceptionalType').value;
   const refund = parseFloat(document.getElementById('exceptionalRefund').value);
   const notes = document.getElementById('exceptionalNotes').value.trim();
 
-  if(!name||!number||isNaN(refund)){ alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد"); return; }
+  if (!name || !number || isNaN(refund)) { alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد"); return; }
 
-  clients.push({name,number,packageValue,packageDays,daysUsed,bank,account,type,notes,refund:refund.toFixed(2),exceptional:true});
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: refund.toFixed(2), exceptional:true });
   renderTable();
   closeExceptionalModal();
 
-  ['exceptionalName','exceptionalNumber','exceptionalPackageValue','exceptionalPackageDays','exceptionalDaysUsed','exceptionalBank','exceptionalAccount','exceptionalType','exceptionalRefund','exceptionalNotes'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#exceptionalModal input').forEach(i=>i.value='');
 }
 
-/* ======================= عرض الجدول ======================= */
-function renderTable(){
+// عرض الجدول
+function renderTable() {
   const table = document.getElementById('clientsTable');
-  table.innerHTML=`<tr>
+  table.innerHTML = `<tr>
     <th>اسم العميل</th>
     <th>قيمة الباقة (عدد الأيام)</th>
     <th>الأيام المستفاد بها</th>
@@ -404,23 +306,74 @@ function renderTable(){
       <td>${c.name}</td>
       <td>${c.packageValue} (${c.packageDays})</td>
       <td>${c.daysUsed}</td>
-      <td>${c.refund||'-'}</td>
-      <td><button class="edit" onclick="openEditModal(${index})">✏️ تعديل</button></td>
-      <td><button class="delete" onclick="deleteClient(${index})">🗑️ حذف</button></td>
+      <td>${c.refund}</td>
+      <td><button onclick="editClient(${index})">✏️</button></td>
+      <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
     </tr>`;
   });
 }
 
-/* ======================= حذف العميل ======================= */
-function deleteClient(index){ 
+function deleteClient(index) {
   if(confirm("هل أنت متأكد من حذف هذا العميل؟")){
     clients.splice(index,1);
     renderTable();
   }
 }
 
-/* ======================= تصدير Excel ======================= */
-function exportToExcel(){
+// ======================= تعديل العميل =======================
+function editClient(index){
+  const c = clients[index];
+  const modalHTML = `
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('editModal').style.display='none'">&times;</span>
+    <h2>تعديل بيانات العميل</h2>
+    <label>اسم العميل</label><input id="editName" value="${c.name}">
+    <label>رقم العميل</label><input id="editNumber" value="${c.number}">
+    <label>قيمة الباقة</label><input type="number" id="editPackageValue" value="${c.packageValue}">
+    <label>عدد أيام الباقة الأساسية</label><input type="number" id="editPackageDays" value="${c.packageDays}">
+    <label>عدد الأيام المستفاد بها</label><input type="number" id="editDaysUsed" value="${c.daysUsed}">
+    <label>اسم البنك</label><input id="editBank" value="${c.bank}">
+    <label>رقم الحساب البنكي</label><input id="editAccount" value="${c.account}">
+    <label>نوع الاشتراك</label>
+    <select id="editType">
+      <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
+      <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
+      <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
+      <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
+    </select>
+    <label>الملاحظات</label><input id="editNotes" value="${c.notes}">
+    <button onclick="saveEdit(${index})">💾 حفظ التعديل</button>
+  </div>`;
+  
+  let modalDiv = document.createElement('div');
+  modalDiv.className = 'modal';
+  modalDiv.id = 'editModal';
+  modalDiv.innerHTML = modalHTML;
+  document.body.appendChild(modalDiv);
+  modalDiv.style.display = 'block';
+}
+
+function saveEdit(index){
+  const c = clients[index];
+  c.name = document.getElementById('editName').value.trim();
+  c.number = document.getElementById('editNumber').value.trim();
+  c.packageValue = parseFloat(document.getElementById('editPackageValue').value);
+  c.packageDays = parseFloat(document.getElementById('editPackageDays').value);
+  c.daysUsed = parseFloat(document.getElementById('editDaysUsed').value);
+  c.bank = document.getElementById('editBank').value.trim();
+  c.account = document.getElementById('editAccount').value.trim();
+  c.type = document.getElementById('editType').value;
+  c.notes = document.getElementById('editNotes').value.trim();
+
+  // إعادة حساب الاسترداد تلقائي
+  c.refund = ((c.packageValue / c.packageDays)*(c.packageDays-c.daysUsed)).toFixed(2);
+
+  renderTable();
+  document.getElementById('editModal').remove();
+}
+
+// ======================= تصدير Excel =======================
+function exportToExcel() {
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; direction:rtl;'>`;
   html += `<tr>
     <th style="background-color:#2196f3; color:white;">اسم العميل</th>
@@ -428,7 +381,7 @@ function exportToExcel(){
     <th style="background-color:#2196f3; color:white;">قيمة الباقة (عدد الأيام)</th>
     <th style="background-color:#2196f3; color:white;">عدد الأيام المستفاد بها</th>
     <th style="background-color:#2196f3; color:white;">اسم البنك</th>
-    <th style="background-color:#2196f3; color:white;">رقم الحساب</th>
+    <th style="background-color:#2196f3; color:white;">رقم الحساب البنكي</th>
     <th style="background-color:#2196f3; color:white;">نوع الاشتراك</th>
     <th style="background-color:#2196f3; color:white;">المبلغ المسترد</th>
     <th style="background-color:#2196f3; color:white;">الملاحظات</th>
@@ -449,13 +402,19 @@ function exportToExcel(){
   });
 
   html += "</table>";
+
   const blob = new Blob([html], {type:"application/vnd.ms-excel"});
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   const today = new Date();
-  const dateStr = today.toLocaleDateString('ar-EG', {day:'2-digit',month:'long',year:'numeric'});
-  link.href=url;
-  link.download=`الاسترداد اليومي ${dateStr}.xls`;
+  today.setDate(today.getDate()-1); // اليوم السابق
+  const options = { day:'numeric', month:'long', year:'numeric'};
+  const arabicDate = today.toLocaleDateString('ar-EG', options);
+  const gregDate = today.toISOString().split('T')[0];
+
+  link.href = url;
+  link.download = `الاسترداد اليومي ${arabicDate} (${gregDate}).xls`;
   link.click();
 }
 </script>
