@@ -348,6 +348,7 @@ function saveEdit(index){
   document.getElementById('editModal').remove();
 }
 
+// ================= Export to Excel =================
 function exportToExcel() {
   let html = `<table border='1' style='border-collapse:collapse; font-family:Tahoma; direction:rtl; text-align:center;'>`;
   html += `<tr>
@@ -380,7 +381,7 @@ function exportToExcel() {
     </tr>`;
   });
 
-  html += "</table>";
+  html += "</table>"; // لا تمدد اللون خارج الصفوف الفعلية
 
   const blob = new Blob([html], {type:"application/vnd.ms-excel"});
   const url = URL.createObjectURL(blob);
