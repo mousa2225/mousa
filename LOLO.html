@@ -88,7 +88,9 @@ button.delete {
   margin-top: 10px;
   font-size: 14px;
 }
-.success-message::before { content: "✔ "; }
+.success-message::before {
+  content: "✔ ";
+}
 
 /* ======================== جدول العملاء ======================== */
 .table-wrapper {
@@ -114,15 +116,6 @@ th {
 }
 tr:nth-child(even) td {
   background-color: #e1bee7;
-}
-
-/* ======================== استجابة الأجهزة الصغيرة ======================== */
-@media (max-width: 600px) {
-  body { padding: 10px; }
-  h1 { font-size: 20px; }
-  .container { padding: 15px; }
-  button { font-size: 14px; }
-  table { font-size: 12px; }
 }
 
 /* ======================== نافذة العميل الاستثنائي ======================== */
@@ -170,33 +163,33 @@ tr:nth-child(even) td {
 }
 </style>
 </head>
-
 <body>
 <h1>حاسبة الاسترداد اليومي</h1>
 
+<!-- ======================== العملاء العاديين ======================== -->
 <div class="container">
   <div class="success-message" id="successMsg">تم حفظ العميل بنجاح</div>
 
   <label>اسم العميل</label>
-  <input type="text" id="clientName">
+  <input type="text" id="clientName" placeholder="ادخل اسم العميل">
 
   <label>رقم العميل</label>
-  <input type="text" id="clientNumber">
+  <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
 
   <label>قيمة الباقة</label>
-  <input type="number" id="packageValue">
+  <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
 
   <label>عدد أيام الباقة الأساسية</label>
-  <input type="number" id="packageDays">
+  <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
 
   <label>عدد الأيام المستفاد بها</label>
-  <input type="number" id="daysUsed">
+  <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
 
   <label>اسم البنك</label>
-  <input type="text" id="bankName">
+  <input type="text" id="bankName" placeholder="ادخل اسم البنك">
 
   <label>رقم الحساب البنكي</label>
-  <input type="text" id="bankAccount">
+  <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
 
   <label>نوع الاشتراك</label>
   <select id="subscriptionType">
@@ -208,34 +201,43 @@ tr:nth-child(even) td {
   </select>
 
   <label>الملاحظات</label>
-  <input type="text" id="notes">
+  <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <!-- زر جديد يجمع الحفظ + الحساب -->
-  <button onclick="addClientAndCalculate()">💾 حفظ وحساب الاسترداد</button>
+  <!-- زر جديد يقوم بالحفظ والحساب معًا -->
+  <button onclick="addClientAndCalculate()">✅ حفظ وحساب الاسترداد</button>
   <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
 
+  <!-- توقيع المحاسب -->
   <div class="signature">Accountant Mousa Muhammad</div>
 </div>
 
-<!-- نافذة العميل الاستثنائي -->
+<!-- ======================== نافذة العميل الاستثنائي ======================== -->
 <div id="exceptionalModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
     <h2>إضافة عميل استثنائي</h2>
+
     <label>اسم العميل</label>
-    <input type="text" id="exceptionalName">
+    <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+
     <label>رقم العميل</label>
-    <input type="text" id="exceptionalNumber">
+    <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+
     <label>قيمة الباقة</label>
-    <input type="number" id="exceptionalPackageValue">
-    <label>عدد الأيام في الباقة</label>
-    <input type="number" id="exceptionalPackageDays">
+    <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
+
+    <label>عدد أيام الباقة</label>
+    <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
+
     <label>عدد الأيام المستفاد بها</label>
-    <input type="number" id="exceptionalDaysUsed">
+    <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
+
     <label>اسم البنك</label>
-    <input type="text" id="exceptionalBank">
+    <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
+
     <label>رقم الحساب البنكي</label>
-    <input type="text" id="exceptionalAccount">
+    <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
+
     <label>نوع الاشتراك</label>
     <select id="exceptionalType">
       <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
@@ -244,20 +246,25 @@ tr:nth-child(even) td {
       <option value="جديد يدوي">جديد يدوي</option>
       <option value="تجديد يدوي">تجديد يدوي</option>
     </select>
+
     <label>المبلغ المسترد يدويًا</label>
-    <input type="number" id="exceptionalRefund">
+    <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+
     <label>الملاحظات</label>
-    <input type="text" id="exceptionalNotes">
+    <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
+
     <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
   </div>
 </div>
 
-<!-- جدول العملاء -->
+<!-- ======================== جدول العملاء ======================== -->
 <div class="table-wrapper">
   <table id="clientsTable">
     <tr>
       <th>اسم العميل</th>
-      <th>قيمة الباقة (عدد الأيام)</th>
+      <th>قيمة الباقة</th>
+      <th>عدد الأيام الكلية</th>
+      <th>الأيام المستفاد بها</th>
       <th>المبلغ المسترد</th>
       <th>حذف</th>
     </tr>
@@ -269,53 +276,142 @@ tr:nth-child(even) td {
 <script>
 let clients = [];
 
-/* دمج الحفظ + الحساب */
+/* حفظ العميل + حساب المبلغ المسترد */
 function addClientAndCalculate() {
-  const name = clientName.value.trim();
-  const number = clientNumber.value.trim();
-  const value = parseFloat(packageValue.value);
-  const totalDays = parseFloat(packageDays.value);
-  const used = parseFloat(daysUsed.value);
-  const bank = bankName.value.trim();
-  const account = bankAccount.value.trim();
-  const type = subscriptionType.value;
-  const notes = notesInput.value.trim();
+  const name = document.getElementById('clientName').value.trim();
+  const number = document.getElementById('clientNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('packageValue').value);
+  const packageDays = parseFloat(document.getElementById('packageDays').value);
+  const daysUsed = parseFloat(document.getElementById('daysUsed').value);
+  const bank = document.getElementById('bankName').value.trim();
+  const account = document.getElementById('bankAccount').value.trim();
+  const type = document.getElementById('subscriptionType').value;
+  const notes = document.getElementById('notes').value.trim();
 
-  if (!name || !number) return alert("الرجاء إدخال اسم ورقم العميل");
-  if (used > totalDays) return alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي");
+  if (!name || !number) {
+    alert("الرجاء إدخال اسم ورقم العميل");
+    return;
+  }
+  if (daysUsed > packageDays) {
+    alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة");
+    return;
+  }
 
-  const refund = ((value / totalDays) * (totalDays - used)).toFixed(2);
+  const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
 
-  clients.push({ name, number, packageValue: value, packageDays: totalDays, daysUsed: used, bank, account, type, notes, refund, exceptional: false });
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: false });
+
+  document.getElementById('successMsg').style.display = 'block';
+  setTimeout(() => document.getElementById('successMsg').style.display = 'none', 2000);
+
   renderTable();
-  successMsg.style.display = 'block';
-  setTimeout(()=> successMsg.style.display='none',2000);
-  document.querySelectorAll('.container input').forEach(i=>i.value='');
+  clearInputs();
 }
 
-/* باقي الدوال كما هي تمامًا */
-function openExceptionalModal(){ exceptionalModal.style.display='block'; }
-function closeExceptionalModal(){ exceptionalModal.style.display='none'; }
-function saveExceptionalClient(){
-  const name = exceptionalName.value.trim();
-  const number = exceptionalNumber.value.trim();
-  const refund = parseFloat(exceptionalRefund.value);
-  if (!name || !number || isNaN(refund)) return alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد");
-  clients.push({ name, number, refund: refund.toFixed(2), exceptional:true });
+/* مسح الحقول */
+function clearInputs() {
+  document.querySelectorAll('.container input').forEach(i => i.value = '');
+}
+
+/* نافذة العميل الاستثنائي */
+function openExceptionalModal() {
+  document.getElementById('exceptionalModal').style.display = 'block';
+}
+function closeExceptionalModal() {
+  document.getElementById('exceptionalModal').style.display = 'none';
+}
+
+/* حفظ العميل الاستثنائي */
+function saveExceptionalClient() {
+  const name = document.getElementById('exceptionalName').value.trim();
+  const number = document.getElementById('exceptionalNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('exceptionalPackageValue').value) || 0;
+  const packageDays = parseFloat(document.getElementById('exceptionalPackageDays').value) || 0;
+  const daysUsed = parseFloat(document.getElementById('exceptionalDaysUsed').value) || 0;
+  const bank = document.getElementById('exceptionalBank').value.trim();
+  const account = document.getElementById('exceptionalAccount').value.trim();
+  const type = document.getElementById('exceptionalType').value;
+  const refund = parseFloat(document.getElementById('exceptionalRefund').value);
+  const notes = document.getElementById('exceptionalNotes').value.trim();
+
+  if (!name || !number || isNaN(refund)) {
+    alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد");
+    return;
+  }
+
+  clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: refund.toFixed(2), exceptional: true });
+
+  renderTable();
   closeExceptionalModal();
-  renderTable();
 }
-function renderTable(){
-  const table=document.getElementById("clientsTable");
-  table.innerHTML=`<tr><th>اسم العميل</th><th>قيمة الباقة (عدد الأيام)</th><th>المبلغ المسترد</th><th>حذف</th></tr>`;
-  clients.forEach((c,i)=>{
-    table.innerHTML+=`<tr ${c.exceptional?'style="background-color:#fff3e0;"':''}>
-    <td>${c.name}</td><td>${c.packageValue||'-'} (${c.packageDays||'-'})</td><td>${c.refund||'-'}</td>
-    <td><button class="delete" onclick="deleteClient(${i})">🗑️</button></td></tr>`;
+
+/* عرض الجدول */
+function renderTable() {
+  const table = document.getElementById("clientsTable");
+  table.innerHTML = `
+    <tr>
+      <th>اسم العميل</th>
+      <th>قيمة الباقة</th>
+      <th>عدد الأيام الكلية</th>
+      <th>الأيام المستفاد بها</th>
+      <th>المبلغ المسترد</th>
+      <th>حذف</th>
+    </tr>
+  `;
+  clients.forEach((c, index) => {
+    table.innerHTML += `
+      <tr ${c.exceptional ? 'style="background-color:#fff3e0;"' : ''}>
+        <td>${c.name}</td>
+        <td>${c.packageValue}</td>
+        <td>${c.packageDays}</td>
+        <td>${c.daysUsed}</td>
+        <td>${c.refund || "-"}</td>
+        <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
+      </tr>
+    `;
   });
 }
-function deleteClient(i){ if(confirm("هل أنت متأكد؟")){clients.splice(i,1);renderTable();}}
-function exportToExcel(){ /* كما هو من كودك الأصلي */ }
+
+/* حذف عميل */
+function deleteClient(index) {
+  if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
+    clients.splice(index, 1);
+    renderTable();
+  }
+}
+
+/* تصدير إلى Excel */
+function exportToExcel() {
+  let html = "<table border='1' style='border-collapse:collapse; font-family:Tahoma; font-size:30px;'>";
+  html += `
+  <tr>
+    <th style="background-color:#2196f3; color:white;">اسم العميل</th>
+    <th style="background-color:#2196f3; color:white;">قيمة الباقة</th>
+    <th style="background-color:#2196f3; color:white;">عدد الأيام الكلية</th>
+    <th style="background-color:#2196f3; color:white;">الأيام المستفاد بها</th>
+    <th style="background-color:#2196f3; color:white;">المبلغ المسترد</th>
+  </tr>`;
+  clients.forEach(c => {
+    html += `
+    <tr>
+      <td style="background-color:#e1bee7;">${c.name}</td>
+      <td style="background-color:#e1bee7;">${c.packageValue}</td>
+      <td style="background-color:#e1bee7;">${c.packageDays}</td>
+      <td style="background-color:#e1bee7;">${c.daysUsed}</td>
+      <td style="background-color:#e1bee7;">${c.refund}</td>
+    </tr>`;
+  });
+  html += "</table>";
+
+  const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('ar-EG', { day: '2-digit', month: 'long', year:'numeric' });
+  link.href = url;
+  link.download = `الاسترداد اليومي ${dateStr}.xls`;
+  link.click();
+}
 </script>
 </body>
 </html>
