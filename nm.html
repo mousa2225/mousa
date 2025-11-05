@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة الاسترداد اليومي</title>
+<style>
+  body {
+    font-family: "Tahoma", Arial, sans-serif;
+    background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  h1 { 
+    color: #0288d1; 
+    text-align: center; 
+    margin-bottom: 25px; 
+    font-size: 24px; 
+  }
+  .container {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+  }
+  label { 
+    font-weight: bold; 
+    color: #00796b; 
+    font-size: 14px; 
+    margin-top: 10px; 
+  }
+  input, select {
+    width: 100%; 
+    padding: 12px; 
+    margin-top: 5px; 
+    border: 2px solid #03a9f4;
+    border-radius: 8px; 
+    font-size: 15px; 
+    text-align: center; 
+    transition: 0.2s;
+    box-sizing: border-box;
+  }
+  input:focus, select:focus { 
+    border-color: #0288d1; 
+    background-color: #e1f5fe; 
+    outline: none; 
+  }
+  button {
+    width: 100%; 
+    background-color: #03a9f4; 
+    color: white; 
+    border: none;
+    padding: 12px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 15px; 
+    font-weight: bold;
+    margin-top: 10px; 
+    transition: 0.2s;
+  }
+  button:hover { background-color: #0288d1; }
+  button.delete { background-color: #f44336; font-size: 13px; padding: 8px 10px; }
+  .success-message { 
+    color: green; 
+    font-weight: bold; 
+    text-align: center; 
+    display: none; 
+    margin-top: 10px; 
+    font-size: 14px; 
+  }
+  .success-message::before { content: "✔ "; }
+  .table-wrapper { 
+    width: 100%; 
+    overflow-x: auto; 
+    margin-top: 20px; 
+  }
+  table { 
+    width: 100%; 
+    min-width: 600px; 
+    border-collapse: collapse; 
+    text-align: center; 
+    font-size: 14px; 
+  }
+  th, td { 
+    border: 1px solid #03a9f4; 
+    padding: 10px; 
+    text-align: center; 
+  }
+  th { 
+    background-color: #2196f3; 
+    color: white; 
+    font-size: 15px;
+  }
+  tr.exceptional td { background-color: #ffe0b2; } /* استثنائي */
+  @media (max-width: 700px) { 
+    body { padding: 10px; } 
+    h1 { font-size: 20px; } 
+    .container { padding: 15px; } 
+    button { font-size: 14px; } 
+    table { font-size: 13px; } 
+  }
+  .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+  .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 14px; max-width: 520px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; }
+  .close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
+  .signature {
+    margin-top: 20px;
+    font-family: 'Brush Script MT', cursive, sans-serif; 
+    font-size: 22px;
+    color: #2c3e50;
+    text-align: right; 
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+  }
+</style>
+</head>
+<body>
+
+<h1>حاسبة الاسترداد اليومي</h1>
+
+<div class="container">
+  <div class="success-message" id="successMsg">تم حفظ العميل وحساب الاسترداد بنجاح</div>
+
+  <label>اسم العميل</label>
+  <input type="text" id="clientName" placeholder="ادخل اسم العميل">
+  <label>رقم العميل</label>
+  <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
+  <label>قيمة الباقة</label>
+  <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
+  <label>عدد أيام الباقة الأساسية</label>
+  <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
+  <label>عدد الأيام المستفاد بها</label>
+  <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
+  <label>اسم البنك</label>
+  <input type="text" id="bankName" placeholder="ادخل اسم البنك">
+  <label>رقم الحساب البنكي</label>
+  <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
+  <label>نوع الاشتراك</label>
+  <select id="subscriptionType">
+    <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
+    <option value="تطبيق جديد">تطبيق جديد</option>
+    <option value="تطبيق تجديد">تطبيق تجديد</option>
+    <option value="جديد يدوي">جديد يدوي</option>
+    <option value="تجديد يدوي">تجديد يدوي</option>
+  </select>
+  <label>الملاحظات</label>
+  <input type="text" id="notes" placeholder="ادخل ملاحظات">
+
+  <button onclick="addAndCalculate()">💾 حفظ وحساب الاسترداد</button>
+  <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
+
+  <div class="signature">Accountant Mousa Muhammad</div>
+</div>
+
+<!-- نافذة العميل الاستثنائي -->
+<div id="exceptionalModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeExceptionalModal()">&times;</span>
+    <h2>إضافة عميل استثنائي</h2>
+
+    <label>اسم العميل</label>
+    <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+    <label>رقم العميل</label>
+    <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+    <label>قيمة الباقة (اختياري)</label>
+    <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
+    <label>عدد أيام الباقة (اختياري)</label>
+    <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
+    <label>عدد الأيام المستفاد بها (اختياري)</label>
+    <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
+    <label>اسم البنك</label>
+    <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
+    <label>رقم الحساب البنكي</label>
+    <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
+    <label>نوع الاشتراك</label>
+    <select id="exceptionalType">
+      <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
+      <option value="تطبيق جديد">تطبيق جديد</option>
+      <option value="تطبيق تجديد">تطبيق تجديد</option>
+      <option value="جديد يدوي">جديد يدوي</option>
+      <option value="تجديد يدوي">تجديد يدوي</option>
+    </select>
+    <label>المبلغ المسترد يدويًا</label>
+    <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+    <label>الملاحظات</label>
+    <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
+
+    <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
+  </div>
+</div>
+
+<div class="table-wrapper">
+  <table id="clientsTable">
+    <tr>
+      <th>اسم العميل</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
+      <th>الأيام المستفاد بها</th>
+      <th>المبلغ المسترد</th>
+      <th>تعديل</th>
+      <th>حذف</th>
+    </tr>
+  </table>
+</div>
+
+<button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
+
+<!-- xlsx library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+let clients = [];
+
+function addAndCalculate() {
+  const name = document.getElementById('clientName').value.trim();
+  const number = document.getElementById('clientNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('packageValue').value);
+  const packageDays = parseFloat(document.getElementById('packageDays').value);
+  const daysUsedInput = document.getElementById('daysUsed').value;
+  const bank = document.getElementById('bankName').value.trim();
+  const account = document.getElementById('bankAccount').value.trim();
+  const type = document.getElementById('subscriptionType').value || '';
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!name || !number) { alert("الرجاء إدخال اسم ورقم العميل"); return; }
+  if (daysUsedInput === "") { alert("الرجاء إدخال عدد الأيام المستفاد بها"); return; }
+  if (isNaN(packageValue) || isNaN(packageDays) || packageDays === 0) { alert("الرجاء إدخال قيمة الباقة وعدد أيام صحيحين"); return; }
+
+  const daysUsed = parseFloat(daysUsedInput);
+  if (daysUsed > packageDays) { alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
+
+  const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
+
+  clients.push({ 
+    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: false 
+  });
+  
+  document.getElementById('successMsg').style.display = 'block';
+  setTimeout(()=>document.getElementById('successMsg').style.display='none', 2000);
+
+  renderTable();
+  clearInputs();
+}
+
+function clearInputs() { 
+  const inputs = document.querySelectorAll('.container input, .container select');
+  inputs.forEach(i => i.value = '');
+}
+
+function openExceptionalModal() { document.getElementById('exceptionalModal').style.display='block'; }
+function closeExceptionalModal() { document.getElementById('exceptionalModal').style.display='none'; }
+
+function saveExceptionalClient() {
+  const name = document.getElementById('exceptionalName').value.trim();
+  const number = document.getElementById('exceptionalNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('exceptionalPackageValue').value) || 0;
+  const packageDays = parseFloat(document.getElementById('exceptionalPackageDays').value) || 0;
+  const daysUsed = parseFloat(document.getElementById('exceptionalDaysUsed').value) || 0;
+  const bank = document.getElementById('exceptionalBank').value.trim();
+  const account = document.getElementById('exceptionalAccount').value.trim();
+  const type = document.getElementById('exceptionalType').value || '';
+  const refundInput = document.getElementById('exceptionalRefund').value;
+  const refund = parseFloat(refundInput);
+  const notes = document.getElementById('exceptionalNotes').value.trim();
+
+  if (!name || !number || isNaN(refund)) { alert("الرجاء إدخال الاسم والرقم والمبلغ المسترد"); return; }
+
+  clients.push({ 
+    name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund: refund.toFixed(2), exceptional:true 
+  });
+  renderTable();
+  closeExceptionalModal();
+  document.querySelectorAll('#exceptionalModal input, #exceptionalModal select').forEach(i=>i.value='');
+}
+
+function renderTable() {
+  const table = document.getElementById('clientsTable');
+  table.innerHTML = `<tr>
+    <th>اسم العميل</th>
+    <th>قيمة الباقة (عدد الأيام)</th>
+    <th>الأيام المستفاد بها</th>
+    <th>المبلغ المسترد</th>
+    <th>تعديل</th>
+    <th>حذف</th>
+  </tr>`;
+
+  let normalRowCount = 0;
+  clients.forEach((c,index)=>{
+    const isExceptional = c.exceptional;
+    let bg = isExceptional ? "#ffe0b2" : (normalRowCount % 2 === 0 ? "#ffffff" : "#e9f7ee"); // أبيض / أخضر باهت
+    if(!isExceptional) normalRowCount++;
+    table.innerHTML += `<tr style="background-color:${bg};">
+      <td>${escapeHtml(c.name)}</td>
+      <td>${c.packageValue} (${c.packageDays})</td>
+      <td>${c.daysUsed}</td>
+      <td>${c.refund}</td>
+      <td><button onclick="editClient(${index})">✏️</button></td>
+      <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
+    </tr>`;
+  });
+}
+
+function deleteClient(index) {
+  if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
+    clients.splice(index,1);
+    renderTable();
+  }
+}
+
+function editClient(index){
+  const c = clients[index];
+  const modalHTML = `
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('editModal')?.remove()">&times;</span>
+    <h2>تعديل بيانات العميل${c.exceptional ? ' الاستثنائي' : ''}</h2>
+    <label>اسم العميل</label><input id="editName" value="${escapeHtml(c.name)}">
+    <label>رقم العميل</label><input id="editNumber" value="${escapeHtml(c.number)}">
+    <label>قيمة الباقة</label><input type="number" id="editPackageValue" value="${c.packageValue}">
+    <label>عدد أيام الباقة الأساسية</label><input type="number" id="editPackageDays" value="${c.packageDays}">
+    <label>عدد الأيام المستفاد بها</label><input type="number" id="editDaysUsed" value="${c.daysUsed}">
+    <label>اسم البنك</label><input id="editBank" value="${escapeHtml(c.bank)}">
+    <label>رقم الحساب البنكي</label><input id="editAccount" value="${escapeHtml(c.account)}">
+    <label>نوع الاشتراك</label>
+    <select id="editType">
+      <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
+      <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
+      <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
+      <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
+    </select>
+    <label>المبلغ المسترد${c.exceptional ? ' يدويًا' : ''}</label>
+    <input type="number" id="editRefund" value="${c.refund}" ${c.exceptional ? '' : 'disabled'}>
+    <label>الملاحظات</label><input id="editNotes" value="${escapeHtml(c.notes)}">
+    <button onclick="saveEdit(${index})">💾 حفظ التعديل</button>
+  </div>`;
+  
+  let modalDiv = document.createElement('div');
+  modalDiv.className = 'modal';
+  modalDiv.id = 'editModal';
+  modalDiv.innerHTML = modalHTML;
+  document.body.appendChild(modalDiv);
+  modalDiv.style.display = 'block';
+}
+
+function saveEdit(index){
+  const c = clients[index];
+  const name = document.getElementById('editName').value.trim();
+  const number = document.getElementById('editNumber').value.trim();
+  const packageValue = parseFloat(document.getElementById('editPackageValue').value);
+  const packageDays = parseFloat(document.getElementById('editPackageDays').value);
+  const daysUsedInput = document.getElementById('editDaysUsed').value;
+  const bank = document.getElementById('editBank').value.trim();
+  const account = document.getElementById('editAccount').value.trim();
+  const type = document.getElementById('editType').value || '';
+  const notes = document.getElementById('editNotes').value.trim();
+
+  if (!name || !number) { alert("الرجاء إدخال الاسم والرقم"); return; }
+
+  if(!c.exceptional){
+    if (daysUsedInput === "") { alert("الرجاء إدخال عدد الأيام المستفاد بها"); return; }
+    const daysUsed = parseFloat(daysUsedInput);
+    if (isNaN(packageValue) || isNaN(packageDays) || packageDays === 0) { alert("الرجاء إدخال قيمة وعدد أيام الباقة بشكل صحيح"); return; }
+    if(daysUsed > packageDays){ alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
+    const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
+    clients[index] = { name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional:false };
+  } else {
+    const refund = parseFloat(document.getElementById('editRefund').value);
+    clients[index] = { 
+      name, number, packageValue, packageDays, daysUsed: parseFloat(daysUsedInput)||0, bank, account, type, notes, refund: (isNaN(refund)? '0.00' : refund.toFixed(2)), exceptional:true 
+    };
+  }
+
+  document.getElementById('editModal').remove();
+  renderTable();
+}
+
+/* ---------- EXPORT TO EXCEL (.xlsx) ---------- */
+/* سيصدر ملف .xlsx باسم تاريخ الأمس ويحتوي الأعمدة: 
+   اسم العميل | رقم العميل | البنك | رقم الحساب | النوع | ملاحظات | الأيام المستفاد بها | المبلغ المسترد
+*/
+function exportToExcel() {
+  if (clients.length === 0) { alert("لا يوجد عملاء للتصدير"); return; }
+
+  // تاريخ الأمس بالعربية
+  const today = new Date();
+  today.setDate(today.getDate() - 1);
+  const day = today.getDate();
+  const monthNames = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const month = monthNames[today.getMonth()];
+  const fileName = `${day} ${month}.xlsx`;
+
+  // تكوين المصفوفة: يمكن إضافة صف عنوان كبير هنا إذا أردت
+  const header = [
+    "اسم العميل",
+    "رقم العميل",
+    "البنك",
+    "رقم الحساب",
+    "النوع",
+    "ملاحظات",
+    "الأيام المستفاد بها",
+    "المبلغ المسترد"
+  ];
+  const aoa = [header];
+
+  clients.forEach(c => {
+    aoa.push([
+      c.name || "",
+      c.number || "",
+      c.bank || "",
+      c.account || "",
+      c.type || "",
+      c.notes || "",
+      c.daysUsed != null ? c.daysUsed : "",
+      c.refund != null ? c.refund : ""
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  // عرض الأعمدة مريح للعين
+  ws['!cols'] = [
+    {wch: 28}, // اسم العميل
+    {wch: 18}, // رقم
+    {wch: 18}, // البنك
+    {wch: 22}, // رقم الحساب
+    {wch: 18}, // النوع
+    {wch: 30}, // ملاحظات
+    {wch: 18}, // الأيام المستفاد بها
+    {wch: 18}  // المبلغ المسترد
+  ];
+
+  // محاولة وضع أنماط بسيطة (ملاحظة: دعم الأنماط يعتمد على قارئ الاكسل واختلاف المكتبات)
+  try {
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({r:R,c:C});
+        if(!ws[cellAddress]) continue;
+        // عناوين الصف الأول
+        if (R === 0) {
+          ws[cellAddress].s = {
+            font: { name: "Tahoma", sz: 14, bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "4CAF50" } },
+            alignment: { horizontal: "center", vertical: "center" }
+          };
+        } else {
+          // صفوف متناوبة: أبيض / أخضر فاتح
+          const bg = (R % 2 === 0) ? "FFFFFF" : "E9F7EE";
+          ws[cellAddress].s = {
+            font: { name: "Tahoma", sz: 13 },
+            fill: { fgColor: { rgb: bg } },
+            alignment: { horizontal: "center", vertical: "center" }
+          };
+        }
+      }
+    }
+  } catch(e) {
+    // إذا فشل تطبيق الأنماط، لا نوقف التصدير — مجرد تحذير في الكونسول
+    console.warn("تعذر تطبيق بعض أنماط Excel عبر مكتبة SheetJS في هذا المتصفح:", e);
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "العملاء");
+
+  // حفظ الملف
+  XLSX.writeFile(wb, fileName);
+}
+
+/* ---------- أدوات مساعدة ---------- */
+function escapeHtml(text) {
+  if (!text && text !== 0) return '';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* بدء التشغيل: جدول فارغ */
+renderTable();
+</script>
+</body>
+</html>
