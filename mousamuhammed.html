@@ -85,7 +85,7 @@ button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
 }
 table { 
   width: 100%; 
-  min-width: 400px; 
+  min-width: 600px; 
   border-collapse: collapse; 
   text-align: center; 
   font-size: 13px; 
@@ -99,14 +99,6 @@ th {
   background-color: #2196f3; 
   color: white; 
 }
-tr.exceptional td { background-color: #ffe0b2; } /* برتقالي فاتح */
-@media (max-width: 600px) { 
-  body { padding: 10px; } 
-  h1 { font-size: 20px; } 
-  .container { padding: 15px; } 
-  button { font-size: 14px; } 
-  table { font-size: 12px; } 
-}
 .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
 .modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 14px; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; }
 .close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
@@ -118,6 +110,13 @@ tr.exceptional td { background-color: #ffe0b2; } /* برتقالي فاتح */
   text-align: right; 
   font-style: italic;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+@media (max-width: 600px) { 
+  body { padding: 10px; } 
+  h1 { font-size: 20px; } 
+  .container { padding: 15px; } 
+  button { font-size: 14px; } 
+  table { font-size: 12px; } 
 }
 </style>
 </head>
@@ -200,8 +199,14 @@ tr.exceptional td { background-color: #ffe0b2; } /* برتقالي فاتح */
   <table id="clientsTable">
     <tr>
       <th>اسم العميل</th>
+      <th>رقم العميل</th>
       <th>قيمة الباقة (عدد الأيام)</th>
+      <th>عدد أيام الباقة</th>
       <th>الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب</th>
+      <th>نوع الاشتراك</th>
+      <th>الملاحظات</th>
       <th>المبلغ المسترد</th>
       <th>تعديل</th>
       <th>حذف</th>
@@ -210,6 +215,9 @@ tr.exceptional td { background-color: #ffe0b2; } /* برتقالي فاتح */
 </div>
 
 <button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
+
+<!-- إضافة مكتبة XLSX -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
 <script>
 let clients = [];
@@ -269,13 +277,19 @@ function saveExceptionalClient() {
 function renderTable() {
   const table = document.getElementById('clientsTable');
   table.innerHTML = `<tr>
-    <th>اسم العميل</th>
-    <th>قيمة الباقة (عدد الأيام)</th>
-    <th>الأيام المستفاد بها</th>
-    <th>المبلغ المسترد</th>
-    <th>تعديل</th>
-    <th>حذف</th>
-  </tr>`;
+      <th>اسم العميل</th>
+      <th>رقم العميل</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
+      <th>عدد أيام الباقة</th>
+      <th>الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب</th>
+      <th>نوع الاشتراك</th>
+      <th>الملاحظات</th>
+      <th>المبلغ المسترد</th>
+      <th>تعديل</th>
+      <th>حذف</th>
+    </tr>`;
 
   let normalRowCount = 0;
   clients.forEach((c,index)=>{
@@ -283,8 +297,14 @@ function renderTable() {
     if(!c.exceptional) normalRowCount++;
     table.innerHTML += `<tr style="background-color:${bg};">
       <td>${c.name}</td>
+      <td>${c.number}</td>
       <td>${c.packageValue} (${c.packageDays})</td>
+      <td>${c.packageDays}</td>
       <td>${c.daysUsed}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.notes}</td>
       <td>${c.refund}</td>
       <td><button onclick="editClient(${index})">✏️</button></td>
       <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
@@ -299,79 +319,29 @@ function deleteClient(index) {
   }
 }
 
-function editClient(index){
-  const c = clients[index];
-  const modalHTML = `
-  <div class="modal-content">
-    <span class="close" onclick="document.getElementById('editModal').remove()">&times;</span>
-    <h2>تعديل بيانات العميل${c.exceptional ? ' الاستثنائي' : ''}</h2>
-    <label>اسم العميل</label><input id="editName" value="${c.name}">
-    <label>رقم العميل</label><input id="editNumber" value="${c.number}">
-    <label>قيمة الباقة</label><input type="number" id="editPackageValue" value="${c.packageValue}">
-    <label>عدد أيام الباقة الأساسية</label><input type="number" id="editPackageDays" value="${c.packageDays}">
-    <label>عدد الأيام المستفاد بها</label><input type="number" id="editDaysUsed" value="${c.daysUsed}">
-    <label>اسم البنك</label><input id="editBank" value="${c.bank}">
-    <label>رقم الحساب البنكي</label><input id="editAccount" value="${c.account}">
-    <label>نوع الاشتراك</label>
-    <select id="editType">
-      <option value="تطبيق جديد" ${c.type=="تطبيق جديد"?'selected':''}>تطبيق جديد</option>
-      <option value="تطبيق تجديد" ${c.type=="تطبيق تجديد"?'selected':''}>تطبيق تجديد</option>
-      <option value="جديد يدوي" ${c.type=="جديد يدوي"?'selected':''}>جديد يدوي</option>
-      <option value="تجديد يدوي" ${c.type=="تجديد يدوي"?'selected':''}>تجديد يدوي</option>
-    </select>
-    <label>المبلغ المسترد${c.exceptional ? ' يدويًا' : ''}</label>
-    <input type="number" id="editRefund" value="${c.refund}" ${c.exceptional ? '' : 'disabled'}>
-    <label>الملاحظات</label><input id="editNotes" value="${c.notes}">
-    <button onclick="saveEdit(${index})">💾 حفظ التعديل</button>
-  </div>`;
-  
-  let modalDiv = document.createElement('div');
-  modalDiv.className = 'modal';
-  modalDiv.id = 'editModal';
-  modalDiv.innerHTML = modalHTML;
-  document.body.appendChild(modalDiv);
-  modalDiv.style.display = 'block';
-}
-
-function saveEdit(index){
-  const c = clients[index];
-  const name = document.getElementById('editName').value.trim();
-  const number = document.getElementById('editNumber').value.trim();
-  const packageValue = parseFloat(document.getElementById('editPackageValue').value);
-  const packageDays = parseFloat(document.getElementById('editPackageDays').value);
-  const daysUsedInput = document.getElementById('editDaysUsed').value;
-  const bank = document.getElementById('editBank').value.trim();
-  const account = document.getElementById('editAccount').value.trim();
-  const type = document.getElementById('editType').value;
-  const notes = document.getElementById('editNotes').value.trim();
-
-  if(!c.exceptional){
-    if (daysUsedInput === "") { alert("الرجاء إدخال عدد الأيام المستفاد بها"); return; }
-    const daysUsed = parseFloat(daysUsedInput);
-    if(daysUsed > packageDays){ alert("عدد الأيام المستفاد بها لا يمكن أن يتجاوز عدد الأيام الكلي للباقة"); return; }
-    const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
-    clients[index] = {name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional:false};
-  }else{
-    const refund = parseFloat(document.getElementById('editRefund').value).toFixed(2);
-    clients[index] = {name, number, packageValue, packageDays, daysUsed: parseFloat(daysUsedInput)||0, bank, account, type, notes, refund, exceptional:true};
-  }
-  document.getElementById('editModal').remove();
-  renderTable();
-}
-
+// وظيفة تصدير Excel
 function exportToExcel(){
-  let csv = '\uFEFF'; // BOM لإصلاح اللغة العربية
-  csv += 'اسم العميل,قيمة الباقة (عدد الأيام),الأيام المستفاد بها,المبلغ المسترد\n';
+  const ws_data = [
+    ['اسم العميل','رقم العميل','قيمة الباقة (عدد الأيام)','عدد أيام الباقة','الأيام المستفاد بها','اسم البنك','رقم الحساب','نوع الاشتراك','الملاحظات','المبلغ المسترد']
+  ];
   clients.forEach(c=>{
-    csv += `"${c.name}","${c.packageValue} (${c.packageDays})","${c.daysUsed}","${c.refund}"\n`;
+    ws_data.push([
+      c.name,
+      c.number,
+      `${c.packageValue} (${c.packageDays})`,
+      c.packageDays,
+      c.daysUsed,
+      c.bank,
+      c.account,
+      c.type,
+      c.notes,
+      c.refund
+    ]);
   });
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'clients.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "العملاء");
+  XLSX.writeFile(wb, "ملف الاسترداد اليومي 5 نوفمبر.xlsx");
 }
 </script>
 </body>
