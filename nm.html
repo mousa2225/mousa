@@ -5,40 +5,142 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حاسبة الاسترداد اليومي</title>
 <style>
-body { font-family: "Tahoma", sans-serif; background: linear-gradient(to bottom, #e8f5e9, #ffffff); margin:0; padding:20px; }
-h1 { text-align:center; color:#2e7d32; margin-bottom:25px; }
-.container { max-width:800px; margin:auto; background:white; padding:25px; border-radius:20px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-label { font-weight:bold; margin-top:10px; display:block; }
-input, select { width:100%; padding:10px; margin:5px 0 15px; border-radius:8px; font-size:16px; text-align:center; }
-button { padding:12px 20px; border:none; border-radius:10px; cursor:pointer; font-size:16px; margin:5px; }
-button.save { background:#4CAF50; color:white; }
-button.save:hover { background:#43a047; }
-button.exceptional { background:#FF9800; color:white; }
-button.exceptional:hover { background:#FB8C00; }
-button.export { background:#03A9F4; color:white; }
-button.export:hover { background:#0288D1; }
-.table-container { margin-top:25px; overflow-x:auto; }
-table { width:100%; border-collapse:collapse; font-size:16px; }
-th, td { border:1px solid #ddd; padding:12px; text-align:center; }
-th { background:#4CAF50; color:white; }
-tr:nth-child(even) { background:#f1f8e9; }
-.modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); }
-.modal-content { background:#fff; margin:5% auto; padding:20px; border-radius:14px; max-width:480px; box-shadow:0 4px 15px rgba(0,0,0,0.2); position:relative; display:flex; flex-direction:column; }
-.close { position:absolute; top:10px; right:15px; font-size:22px; font-weight:bold; cursor:pointer; color:#f44336; }
+body {
+  font-family: "Tahoma", Arial, sans-serif;
+  background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+h1 { 
+  color: #0288d1; 
+  text-align: center; 
+  margin-bottom: 25px; 
+  font-size: 24px; 
+}
+.container {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  padding: 20px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+label { 
+  font-weight: bold; 
+  color: #00796b; 
+  font-size: 14px; 
+  margin-top: 10px; 
+}
+input, select {
+  width: 100%; 
+  padding: 10px; 
+  margin-top: 5px; 
+  border: 2px solid #03a9f4;
+  border-radius: 6px; 
+  font-size: 14px; 
+  text-align: center; 
+  transition: 0.3s;
+  box-sizing: border-box;
+}
+input:focus, select:focus { 
+  border-color: #0288d1; 
+  background-color: #e1f5fe; 
+  outline: none; 
+}
+button {
+  width: 100%; 
+  background-color: #03a9f4; 
+  color: white; 
+  border: none;
+  padding: 10px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 15px; 
+  font-weight: bold;
+  margin-top: 10px; 
+  transition: 0.3s;
+}
+button:hover { background-color: #0288d1; }
+button.delete { background-color: #f44336; font-size: 13px; padding: 6px 8px; }
+.success-message { 
+  color: green; 
+  font-weight: bold; 
+  text-align: center; 
+  display: none; 
+  margin-top: 10px; 
+  font-size: 14px; 
+}
+.success-message::before { content: "✔ "; }
+.table-wrapper { 
+  width: 100%; 
+  overflow-x: auto; 
+  margin-top: 20px; 
+}
+table { 
+  width: 100%; 
+  min-width: 600px; 
+  border-collapse: collapse; 
+  text-align: center; 
+  font-size: 13px; 
+}
+th, td { 
+  border: 1px solid #03a9f4; 
+  padding: 8px; 
+  text-align: center; 
+}
+th { 
+  background-color: #2196f3; 
+  color: white; 
+}
+.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 14px; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; }
+.close { position: absolute; top: 10px; right: 15px; font-size: 22px; font-weight: bold; cursor: pointer; color:#f44336; }
+.signature {
+  margin-top: 30px;
+  font-family: 'Brush Script MT', cursive, sans-serif; 
+  font-size: 26px;
+  color: #2c3e50;
+  text-align: right; 
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+@media (max-width: 600px) { 
+  body { padding: 10px; } 
+  h1 { font-size: 20px; } 
+  .container { padding: 15px; } 
+  button { font-size: 14px; } 
+  table { font-size: 12px; } 
+}
 </style>
 </head>
 <body>
 
-<h1>📘 حاسبة الاسترداد اليومي</h1>
+<h1>حاسبة الاسترداد اليومي</h1>
 
 <div class="container">
-  <label>اسم العميل</label><input id="clientName" type="text">
-  <label>رقم العميل</label><input id="clientNumber" type="text">
-  <label>قيمة الباقة</label><input id="packageValue" type="number">
-  <label>عدد أيام الباقة الأساسية</label><input id="packageDays" type="number">
-  <label>عدد الأيام المستفاد بها</label><input id="daysUsed" type="number">
-  <label>اسم البنك</label><input id="bankName" type="text">
-  <label>رقم الحساب البنكي</label><input id="bankAccount" type="text">
+  <div class="success-message" id="successMsg">تم حفظ العميل وحساب الاسترداد بنجاح</div>
+
+  <label>اسم العميل</label>
+  <input type="text" id="clientName" placeholder="ادخل اسم العميل">
+  <label>رقم العميل</label>
+  <input type="text" id="clientNumber" placeholder="ادخل رقم العميل">
+  <label>قيمة الباقة</label>
+  <input type="number" id="packageValue" placeholder="ادخل قيمة الباقة">
+  <label>عدد أيام الباقة الأساسية</label>
+  <input type="number" id="packageDays" placeholder="ادخل عدد الأيام">
+  <label>عدد الأيام المستفاد بها</label>
+  <input type="number" id="daysUsed" placeholder="ادخل الأيام المستفاد بها">
+  <label>اسم البنك</label>
+  <input type="text" id="bankName" placeholder="ادخل اسم البنك">
+  <label>رقم الحساب البنكي</label>
+  <input type="text" id="bankAccount" placeholder="ادخل رقم الحساب">
   <label>نوع الاشتراك</label>
   <select id="subscriptionType">
     <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
@@ -47,24 +149,35 @@ tr:nth-child(even) { background:#f1f8e9; }
     <option value="جديد يدوي">جديد يدوي</option>
     <option value="تجديد يدوي">تجديد يدوي</option>
   </select>
-  <label>الملاحظات</label><input id="notes" type="text">
+  <label>الملاحظات</label>
+  <input type="text" id="notes" placeholder="ادخل ملاحظات">
 
-  <button class="save" onclick="addAndCalculate()">💾 حفظ وحساب الاسترداد</button>
-  <button class="exceptional" onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
-  <button class="export" onclick="exportToExcel()">📤 تصدير الإكسل</button>
+  <button onclick="addAndCalculate()">💾 حفظ وحساب الاسترداد</button>
+  <button onclick="openExceptionalModal()">🌟 إضافة عميل استثنائي</button>
+
+  <div class="signature">Accountant Mousa Muhammad</div>
 </div>
 
+<!-- نافذة العميل الاستثنائي -->
 <div id="exceptionalModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeExceptionalModal()">&times;</span>
     <h2>إضافة عميل استثنائي</h2>
-    <label>اسم العميل</label><input id="exceptionalName">
-    <label>رقم العميل</label><input id="exceptionalNumber">
-    <label>قيمة الباقة (اختياري)</label><input type="number" id="exceptionalPackageValue">
-    <label>عدد أيام الباقة (اختياري)</label><input type="number" id="exceptionalPackageDays">
-    <label>عدد الأيام المستفاد بها (اختياري)</label><input type="number" id="exceptionalDaysUsed">
-    <label>اسم البنك</label><input id="exceptionalBank">
-    <label>رقم الحساب البنكي</label><input id="exceptionalAccount">
+
+    <label>اسم العميل</label>
+    <input type="text" id="exceptionalName" placeholder="ادخل اسم العميل">
+    <label>رقم العميل</label>
+    <input type="text" id="exceptionalNumber" placeholder="ادخل رقم العميل">
+    <label>قيمة الباقة (اختياري)</label>
+    <input type="number" id="exceptionalPackageValue" placeholder="ادخل قيمة الباقة">
+    <label>عدد أيام الباقة (اختياري)</label>
+    <input type="number" id="exceptionalPackageDays" placeholder="ادخل عدد الأيام">
+    <label>عدد الأيام المستفاد بها (اختياري)</label>
+    <input type="number" id="exceptionalDaysUsed" placeholder="ادخل الأيام المستفاد بها">
+    <label>اسم البنك</label>
+    <input type="text" id="exceptionalBank" placeholder="ادخل اسم البنك">
+    <label>رقم الحساب البنكي</label>
+    <input type="text" id="exceptionalAccount" placeholder="ادخل رقم الحساب">
     <label>نوع الاشتراك</label>
     <select id="exceptionalType">
       <option value="" disabled selected hidden>اختر نوع الاشتراك</option>
@@ -73,25 +186,39 @@ tr:nth-child(even) { background:#f1f8e9; }
       <option value="جديد يدوي">جديد يدوي</option>
       <option value="تجديد يدوي">تجديد يدوي</option>
     </select>
-    <label>المبلغ المسترد يدويًا</label><input type="number" id="exceptionalRefund">
-    <label>الملاحظات</label><input id="exceptionalNotes">
+    <label>المبلغ المسترد يدويًا</label>
+    <input type="number" id="exceptionalRefund" placeholder="ادخل المبلغ المسترد">
+    <label>الملاحظات</label>
+    <input type="text" id="exceptionalNotes" placeholder="ادخل ملاحظات">
+
     <button onclick="saveExceptionalClient()">💾 حفظ العميل الاستثنائي</button>
   </div>
 </div>
 
-<div class="table-container">
+<div class="table-wrapper">
   <table id="clientsTable">
-    <thead>
-      <tr>
-        <th>اسم العميل</th><th>قيمة الباقة (عدد الأيام)</th><th>الأيام المستفاد بها</th><th>المبلغ المسترد</th>
-        <th>اسم البنك</th><th>رقم الحساب</th><th>نوع الاشتراك</th><th>ملاحظات</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
+    <tr>
+      <th>اسم العميل</th>
+      <th>رقم العميل</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
+      <th>عدد أيام الباقة</th>
+      <th>الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب</th>
+      <th>نوع الاشتراك</th>
+      <th>الملاحظات</th>
+      <th>المبلغ المسترد</th>
+      <th>تعديل</th>
+      <th>حذف</th>
+    </tr>
   </table>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<button onclick="exportToExcel()">📥 إصدار ملف Excel</button>
+
+<!-- إضافة مكتبة XLSX -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 <script>
 let clients = [];
 
@@ -114,6 +241,10 @@ function addAndCalculate() {
   const refund = ((packageValue / packageDays) * (packageDays - daysUsed)).toFixed(2);
 
   clients.push({ name, number, packageValue, packageDays, daysUsed, bank, account, type, notes, refund, exceptional: false });
+  
+  document.getElementById('successMsg').style.display = 'block';
+  setTimeout(()=>document.getElementById('successMsg').style.display='none', 2000);
+
   renderTable();
   clearInputs();
 }
@@ -144,37 +275,73 @@ function saveExceptionalClient() {
 }
 
 function renderTable() {
-  const tbody = document.querySelector('#clientsTable tbody');
-  tbody.innerHTML = '';
+  const table = document.getElementById('clientsTable');
+  table.innerHTML = `<tr>
+      <th>اسم العميل</th>
+      <th>رقم العميل</th>
+      <th>قيمة الباقة (عدد الأيام)</th>
+      <th>عدد أيام الباقة</th>
+      <th>الأيام المستفاد بها</th>
+      <th>اسم البنك</th>
+      <th>رقم الحساب</th>
+      <th>نوع الاشتراك</th>
+      <th>الملاحظات</th>
+      <th>المبلغ المسترد</th>
+      <th>تعديل</th>
+      <th>حذف</th>
+    </tr>`;
+
   let normalRowCount = 0;
-  clients.forEach(c=>{
+  clients.forEach((c,index)=>{
     let bg = c.exceptional ? "#ffe0b2" : (normalRowCount % 2 === 0 ? "#ffffff" : "#e3f2fd");
     if(!c.exceptional) normalRowCount++;
-    tbody.innerHTML += `<tr style="background-color:${bg};">
-      <td>${c.name}</td><td>${c.packageValue} (${c.packageDays})</td><td>${c.daysUsed}</td>
-      <td>${c.refund}</td><td>${c.bank}</td><td>${c.account}</td>
-      <td>${c.type}</td><td>${c.notes}</td>
+    table.innerHTML += `<tr style="background-color:${bg};">
+      <td>${c.name}</td>
+      <td>${c.number}</td>
+      <td>${c.packageValue} (${c.packageDays})</td>
+      <td>${c.packageDays}</td>
+      <td>${c.daysUsed}</td>
+      <td>${c.bank}</td>
+      <td>${c.account}</td>
+      <td>${c.type}</td>
+      <td>${c.notes}</td>
+      <td>${c.refund}</td>
+      <td><button onclick="editClient(${index})">✏️</button></td>
+      <td><button class="delete" onclick="deleteClient(${index})">🗑️</button></td>
     </tr>`;
   });
 }
 
-// تصدير Excel
-function exportToExcel() {
-  if(clients.length===0){ alert("لا يوجد عملاء للتصدير"); return; }
+function deleteClient(index) {
+  if(confirm("هل أنت متأكد من حذف هذا العميل؟")){
+    clients.splice(index,1);
+    renderTable();
+  }
+}
 
-  const headers = ["اسم العميل","قيمة الباقة (عدد الأيام)","الأيام المستفاد بها","المبلغ المسترد","اسم البنك","رقم الحساب","نوع الاشتراك","ملاحظات"];
-  const data = clients.map(c=>[c.name, c.packageValue+" ("+c.packageDays+")", c.daysUsed, c.refund, c.bank, c.account, c.type, c.notes]);
-  const ws = XLSX.utils.aoa_to_sheet([headers,...data]);
-  ws['!cols'] = [{wch:18},{wch:18},{wch:15},{wch:15},{wch:18},{wch:18},{wch:15},{wch:25}];
-
-  const today=new Date(); today.setDate(today.getDate()-1);
-  const day=today.getDate();
-  const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-  const fileName=day+" "+months[today.getMonth()]+".xlsx";
-
-  const wb=XLSX.utils.book_new();
+// وظيفة تصدير Excel
+function exportToExcel(){
+  const ws_data = [
+    ['اسم العميل','رقم العميل','قيمة الباقة (عدد الأيام)','عدد أيام الباقة','الأيام المستفاد بها','اسم البنك','رقم الحساب','نوع الاشتراك','الملاحظات','المبلغ المسترد']
+  ];
+  clients.forEach(c=>{
+    ws_data.push([
+      c.name,
+      c.number,
+      `${c.packageValue} (${c.packageDays})`,
+      c.packageDays,
+      c.daysUsed,
+      c.bank,
+      c.account,
+      c.type,
+      c.notes,
+      c.refund
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "العملاء");
-  XLSX.writeFile(wb,fileName);
+  XLSX.writeFile(wb, "ملف الاسترداد اليومي 5 نوفمبر.xlsx");
 }
 </script>
 </body>
