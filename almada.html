@@ -96,7 +96,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .sb.collapsed{width:52px}
 .sb.collapsed .nav-item span,.sb.collapsed .nav-item .nb,.sb.collapsed .sb-logo-text,.sb.collapsed nav a span{display:none}
 .sb-toggle-btn{position:absolute;bottom:60px;left:-14px;width:28px;height:28px;background:var(--pd);border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.sb.collapsed~.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh;transition:margin-right .3s ease}
+.sb.collapsed~.adm-main{flex:1;margin-right:230px;padding:24px;min-height:100vh;transition:margin-right .3s ease}
 /* Mobile admin */
 .sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
@@ -115,7 +115,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .2s;border:none;background:transparent;font-family:var(--ff);width:100%;text-align:right}
 .nav-item:hover{background:var(--bg2);color:var(--txt)}.nav-item.on{background:rgba(0,114,255,.15);color:var(--p)}
 .nb{margin-right:auto;background:var(--err);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;display:none}.nb.on{display:inline}
-.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh;transition:margin-right .3s ease}
+.adm-main{flex:1;margin-right:230px;padding:24px;min-height:100vh;transition:margin-right .3s ease}
 /* Mobile */
 .sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
@@ -1771,9 +1771,12 @@ function nav(s){
   document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
   const sec=$('sec-'+s);
   if(sec) sec.classList.add('on');
-  // ارجع للأعلى دائماً عند فتح أي قسم
+  // scroll to top
+  window.scrollTo({top:0,behavior:'instant'});
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
   const main=document.querySelector('.adm-main');
-  if(main) main.scrollTop=0;
+  if(main){main.scrollTop=0;main.scrollIntoView();}
   if(window.innerWidth<=768) closeSB();
   if(s==='transfers') loadAdminTransfers();
 }
