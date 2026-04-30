@@ -96,7 +96,18 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .sb.collapsed{width:52px}
 .sb.collapsed .nav-item span,.sb.collapsed .nav-item .nb,.sb.collapsed .sb-logo-text,.sb.collapsed nav a span{display:none}
 .sb-toggle-btn{position:absolute;bottom:60px;left:-14px;width:28px;height:28px;background:var(--pd);border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.sb.collapsed~.adm-main{margin-right:52px}
+.sb.collapsed~.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh;transition:margin-right .3s ease}
+/* Mobile admin */
+.sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
+@media(max-width:768px){
+  .sb{transform:translateX(100%);width:240px!important}.sb.open{transform:translateX(0)}
+  .sb-dim.on{display:block}.sb-menu-btn{display:flex}
+  .adm-main{margin-right:0!important;padding:14px;padding-top:56px}
+  .stats-row{grid-template-columns:repeat(2,1fr)!important}
+  .fr{flex-direction:column}
+  #sec-sup>div[style*="grid"]{display:flex!important;flex-direction:column}
+}
 .sb-logo{padding:18px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0}
 .sb-icon img{width:100%;height:100%;object-fit:cover}
@@ -1755,8 +1766,13 @@ function initAdmin(){
 }
 
 function nav(s){
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));event.currentTarget.classList.add('on');
-  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));$('sec-'+s)?.classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  if(event&&event.currentTarget)event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
+  const sec=$('sec-'+s);
+  if(sec){sec.classList.add('on');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(window.innerWidth<=768) closeSB();
+  if(s==='transfers') loadAdminTransfers();
 }
 
 function refreshStats(){
@@ -2501,12 +2517,7 @@ window.switchHistTab = async function(tab){
 };
 
 // ── Fix nav to close sidebar on mobile + load transfers ──
-// Extend nav for transfers
-const _origNav2 = window.nav;
-window.nav = function(s){
-  if(_origNav2) _origNav2.call(this, s);
-  if(s==='transfers') loadAdminTransfers();
-};
+
 
 // ── Fix initUser to add avatar + notifications ──
 const _origInitUser2 = window.initUser;
@@ -2537,19 +2548,7 @@ function toggleCollapse(){
   if(btn)btn.textContent=_sbCollapsed?'▶':'◀';
 }
 
-// ── OVERRIDE nav to close mobile sidebar ──
-const _origNav3=window.nav;
-window.nav=function(s){
-  // Update active state
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
-  if(event?.currentTarget)event.currentTarget.classList.add('on');
-  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
-  $('sec-'+s)?.classList.add('on');
-  // Close mobile sidebar
-  if(window.innerWidth<=768) closeSB();
-  // Load transfers data when opening section
-  if(s==='transfers') loadAdminTransfers();
-};
+// nav already fixed above
 
 // ── SEARCH/FILTER FUNCTIONS ──
 
