@@ -651,78 +651,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div><!-- admin-main -->
 </div><!-- adminPg -->
 
-<!-- User Support Sheet -->
-          <div style="display:flex;flex-direction:column;gap:7px">
-            <button class="b1" onclick="$('logoFile').click()">📁 رفع شعار</button>
-            <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="uploadLogo(this)">
-            <button class="b4" onclick="removeLogo()">✕ إزالة</button>
-          </div>
-          <div><label class="fl">لون خلفية الشعار</label><input type="color" id="logoBgClr" value="#0072ff" style="width:60px;height:34px;border:1px solid var(--brd);border-radius:8px;cursor:pointer;background:var(--bg2);padding:2px" oninput="applyLogoBg(this.value)"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم الموقع</label><input class="inp" id="cf_siteName" value="المدى نت"></div>
-          <div><label class="fl">رمز احتياطي</label><input class="inp" id="cf_siteIcon" value="📡" style="max-width:80px"></div>
-        </div>
-        <div class="fr" style="margin-bottom:14px">
-          <div><label class="fl">وصف الموقع</label><input class="inp" id="cf_siteDesc" value="بوابة كروت الإنترنت"></div>
-          <div><label class="fl">رقم الجوال</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr"></div>
-        </div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(255,107,53,.05)"><h3>🎨 الألوان</h3></div><div class="pb">
-        <div class="cg">
-          <div><label>اللون الأساسي</label><input type="color" id="cl_p" value="#00c6ff" oninput="applyColor('--p',this.value)"></div>
-          <div><label>الأساسي الداكن</label><input type="color" id="cl_pd" value="#0072ff" oninput="applyColor('--pd',this.value)"></div>
-          <div><label>زر الشراء</label><input type="color" id="cl_acc" value="#ff6b35" oninput="applyColor('--acc',this.value)"></div>
-          <div><label>النجاح</label><input type="color" id="cl_ok" value="#00d68f" oninput="applyColor('--ok',this.value)"></div>
-          <div><label>الخلفية</label><input type="color" id="cl_bg" value="#070b14" oninput="applyColor('--bg',this.value)"></div>
-          <div><label>البطاقات</label><input type="color" id="cl_card" value="#131d2e" oninput="applyColor('--card',this.value)"></div>
-        </div>
-        <div style="margin-top:14px;display:flex;gap:9px">
-          <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-          <button class="b4" onclick="resetColors()">↺ افتراضي</button>
-        </div>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(0,214,143,.05)"><h3>📝 النصوص</h3></div><div class="pb">
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">عنوان قسم الكروت</label><input class="inp" id="cf_lblCards" value="اختر فئة الكرت"></div>
-          <div><label class="fl">عنوان السجل</label><input class="inp" id="cf_lblHist" value="آخر عمليات الشراء"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">تسمية الرصيد</label><input class="inp" id="cf_lblBal" value="رصيدك الحالي"></div>
-          <div><label class="fl">رمز العملة</label><input class="inp" id="cf_currency" value="ر.ي" style="max-width:90px"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">زر شحن الرصيد</label><input class="inp" id="cf_btnRC" value="+ شحن رصيد"></div>
-          <div><label class="fl">زر السجل</label><input class="inp" id="cf_btnHist" value="📋 سجل العمليات"></div>
-        </div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(0,198,255,.05)"><h3>🏦 بيانات البنك</h3></div><div class="pb">
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم البنك</label><input class="inp" id="cf_bankName" value="بنك الكريمي"></div>
-          <div><label class="fl">رقم الحساب</label><input class="inp" id="cf_bankNum" value="777-XXXX-XXXX" style="direction:ltr"></div>
-        </div>
-        <div style="margin-bottom:12px"><label class="fl">اسم صاحب الحساب</label><input class="inp" id="cf_bankOwner" value="المدى نت"></div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">تسمية حقل البنك</label><input class="inp" id="cf_bankLbl1" value="البنك"></div>
-          <div><label class="fl">تسمية حقل رقم الحساب</label><input class="inp" id="cf_bankLbl2" value="رقم الحساب"></div>
-        </div>
-        <div style="margin-bottom:14px"><label class="fl">تسمية حقل اسم الحساب</label><input class="inp" id="cf_bankLbl3" value="اسم الحساب"></div>
-        <div style="margin-bottom:14px"><label class="fl">تعليمات الشحن</label><textarea class="inp ta" id="cf_bankInstr" style="min-height:70px;resize:vertical">حوّل المبلغ للحساب أعلاه ثم أرسل الإيصال.</textarea></div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(255,61,113,.05)"><h3>🔐 كلمة مرور لوحة التحكم</h3></div><div class="pb">
-        <div style="margin-bottom:12px"><label class="fl">الحالية</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apCur" placeholder="••••••••"><button class="eye" onclick="togglePw('apCur',this)" type="button">👁</button></div></div>
-        <div style="margin-bottom:12px"><label class="fl">الجديدة</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apNew" placeholder="••••••••"><button class="eye" onclick="togglePw('apNew',this)" type="button">👁</button></div></div>
-        <div style="margin-bottom:14px"><label class="fl">تأكيد</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apConf" placeholder="••••••••"><button class="eye" onclick="togglePw('apConf',this)" type="button">👁</button></div></div>
-        <button class="b3" onclick="changeAdminPass()">🔒 تغيير</button>
-      </div></div>
-    </div><!-- end sec-set -->
 <div class="sup-overlay" id="supOverlay">
   <div class="sup-sheet">
     <div class="sup-hdr">
@@ -1202,6 +1130,8 @@ function initUser(){
   _salesPage=0;_rcPage=0;
   updateBal();renderGrid();renderHist();applySettings();
   initSlider();
+  applyAvatar();
+  loadNotifs();
 }
 function updateBal(){const b=S.user?.balance||0;const h=$('hBal'),u=$('uBal');if(h)h.textContent=b.toLocaleString();if(u)u.textContent=b.toLocaleString();}
 
@@ -1366,13 +1296,7 @@ function checkDot(){
   const d=$('supDot');
   if(d)d.style.display=unread.length>0?'block':'none';
 }
-async function switchHistTab(tab){
-  $('tabSales').className=tab==='sales'?'tab on':'tab';
-  $('tabRc').className=tab==='rc'?'tab on':'tab';
-  $('salesHistDiv').style.display=tab==='sales'?'block':'none';
-  $('rcHistDiv').style.display=tab==='rc'?'block':'none';
-  if(tab==='rc') await renderRcHist();
-}
+// switchHistTab defined below with transfers support
 
 async function renderRcHist(){
   const list=$('rcHistList');if(!list)return;
@@ -1787,13 +1711,18 @@ async function delUserMsg(uid,idx){
 // ═══════════════════════════════════════════════
 function initAdmin(){
   $('todayDate').textContent=new Date().toLocaleDateString('ar-YE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  refreshStats();renderRcList();renderUsersTable();renderSalesTable();renderCardsTable();renderCatsAdmin();renderOffersAdmin();renderRcOffers();renderConvList();renderPopAds();renderSliderAdmin();popSelects();applySettings();
+  refreshStats();renderRcList();renderUsersTable();renderSalesTable();renderCardsTable();renderCatsAdmin();renderOffersAdmin();renderRcOffers();renderConvList();renderPopAds();renderSliderAdmin();popSelects();popTransferSelects();applySettings();
   loadAllChats();
 }
 
 function nav(s){
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));event.currentTarget.classList.add('on');
-  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));$('sec-'+s)?.classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
+  $('sec-'+s)?.classList.add('on');
+  if(window.innerWidth<=768) closeSB();
+  if(s==='transfers') loadAdminTransfers();
+}
 }
 
 function refreshStats(){
@@ -1878,10 +1807,12 @@ function renderRcList(){
   const el=$('rcList');if(!el)return;const pend=S.reqs.filter(r=>r.status==='pending');
   const nb=$('nbRc');if(nb){nb.textContent=pend.length;nb.classList.toggle('on',pend.length>0);}
   if(!pend.length){el.innerHTML='<p style="color:var(--t3);font-size:13px;text-align:center;padding:16px">✅ لا توجد طلبات معلقة</p>';return;}
-  el.innerHTML=pend.map(r=>`
-    <div style="padding:14px 0;border-bottom:1px solid var(--brd)">
+  el.innerHTML=pend.map(r=>{
+    const u=S.users.find(x=>x.fbId===r.userId);
+    const av=u?.avatarImg?`<img src="${u.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤';
+    return`<div style="padding:14px 0;border-bottom:1px solid var(--brd)">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <div style="width:36px;height:36px;background:rgba(0,198,255,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px">👤</div>
+        <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgba(0,198,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${av}</div>
         <div style="flex:1"><div style="font-size:14px;font-weight:600">${r.user}</div><div style="font-size:11px;color:var(--t2)">${r.date}</div></div>
         <div style="text-align:left"><div style="font-size:16px;font-weight:700;color:var(--ok)" id="ra_${r.fbId}">${(r.amount||0).toLocaleString()}</div><div style="font-size:11px;color:var(--t2)">${S.cfg.currency||'ر.ي'}</div></div>
       </div>
@@ -1889,8 +1820,9 @@ function renderRcList(){
         <button class="b2" onclick="approveRc('${r.fbId}')">✅ موافقة</button>
         <button class="b3" onclick="rejectRc('${r.fbId}')">❌ رفض</button>
         <button class="b4" onclick="editRcAmt('${r.fbId}')">✏️ تعديل المبلغ</button>
-        ${r.receiptImg?`<button class="b1" onclick="viewReceipt('${r.fbId}')">🖼️ إيصال</button>`:""}
+        ${r.receiptImg?`<button class="b1" onclick="viewReceipt('${r.fbId}')">🖼️ إيصال</button>`:''}
       </div>
+    </div>`;}).join('');
     </div>`).join('');
 }
 function viewReceipt(id){const r=S.reqs.find(x=>x.fbId===id);if(!r?.receiptImg){toast('لا يوجد إيصال','err');return;}$('rcViewImg').src=r.receiptImg;openOv('rcViewModal');}
@@ -1933,17 +1865,22 @@ async function manRc(){
 // USERS
 function renderUsersTable(){
   const tb=$('usersTable');if(!tb)return;
-  if(!S.users.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>';popSelects();return;}
+  if(!S.users.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>';popSelects();popTransferSelects();return;}
   tb.innerHTML=S.users.map((u,i)=>`<tr>
     <td>${i+1}</td>
-    <td><div style="font-weight:600">${u.name||u.username||'—'}</div><div style="font-size:11px;color:var(--t2)">${u.email||u.username||''}</div></td>
+    <td><div style="display:flex;align-items:center;gap:8px">
+      <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">
+        ${u.avatarImg?`<img src="${u.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤'}
+      </div>
+      <div><div style="font-weight:600">${u.name||u.username||'—'}</div><div style="font-size:11px;color:var(--t2)">${u.email||u.username||''}</div></div>
+    </div></td>
     <td style="color:var(--ok);font-weight:600">${(u.balance||0).toLocaleString()} <span class="cur">ر.ي</span></td>
     <td>${(u.cards||[]).length}</td>
     <td style="display:flex;gap:5px;flex-wrap:wrap">
       <button class="b2" onclick="qAddBal('${u.fbId}')">+ رصيد</button>
       <button class="b1" onclick="viewUserStatement('${u.fbId}')">📊 كشف</button>
-      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑 كلمة مرور</button>
-      <button class="b3" onclick="delUser('${u.fbId}')">🗑️ حذف</button>
+      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑</button>
+      <button class="b3" onclick="delUser('${u.fbId}')">🗑️</button>
     </td>
   </tr>`).join('');
   popSelects();
@@ -2075,19 +2012,8 @@ function toggleAdminVoiceRec(){
 
 
 // ── HISTORY TABS ──
-function switchHistTab(tab){
-  document.querySelectorAll('#histSec .tab').forEach(b=>b.classList.remove('on'));
-  $('tab'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('on');
-  $('salesHistDiv').style.display=tab==='sales'?'block':'none';
-  $('rcHistDiv').style.display=tab==='rc'?'block':'none';
-}
+// old switchHistTab and renderRcHist removed
 
-function renderRcHist(){
-  const list=$('rcHistList');if(!list)return;
-  const uid=S.user?.fbId;if(!uid)return;
-  // Get approved recharge requests for this user from state
-  const myRc=(S.reqs||[]).filter(r=>r.userId===uid&&r.status==='approved');
-  if(!myRc.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
   list.innerHTML=myRc.slice().reverse().map(r=>`
     <div class="hi">
       <div style="display:flex;align-items:center;gap:10px;flex:1">
@@ -2740,86 +2666,14 @@ function popTransferSelects(){
 
 // ══ OVERRIDE initUser to add notifs + avatar ══
 const _origInitUser=window.initUser||function(){};
-function initUser(){
-  if(typeof _origInitUser==='function'&&_origInitUser.toString().length>20) _origInitUser.call(this);
-  else{if(typeof _salesPage!=='undefined'){_salesPage=0;_rcPage=0;}updateBal();renderGrid&&renderGrid();renderHist&&renderHist();applySettings&&applySettings();initSlider&&initSlider();}
-  applyAvatar();
-  loadNotifs();
-}
-
-// ══ OVERRIDE initAdmin to add transfers ══
-const _origInitAdmin=window.initAdmin||function(){};
-function initAdmin(){
-  if(typeof _origInitAdmin==='function'&&_origInitAdmin.toString().length>20) _origInitAdmin.call(this);
-  else{if(typeof $==='function'){refreshStats&&refreshStats();renderRcList&&renderRcList();renderUsersTable&&renderUsersTable();popSelects&&popSelects();applySettings&&applySettings();}}
-  popTransferSelects();
-}
-
-// ══ OVERRIDE renderUsersTable to show avatar ══
-const _origRUT=window.renderUsersTable;
-function renderUsersTable(){
-  const tb=$('usersTable');if(!tb)return;
-  if(!S.users.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>';popSelects&&popSelects();popTransferSelects();return;}
-  tb.innerHTML=S.users.map((u,i)=>`<tr>
-    <td>${i+1}</td>
-    <td><div style="display:flex;align-items:center;gap:8px">
-      <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px">
-        ${u.avatarImg?`<img src="${u.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤'}
-      </div>
-      <div><div style="font-weight:600">${u.name||u.username||'—'}</div><div style="font-size:11px;color:var(--t2)">${u.email||u.username||''}</div></div>
-    </div></td>
-    <td style="color:var(--ok);font-weight:600">${(u.balance||0).toLocaleString()} <span class="cur">ر.ي</span></td>
-    <td>${(u.cards||[]).length}</td>
-    <td style="display:flex;gap:5px;flex-wrap:wrap">
-      <button class="b2" onclick="qAddBal('${u.fbId}')">+ رصيد</button>
-      <button class="b1" onclick="viewUserStatement('${u.fbId}')">📊 كشف</button>
-      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑</button>
-      <button class="b3" onclick="delUser('${u.fbId}')">🗑️</button>
-    </td>
-  </tr>`).join('');
-  popSelects&&popSelects();popTransferSelects();
-}
-
-// ══ OVERRIDE renderRcList to show avatar ══
-const _origRRL=window.renderRcList;
-function renderRcList(){
-  const el=$('rcList');if(!el)return;
-  const pend=S.reqs.filter(r=>r.status==='pending');
-  const nb=$('nbRc');if(nb){nb.textContent=pend.length;nb.classList.toggle('on',pend.length>0);}
-  if(!pend.length){el.innerHTML='<p style="color:var(--t3);font-size:13px;text-align:center;padding:16px">✅ لا توجد طلبات معلقة</p>';return;}
-  el.innerHTML=pend.map(r=>{
-    const u=S.users.find(x=>x.fbId===r.userId);
-    const av=u?.avatarImg?`<img src="${u.avatarImg}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`:'👤';
-    return`<div style="padding:14px 0;border-bottom:1px solid var(--brd)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgba(0,198,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${av}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:600">${r.user}</div><div style="font-size:11px;color:var(--t2)">${r.date}</div></div>
-        <div style="text-align:left"><div style="font-size:16px;font-weight:700;color:var(--ok)" id="ra_${r.fbId}">${(r.amount||0).toLocaleString()}</div><div style="font-size:11px;color:var(--t2)">${S.cfg.currency||'ر.ي'}</div></div>
-      </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="b2" onclick="approveRc('${r.fbId}')">✅ موافقة</button>
-        <button class="b3" onclick="rejectRc('${r.fbId}')">❌ رفض</button>
-        <button class="b4" onclick="editRcAmt&&editRcAmt('${r.fbId}')">✏️ تعديل</button>
-        ${r.receiptImg?`<button class="b1" onclick="viewReceipt('${r.fbId}')">🖼️ إيصال</button>`:''}
-      </div>
-    </div>`;}).join('');
-}
-
-// Patch approveRc to send notification
+// ══ Patch approveRc to send notification ══
 const _origApproveRc=window.approveRc;
 window.approveRc=async function(id){
   await _origApproveRc(id);
   const req=S.reqs.find(r=>r.fbId===id);
-  if(req)await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg.currency||'ر.ي'} لحسابك`);
+  if(req) await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg.currency||'ر.ي'} لحسابك`);
 };
 
-// Patch manRc to send notification
-const _origManRc=window.manRc;
-if(_origManRc){window.manRc=async function(){
-  const uid=$('manUser').value,amt=parseInt($('manAmt').value);
-  await _origManRc();
-  if(uid&&amt)await pushNotif(uid,'gift','🎁 هدية من الإدارة',`تم إضافة ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} لحسابك كهدية من الإدارة`);
-};}
 </script>
 
 <!-- PWA -->
