@@ -1128,7 +1128,9 @@ function initUser(){
 function updateBal(){const b=S.user?.balance||0;const h=$('hBal'),u=$('uBal');if(h)h.textContent=b.toLocaleString();if(u)u.textContent=b.toLocaleString();}
 
 function getOffer(catId){
-  const now=new Date();now.setHours(0,0,0,0);
+  // استخدام وقت السيرفر لمنع التلاعب بالتاريخ
+  const now=window._serverNow ? new Date(window._serverNow) : new Date();
+  now.setHours(0,0,0,0);
   return S.offers.find(o=>{
     if(!o.active)return false;
     const tc=o.triggerCat||o.cat||'all';
@@ -1309,11 +1311,16 @@ async function renderRcHist(){
     const manualRcs=(userSnap.data()?.manualRecharges||[]);
     // Combine
     const all=[
-      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,amount:r.amount,note:'💳 شحن رصيد',type:'approved'})),
-      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,amount:r.amount,note:'⏳ قيد المراجعة',type:'pending'})),
-      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,amount:r.amount,note:'❌ مرفوض',type:'rejected'})),
-      ...manualRcs.map(r=>({date:r.date,amount:r.amount,note:'🎁 شحن من الإدارة',type:'admin'}))
-    ].sort((a,b)=>(b.ts||0)-(a.ts||0));
+      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'💳 شحن رصيد',type:'approved'})),
+      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'⏳ قيد المراجعة',type:'pending'})),
+      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'❌ مرفوض',type:'rejected'})),
+      ...manualRcs.map(r=>({
+        date:r.date,ts:(r.ts||0)/1000,
+        amount:r.amount||0,
+        note:r.type==='deduct'?'➖ '+(r.note||'خصم من الإدارة'):'🎁 '+(r.note||'شحن من الإدارة'),
+        type:r.type==='deduct'?'deduct':'admin'
+      }))
+    ].sort((a,b)=>b.ts-a.ts);
     if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
     const page=all.slice(0,(_rcPage+1)*PAGE_SIZE);
     const hasMore=all.length>(_rcPage+1)*PAGE_SIZE;
@@ -1321,16 +1328,16 @@ async function renderRcHist(){
     list.innerHTML=page.map(r=>`
       <div class="hi">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <div style="width:36px;height:36px;background:${r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
-            ${r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
+          <div style="width:36px;height:36px;background:${r.type==='deduct'?'rgba(255,61,113,.1)':r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
+            ${r.type==='deduct'?'➖':r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
           </div>
           <div>
             <div style="font-size:13px;font-weight:600">${r.note}</div>
             <div style="font-size:11px;color:var(--t2)">${r.date||''}</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:${r.type==='approved'||r.type==='admin'?'var(--ok)':r.type==='pending'?'var(--warn)':'var(--err)'}">
-          ${r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
+        <div style="font-size:14px;font-weight:700;color:${r.type==='deduct'||r.type==='rejected'?'var(--err)':r.type==='pending'?'var(--warn)':'var(--ok)'}">
+          ${r.type==='deduct'?'':r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
         </div>
       </div>`).join('');
     const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:10px';
@@ -2074,7 +2081,7 @@ async function downloadPDF(uid){
   const all=[
     ...userSales.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'🛒 شراء — '+x.catName,code:x.code||'',amount:-(x.price||0)})),
     ...userRc.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'💳 شحن رصيد',code:'',amount:+(x.amount||0)})),
-    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'🎁 '+(x.note||'شحن من الإدارة'),code:'',amount:+(x.amount||0)})),
+    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:(x.type==='deduct'?'➖ ':''+(x.note||'شحن من الإدارة')),code:'',amount:x.amount||0})),
     ...rcvTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📥 تحويل من '+x.fromName+(x.byAdmin?' (إدارة)':''),code:'',amount:+(x.amount||0)})),
     ...sentTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📤 تحويل إلى '+x.toName+(x.byAdmin?' (إدارة)':''),code:'',amount:-(x.amount||0)}))
   ].sort((a,b)=>a.ts-b.ts);
@@ -2355,9 +2362,18 @@ async function addSliderItemVideo(input){
 // ═══════════════════════════════════════════════
 // STARTUP
 // ═══════════════════════════════════════════════
-// Load settings before auth (faster UI)
+// Load settings + server time before auth
 (async()=>{
   try{const s=await doc('settings','main').get();if(s.exists){Object.assign(S.cfg,s.data());applySettings();}}catch(e){}
+  // جلب وقت السيرفر لمنع التلاعب بالتواريخ والعروض
+  try{
+    const ref=col('_ping').doc('ts');
+    await ref.set({t:TS()});
+    const snap=await ref.get();
+    const st=snap.data()?.t?.toDate?.();
+    if(st) window._serverNow=st.getTime();
+    else window._serverNow=Date.now();
+  }catch(e){window._serverNow=Date.now();}
   loadRem();
 })();
 </script>
@@ -2565,6 +2581,68 @@ async function clearNotifs(){
 async function pushNotif(uid,type,title,body){
   try{await col('notifications').add({uid,type,title,body,date:new Date().toLocaleString('ar-YE'),ts:Date.now(),read:false,createdAt:TS()});}catch(e){}
 }
+
+// ── Server timestamp (يمنع التلاعب بالتاريخ) ──
+async function getServerDate(){
+  try{
+    const ref=col('_ping').doc('ts');
+    await ref.set({t:TS()});
+    const snap=await ref.get();
+    const st=snap.data()?.t?.toDate?.();
+    if(st) return st.toLocaleString('ar-YE');
+  }catch(e){}
+  return new Date().toLocaleString('ar-YE');
+}
+
+// ── Fix addBal to log in manualRecharges ──
+const _origAddBal2=window.addBal;
+window.addBal=async function(){
+  const uid=$('addBalUser')?.value,amt=parseInt($('addBalAmt')?.value);
+  if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
+  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
+  const nb=(u.balance||0)+amt;
+  const now=await getServerDate();
+  const entry={amount:amt,date:now,note:'شحن يدوي من الإدارة',type:'add',ts:Date.now()};
+  const prev=u.manualRecharges||[];
+  await col('users').doc(uid).update({balance:nb,manualRecharges:[...prev,entry]});
+  u.balance=nb;u.manualRecharges=[...prev,entry];
+  if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}
+  $('addBalAmt').value='';
+  toast(`✅ تمت إضافة ${amt.toLocaleString()} ريال`,'ok');
+  window.renderUsersTable&&renderUsersTable();window.refreshStats&&refreshStats();
+  await pushNotif(uid,'gift','💳 إضافة رصيد',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك من الإدارة`);
+};
+
+// ── Fix deductBal to log deductions ──
+const _origDeductBal2=window.deductBal;
+window.deductBal=async function(){
+  const uid=$('addBalUser')?.value;
+  if(!uid){toast('اختر مستخدماً','err');return;}
+  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
+  const mode=prompt(`رصيد ${u.name||u.username}: ${(u.balance||0).toLocaleString()}\n\n• خصم مبلغ → اكتب: خصم 500\n• تعيين رصيد → اكتب: تعيين 1000`);
+  if(!mode)return;
+  let newBal,amt,note;
+  if(mode.includes('خصم')){
+    amt=parseInt(mode.replace(/[^\d]/g,''));
+    if(!amt){toast('مبلغ غير صحيح','err');return;}
+    newBal=Math.max(0,(u.balance||0)-amt);
+    note='خصم من الإدارة';
+  }else if(mode.includes('تعيين')){
+    newBal=parseInt(mode.replace(/[^\d]/g,''));
+    if(isNaN(newBal)){toast('مبلغ غير صحيح','err');return;}
+    amt=Math.abs((u.balance||0)-newBal);
+    note='تعيين رصيد من الإدارة';
+  }else{toast('اكتب خصم أو تعيين','err');return;}
+  const now=await getServerDate();
+  const entry={amount:-Math.abs(amt),date:now,note,type:'deduct',ts:Date.now()};
+  const prev=u.manualRecharges||[];
+  await col('users').doc(uid).update({balance:newBal,manualRecharges:[...prev,entry]});
+  u.balance=newBal;u.manualRecharges=[...prev,entry];
+  if(S.user?.fbId===uid){S.user.balance=newBal;updateBal();}
+  toast(`✅ ${note} ${amt.toLocaleString()} — الرصيد: ${newBal.toLocaleString()}`,'ok');
+  window.renderUsersTable&&renderUsersTable();window.refreshStats&&refreshStats();
+  await pushNotif(uid,'gift','⚠️ تعديل رصيد',`${note}: ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`);
+};
 
 // Patch approveRc
 const _origApproveRc2=window.approveRc;
