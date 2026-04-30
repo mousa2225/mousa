@@ -92,7 +92,11 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 
 /* ─ ADMIN ─ */
-.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100;overflow-y:auto}
+.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:200;overflow-y:auto;transition:transform .3s ease}
+.sb.collapsed{width:52px}
+.sb.collapsed .nav-item span,.sb.collapsed .nav-item .nb,.sb.collapsed .sb-logo-text,.sb.collapsed nav a span{display:none}
+.sb-toggle-btn{position:absolute;bottom:60px;left:-14px;width:28px;height:28px;background:var(--pd);border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.sb.collapsed~.adm-main{margin-right:52px}
 .sb-logo{padding:18px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0}
 .sb-icon img{width:100%;height:100%;object-fit:cover}
@@ -100,7 +104,18 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .2s;border:none;background:transparent;font-family:var(--ff);width:100%;text-align:right}
 .nav-item:hover{background:var(--bg2);color:var(--txt)}.nav-item.on{background:rgba(0,114,255,.15);color:var(--p)}
 .nb{margin-right:auto;background:var(--err);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;display:none}.nb.on{display:inline}
-.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
+.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh;transition:margin-right .3s ease}
+/* Mobile */
+.sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
+@media(max-width:768px){
+  .sb{transform:translateX(100%);width:240px!important}.sb.open{transform:translateX(0)}
+  .sb-dim.on{display:block}.sb-menu-btn{display:flex}
+  .adm-main{margin-right:0!important;padding:14px;padding-top:56px}
+  .stats-row{grid-template-columns:repeat(2,1fr)!important}
+  .fr{flex-direction:column}
+  #sec-sup>div[style*="grid"]{display:flex!important;flex-direction:column}
+}
 .adm-sec{display:none}.adm-sec.on{display:block}
 .adm-hdr{margin-bottom:20px}.adm-hdr h2{font-size:20px;font-weight:700}.adm-hdr p{font-size:12px;color:var(--t2);margin-top:3px}
 
@@ -319,7 +334,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ══ ADMIN ══ -->
 <div id="adminPg" class="pg">
-  <div class="sb">
+<button class="sb-menu-btn" onclick="toggleSB()">☰</button>
+<div class="sb-dim" id="sbDim" onclick="closeSB()"></div>
+  <div class="sb" id="sbEl">
+    <button class="sb-toggle-btn" id="sbColBtn" onclick="toggleCollapse()">◀</button>
     <div class="sb-logo">
       <div class="sb-icon" id="sbIcon"><span id="sbEmoji">📡</span><img id="sbImg" src="" style="display:none"></div>
       <div><div style="font-size:14px;font-weight:700" id="sbName">المدى نت</div><div style="font-size:11px;color:var(--t2)">لوحة الإدارة</div></div>
@@ -2496,6 +2514,41 @@ window.initUser = function(){
   _origInitUser2 && _origInitUser2();
   applyAvatar();
   loadNotifs();
+};
+
+// ── SIDEBAR FUNCTIONS ──
+function toggleSB(){
+  const sb=$('sbEl'),dim=$('sbDim');
+  if(!sb)return;
+  sb.classList.toggle('open');
+  if(dim)dim.classList.toggle('on');
+}
+function closeSB(){
+  $('sbEl')?.classList.remove('open');
+  $('sbDim')?.classList.remove('on');
+}
+let _sbCollapsed=false;
+function toggleCollapse(){
+  const sb=$('sbEl'),main=document.querySelector('.adm-main'),btn=$('sbColBtn');
+  if(!sb)return;
+  _sbCollapsed=!_sbCollapsed;
+  sb.classList.toggle('collapsed',_sbCollapsed);
+  if(main)main.style.marginRight=_sbCollapsed?'52px':'230px';
+  if(btn)btn.textContent=_sbCollapsed?'▶':'◀';
+}
+
+// ── OVERRIDE nav to close mobile sidebar ──
+const _origNav3=window.nav;
+window.nav=function(s){
+  // Update active state
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  if(event?.currentTarget)event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
+  $('sec-'+s)?.classList.add('on');
+  // Close mobile sidebar
+  if(window.innerWidth<=768) closeSB();
+  // Load transfers data when opening section
+  if(s==='transfers') loadAdminTransfers();
 };
 
 // ── SEARCH/FILTER FUNCTIONS ──
