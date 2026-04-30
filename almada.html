@@ -286,7 +286,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="bal-amt"><span class="cur">ر.ي</span> <span id="uBal">0</span></div>
       <div class="bal-row">
         <button class="rc-btn" onclick="openRcModal()" id="btnRC">+ شحن رصيد</button>
-        <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 سجل العمليات</button>
+        <button class="rc-btn" onclick="openTransferModal()">💸 تحويل</button>
+        <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 السجل</button>
       </div>
     </div>
     <div class="sec-ttl" id="lblCards">اختر فئة الكرت</div>
@@ -758,6 +759,34 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="mrow">
       <button class="mcancel" onclick="closeOv('chgPassModal')">إلغاء</button>
       <button class="mok" onclick="confirmChgPass()">🔒 تغيير</button>
+    </div>
+  </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="ov" id="transferModal">
+  <div class="modal">
+    <h3>💸 تحويل رصيد</h3>
+    <div style="background:rgba(0,114,255,.08);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--p)">
+      رصيدك الحالي: <strong id="transferMyBal">0</strong> <span class="cur">ر.ي</span>
+    </div>
+    <div class="fg">
+      <label>اسم المستخدم أو البريد الإلكتروني للمستقبل</label>
+      <input class="inp" id="transferTo" placeholder="ahmed99 أو ahmed@email.com">
+    </div>
+    <div class="fg">
+      <label>المبلغ (<span class="cur">ر.ي</span>)</label>
+      <input class="inp" type="number" id="transferAmt" placeholder="500" min="1">
+    </div>
+    <div id="transferConfirmBox" style="display:none;background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px">
+      <div style="margin-bottom:6px;color:var(--t2)">تأكيد التحويل:</div>
+      <div>إلى: <strong id="transferToName" style="color:var(--p)"></strong></div>
+      <div>المبلغ: <strong id="transferAmtConfirm" style="color:var(--ok)"></strong></div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">⚠️ العملية لا يمكن التراجع عنها</div>
+    </div>
+    <div class="mrow">
+      <button class="mcancel" onclick="closeOv('transferModal');$('transferConfirmBox').style.display='none'">إلغاء</button>
+      <button class="mok" id="transferBtn" onclick="doTransfer()">🔍 بحث عن المستخدم</button>
     </div>
   </div>
 </div>
@@ -1277,47 +1306,74 @@ async function renderRcHist(){
   const uid=S.user?.fbId;if(!uid)return;
   list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px;font-size:13px">⏳ جاري التحميل...</div>';
   try{
-    // Load directly from Firebase — user-specific
-    const snap=await col('rechargeRequests')
-      .where('userId','==',uid)
-      .orderBy('createdAt','desc')
-      .get();
+    // Load WITHOUT orderBy to avoid needing a Firestore index
+    const snap=await col('rechargeRequests').where('userId','==',uid).get();
     const rcs=snap.docs.map(d=>({fbId:d.id,...d.data()}));
-    // Also get admin manual recharges from user doc
-    const userSnap=await col('users').doc(uid).get();
-    const manualRcs=(userSnap.data()?.manualRecharges||[]);
-    // Combine
+
+    // Get manual recharges from user doc (already loaded in S.user)
+    const manualRcs=S.user?.manualRecharges||[];
+
+    // Get transfers received
+    const transfersSnap=await col('transfers').where('toId','==',uid).get().catch(()=>({docs:[]}));
+    const transfers=transfersSnap.docs.map(d=>d.data());
+
+    // Combine all
     const all=[
-      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,amount:r.amount,note:'💳 شحن رصيد',type:'approved'})),
-      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,amount:r.amount,note:'⏳ قيد المراجعة',type:'pending'})),
-      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,amount:r.amount,note:'❌ مرفوض',type:'rejected'})),
-      ...manualRcs.map(r=>({date:r.date,amount:r.amount,note:'🎁 شحن من الإدارة',type:'admin'}))
-    ].sort((a,b)=>(b.ts||0)-(a.ts||0));
-    if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
+      ...rcs.filter(r=>r.status==='approved').map(r=>({
+        date:r.date,ts:r.createdAt?.seconds||0,
+        note:'💳 شحن رصيد',type:'approved',amount:r.amount
+      })),
+      ...rcs.filter(r=>r.status==='pending').map(r=>({
+        date:r.date,ts:r.createdAt?.seconds||0,
+        note:'⏳ قيد المراجعة',type:'pending',amount:r.amount
+      })),
+      ...rcs.filter(r=>r.status==='rejected').map(r=>({
+        date:r.date,ts:r.createdAt?.seconds||0,
+        note:'❌ مرفوض',type:'rejected',amount:r.amount
+      })),
+      ...manualRcs.map(r=>({
+        date:r.date,ts:(r.ts||0)/1000,
+        note:'🎁 '+(r.note||'شحن من الإدارة'),type:'admin',amount:r.amount
+      })),
+      ...transfers.map(r=>({
+        date:r.date,ts:(r.ts||0)/1000,
+        note:`💸 تحويل من ${r.fromName||'مستخدم'}`,type:'transfer',amount:r.amount
+      }))
+    ].sort((a,b)=>b.ts-a.ts);
+
+    if(!all.length){
+      list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';
+      return;
+    }
     const page=all.slice(0,(_rcPage+1)*PAGE_SIZE);
     const hasMore=all.length>(_rcPage+1)*PAGE_SIZE;
     const hasLess=_rcPage>0;
+
+    const colorMap={approved:'var(--ok)',admin:'var(--ok)',transfer:'var(--ok)',pending:'var(--warn)',rejected:'var(--err)'};
+    const iconMap={approved:'💳',admin:'🎁',transfer:'💸',pending:'⏳',rejected:'❌'};
+
     list.innerHTML=page.map(r=>`
       <div class="hi">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <div style="width:36px;height:36px;background:${r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
-            ${r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
-          </div>
+          <div style="width:36px;height:36px;background:rgba(0,214,143,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${iconMap[r.type]||'💳'}</div>
           <div>
             <div style="font-size:13px;font-weight:600">${r.note}</div>
             <div style="font-size:11px;color:var(--t2)">${r.date||''}</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:${r.type==='approved'||r.type==='admin'?'var(--ok)':r.type==='pending'?'var(--warn)':'var(--err)'}">
-          ${r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
+        <div style="font-size:14px;font-weight:700;color:${colorMap[r.type]||'var(--ok)'}">
+          ${r.type==='pending'||r.type==='rejected'?'':`+`}${(r.amount||0).toLocaleString()} <span class="cur">${S.cfg.currency||'ر.ي'}</span>
         </div>
       </div>`).join('');
-    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:10px';
-    if(hasMore)btnRow.innerHTML+=`<button onclick="_rcPage++;renderRcHist()" style="flex:1;padding:10px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;color:var(--p);font-family:var(--ff);cursor:pointer;font-size:13px">المزيد ↓</button>`;
-    if(hasLess)btnRow.innerHTML+=`<button onclick="_rcPage=Math.max(0,_rcPage-1);renderRcHist()" style="flex:1;padding:10px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;color:var(--t2);font-family:var(--ff);cursor:pointer;font-size:13px">أقل ↑</button>`;
-    if(hasMore||hasLess)list.appendChild(btnRow);
+
+    const btnRow=document.createElement('div');
+    btnRow.style.cssText='display:flex;gap:8px;margin-top:10px';
+    if(hasMore) btnRow.innerHTML+=`<button onclick="_rcPage++;renderRcHist()" style="flex:1;padding:10px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;color:var(--p);font-family:var(--ff);cursor:pointer;font-size:13px">المزيد ↓</button>`;
+    if(hasLess) btnRow.innerHTML+=`<button onclick="_rcPage=Math.max(0,_rcPage-1);renderRcHist()" style="flex:1;padding:10px;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;color:var(--t2);font-family:var(--ff);cursor:pointer;font-size:13px">أقل ↑</button>`;
+    if(hasMore||hasLess) list.appendChild(btnRow);
+
   }catch(e){
-    list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">تعذر تحميل السجل</div>';
+    list.innerHTML=`<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">⚠️ خطأ: ${e.message}</div>`;
     console.error('rcHist:',e);
   }
 }
@@ -2327,6 +2383,109 @@ async function addSliderItemVideo(input){
     toast('✅ تمت إضافة الفيديو','ok');
     renderSliderAdmin();initSlider();
   }catch(e){toast('خطأ: '+e.message,'err');}
+}
+
+// ── TRANSFER BALANCE ──
+let _transferTarget = null; // {fbId, name, username}
+
+function openTransferModal(){
+  _transferTarget = null;
+  $('transferTo').value = '';
+  $('transferAmt').value = '';
+  $('transferConfirmBox').style.display = 'none';
+  $('transferBtn').textContent = '🔍 بحث عن المستخدم';
+  $('transferBtn').onclick = searchTransferUser;
+  $('transferMyBal').textContent = (S.user?.balance||0).toLocaleString();
+  openOv('transferModal');
+}
+
+async function searchTransferUser(){
+  const query = $('transferTo').value.trim().toLowerCase();
+  const amt   = parseInt($('transferAmt').value);
+  if(!query){ toast('أدخل اسم المستخدم أو البريد','err'); return; }
+  if(!amt||amt<1){ toast('أدخل مبلغاً صحيحاً','err'); return; }
+  if(amt > (S.user?.balance||0)){ toast('رصيدك غير كافٍ','err'); return; }
+
+  $('transferBtn').textContent = '⏳ جاري البحث...';
+  $('transferBtn').disabled = true;
+  try{
+    // Search by username
+    let snap = await col('users').where('username','==',query).limit(1).get();
+    if(snap.empty){
+      // Search by email
+      snap = await col('users').where('email','==',query).limit(1).get();
+    }
+    if(snap.empty){
+      toast('المستخدم غير موجود','err');
+      $('transferBtn').textContent = '🔍 بحث عن المستخدم';
+      $('transferBtn').disabled = false;
+      return;
+    }
+    const targetDoc = snap.docs[0];
+    const targetData = targetDoc.data();
+    if(targetDoc.id === S.user.fbId){ toast('لا يمكنك التحويل لنفسك','err'); $('transferBtn').textContent='🔍 بحث';$('transferBtn').disabled=false; return; }
+
+    _transferTarget = { fbId: targetDoc.id, name: targetData.name||targetData.username||targetData.email };
+
+    // Show confirm box
+    $('transferToName').textContent = _transferTarget.name;
+    $('transferAmtConfirm').textContent = amt.toLocaleString() + ' ' + (S.cfg.currency||'ر.ي');
+    $('transferConfirmBox').style.display = 'block';
+    $('transferBtn').textContent = '✅ تأكيد التحويل';
+    $('transferBtn').disabled = false;
+    $('transferBtn').onclick = confirmTransfer;
+  }catch(e){
+    toast('خطأ: '+e.message,'err');
+    $('transferBtn').textContent = '🔍 بحث';
+    $('transferBtn').disabled = false;
+  }
+}
+
+async function confirmTransfer(){
+  if(!_transferTarget){ toast('ابحث عن المستخدم أولاً','err'); return; }
+  const amt = parseInt($('transferAmt').value);
+  if(!amt||amt<1){ toast('أدخل مبلغاً','err'); return; }
+  if(amt > (S.user?.balance||0)){ toast('رصيدك غير كافٍ','err'); return; }
+
+  $('transferBtn').disabled = true;
+  $('transferBtn').textContent = '⏳ جاري التحويل...';
+  const now = new Date().toLocaleString('ar-YE');
+  try{
+    // Deduct from sender
+    const newSenderBal = (S.user.balance||0) - amt;
+    await col('users').doc(S.user.fbId).update({ balance: newSenderBal });
+
+    // Add to receiver
+    const recvSnap = await col('users').doc(_transferTarget.fbId).get();
+    const newRecvBal = (recvSnap.data()?.balance||0) + amt;
+    await col('users').doc(_transferTarget.fbId).update({ balance: newRecvBal });
+
+    // Log transfer
+    const transferLog = {
+      fromId:   S.user.fbId,
+      fromName: S.user.name||S.user.username||'مستخدم',
+      toId:     _transferTarget.fbId,
+      toName:   _transferTarget.name,
+      amount:   amt,
+      date:     now,
+      ts:       Date.now(),
+      createdAt: TS()
+    };
+    await col('transfers').add(transferLog);
+
+    // Update local state
+    S.user.balance = newSenderBal;
+    updateBal();
+
+    closeOv('transferModal');
+    $('transferConfirmBox').style.display = 'none';
+    _transferTarget = null;
+    toast(`✅ تم تحويل ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} إلى ${transferLog.toName}`, 'ok');
+  }catch(e){
+    toast('فشل التحويل: '+e.message,'err');
+    $('transferBtn').disabled = false;
+    $('transferBtn').textContent = '✅ تأكيد التحويل';
+  }
 }
 
 // ═══════════════════════════════════════════════
