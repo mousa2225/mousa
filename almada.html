@@ -1770,7 +1770,10 @@ function nav(s){
   if(event&&event.currentTarget)event.currentTarget.classList.add('on');
   document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
   const sec=$('sec-'+s);
-  if(sec){sec.classList.add('on');sec.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(sec) sec.classList.add('on');
+  // ارجع للأعلى دائماً عند فتح أي قسم
+  const main=document.querySelector('.adm-main');
+  if(main) main.scrollTop=0;
   if(window.innerWidth<=768) closeSB();
   if(s==='transfers') loadAdminTransfers();
 }
