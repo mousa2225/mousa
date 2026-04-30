@@ -437,7 +437,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="panel"><div class="ph"><h3>الطلبات المعلقة</h3></div><div class="pb" id="rcList"><p style="color:var(--t3);text-align:center">لا توجد طلبات</p></div></div>
       <div class="panel"><div class="ph"><h3>شحن يدوي مباشر</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label><select class="sel" id="manUser"></select></div>
+          <div><label class="fl">المستخدم</label>
+            <input class="inp" id="manUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSelect('manUserSearch','manUser',this.value)" style="margin-bottom:4px">
+            <select class="sel" id="manUser"></select>
+          </div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="manAmt" placeholder="5000"></div>
         </div>
         <button class="b2" onclick="manRc()">✅ شحن</button>
@@ -448,7 +451,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="adm-hdr"><h2>👥 المستخدمون</h2></div>
       <div class="panel"><div class="ph"><h3>إضافة رصيد</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label><select class="sel" id="addBalUser"></select></div>
+          <div><label class="fl">المستخدم</label>
+            <input class="inp" id="addBalSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSelect('addBalSearch','addBalUser',this.value)" style="margin-bottom:4px">
+            <select class="sel" id="addBalUser"></select>
+          </div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="addBalAmt" placeholder="5000"></div>
         </div>
         <div style="display:flex;gap:8px">
@@ -456,9 +462,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="b3" onclick="deductBal()">➖ خصم / تعيين رصيد</button>
         </div>
       </div></div>
-      <div class="panel"><div class="ph"><h3>قائمة المستخدمين</h3></div><div class="pb"><div class="tw">
-        <table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>الكروت</th><th>إجراءات</th></tr></thead>
-        <tbody id="usersTable"></tbody></table>
+      <div class="panel"><div class="ph"><h3>قائمة المستخدمين</h3></div><div class="pb">
+        <input class="inp" id="userSearch" placeholder="🔍 بحث بالاسم أو البريد..." oninput="filterUsers(this.value)" style="max-width:340px;margin-bottom:10px">
+        <div class="tw"><table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>الكروت</th><th>إجراءات</th></tr></thead>
+        <tbody id="usersTable"></tbody></table></div>
       </div></div></div>
     </div>
 
@@ -469,9 +476,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button class="b5" id="filterSales" onclick="filterStatement('sales')" style="padding:6px 14px">🛒 المشتريات</button>
         <button class="b5" id="filterRc" onclick="filterStatement('rc')" style="padding:6px 14px">💳 الشحن</button>
       </div>
-      <div class="panel"><div class="pb"><div class="tw">
-        <table><thead><tr><th>#</th><th>المستخدم</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
-        <tbody id="salesTable"></tbody></table>
+      <div class="panel"><div class="pb">
+        <input class="inp" id="salesSearch" placeholder="🔍 بحث بالمستخدم أو النوع..." oninput="filterSales(this.value)" style="max-width:340px;margin-bottom:10px">
+        <div class="tw"><table><thead><tr><th>#</th><th>المستخدم</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
+        <tbody id="salesTable"></tbody></table></div>
       </div></div></div>
     </div>
 
@@ -480,6 +488,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div style="display:grid;grid-template-columns:260px 1fr;gap:14px;height:calc(100vh - 180px)">
         <div class="panel" style="overflow-y:auto;margin-bottom:0">
           <div class="ph"><h3>المحادثات</h3></div>
+          <div style="padding:8px 8px 0">
+            <input class="inp" id="convSearch" placeholder="🔍 بحث في المحادثات..." oninput="filterConvs(this.value)" style="margin-bottom:8px;font-size:13px">
+          </div>
           <div id="adminConvList" style="padding:8px"></div>
         </div>
         <div class="panel" style="display:flex;flex-direction:column;margin-bottom:0;overflow:hidden">
@@ -638,8 +649,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div></div>
       <div class="panel"><div class="ph"><h3>سجل التحويلات</h3><button class="b5" onclick="loadAdminTransfers()">🔄 تحديث</button></div><div class="pb"><div class="tw">
         <table><thead><tr><th>#</th><th>من</th><th>إلى</th><th>المبلغ</th><th>التاريخ</th><th>نوع</th></tr></thead>
-        <tbody id="transfersTable"></tbody></table>
-      </div></div></div>
+        <tbody id="transfersTable"></tbody></table></div>
+      </div></div>
     </div>
 
 </div><!-- admin-main -->
@@ -805,6 +816,9 @@ const au  = firebase.auth();
 const st  = firebase.storage();
 const TS  = () => firebase.firestore.FieldValue.serverTimestamp();
 const col = n     => db.collection(n);
+// تاريخ من السيرفر (يمنع التلاعب)
+function serverNow(){ return new Date(Date.now()+(window._serverOffset||0)); }
+function serverDate(){ return serverNow().toLocaleString('ar-YE'); }
 const doc = (c,i) => db.collection(c).doc(i);
 
 // ═══════════════════════════════════════════════
@@ -1129,7 +1143,7 @@ function updateBal(){const b=S.user?.balance||0;const h=$('hBal'),u=$('uBal');if
 
 function getOffer(catId){
   // استخدام وقت السيرفر لمنع التلاعب بالتاريخ
-  const now=window._serverNow ? new Date(window._serverNow) : new Date();
+  const now=serverNow();
   now.setHours(0,0,0,0);
   return S.offers.find(o=>{
     if(!o.active)return false;
@@ -1183,7 +1197,7 @@ async function confirmBuy(){
   if((S.user.balance||0)<price){toast('رصيدك غير كافٍ','err');closeOv('buyModal');return;}
   const card=S.cards.find(c=>c.cat===S.selCat&&c.status==='available');if(!card){toast('لا توجد كروت متاحة','err');closeOv('buyModal');return;}
   S.user.balance-=price;card.status='sold';
-  const now=new Date().toLocaleString('ar-YE');
+  const now=serverDate();
   let freeCard=null,bonusMsg='';
   if(o){
     if(o.type==='free_card'){freeCard=S.cards.find(c=>c.cat===o.freeCat&&c.status==='available'&&c.fbId!==card.fbId);if(freeCard)freeCard.status='sold';}
@@ -1252,7 +1266,7 @@ async function submitRc(){
   if(!S.user){toast('يرجى تسجيل الدخول','err');return;}
   if(btn){btn.disabled=true;btn.textContent='⏳ جاري الإرسال...';}
   try{
-    await col('rechargeRequests').add({user:S.user.name||S.user.username||S.user.email||'مستخدم',userId:S.user.fbId,amount:amt,receiptImg:S.rcB64,date:new Date().toLocaleString('ar-YE'),status:'pending',createdAt:TS()});
+    await col('rechargeRequests').add({user:S.user.name||S.user.username||S.user.email||'مستخدم',userId:S.user.fbId,amount:amt,receiptImg:S.rcB64,date:serverDate(),status:'pending',createdAt:TS()});
     const match=(S.rcOffers||[]).filter(o=>o.active&&amt>=(o.minAmt||0)).sort((a,b)=>b.bonus-a.bonus)[0];
     closeOv('rcModal');resetRc();$('rcAmt').value='';
     toast('✅ تم إرسال طلب الشحن — سيتم المراجعة قريباً','ok');
@@ -1846,7 +1860,7 @@ async function manRc(){
   if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
   const u=S.users.find(x=>x.fbId===uid);if(!u)return;
   const newBal=(u.balance||0)+amt;
-  const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'شحن من الإدارة',ts:Date.now()};
+  const entry={amount:amt,date:serverDate(),note:'شحن من الإدارة',ts:Date.now()};
   // Save balance + log entry
   const prev=(u.manualRecharges||[]);
   await col('users').doc(uid).update({
@@ -2081,7 +2095,7 @@ async function downloadPDF(uid){
   const all=[
     ...userSales.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'🛒 شراء — '+x.catName,code:x.code||'',amount:-(x.price||0)})),
     ...userRc.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'💳 شحن رصيد',code:'',amount:+(x.amount||0)})),
-    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:(x.type==='deduct'?'➖ ':''+(x.note||'شحن من الإدارة')),code:'',amount:x.amount||0})),
+    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:(x.note||'عملية يدوية'),code:'',amount:x.amount||0})),
     ...rcvTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📥 تحويل من '+x.fromName+(x.byAdmin?' (إدارة)':''),code:'',amount:+(x.amount||0)})),
     ...sentTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📤 تحويل إلى '+x.toName+(x.byAdmin?' (إدارة)':''),code:'',amount:-(x.amount||0)}))
   ].sort((a,b)=>a.ts-b.ts);
@@ -2365,15 +2379,19 @@ async function addSliderItemVideo(input){
 // Load settings + server time before auth
 (async()=>{
   try{const s=await doc('settings','main').get();if(s.exists){Object.assign(S.cfg,s.data());applySettings();}}catch(e){}
-  // جلب وقت السيرفر لمنع التلاعب بالتواريخ والعروض
-  try{
-    const ref=col('_ping').doc('ts');
-    await ref.set({t:TS()});
-    const snap=await ref.get();
-    const st=snap.data()?.t?.toDate?.();
-    if(st) window._serverNow=st.getTime();
-    else window._serverNow=Date.now();
-  }catch(e){window._serverNow=Date.now();}
+  // جلب وقت السيرفر — يُحدَّث كل 5 دقائق
+  async function refreshServerTime(){
+    try{
+      const ref=col('_ping').doc('ts');
+      await ref.set({t:TS()});
+      const snap=await ref.get();
+      const st=snap.data()?.t?.toDate?.();
+      if(st){ window._serverNow=st.getTime(); window._serverOffset=st.getTime()-Date.now(); }
+    }catch(e){ window._serverOffset=0; }
+  }
+  window._serverOffset=0;
+  await refreshServerTime();
+  setInterval(refreshServerTime, 5*60*1000); // تحديث كل 5 دقائق
   loadRem();
 })();
 </script>
@@ -2480,7 +2498,64 @@ window.initUser = function(){
   loadNotifs();
 };
 
-// ── Fix initAdmin to add transfer selects ──
+// ── SEARCH/FILTER FUNCTIONS ──
+
+// Filter users table
+function filterUsers(q){
+  const rows=$('usersTable')?.querySelectorAll('tr')||[];
+  const lq=q.toLowerCase();
+  rows.forEach(row=>{
+    const text=row.textContent.toLowerCase();
+    row.style.display=(!q||text.includes(lq))?'':'none';
+  });
+}
+
+// Filter users in select dropdowns (for addBal, manRc, transfers)
+function searchUserSelect(searchId, selectId, q){
+  const sel=$(selectId);if(!sel)return;
+  const lq=q.toLowerCase();
+  const opts=S.users?.filter(u=>{
+    const t=(u.name||u.username||u.email||'').toLowerCase();
+    return !lq||t.includes(lq);
+  })||[];
+  sel.innerHTML='<option value="">— اختر —</option>'+opts.map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
+}
+
+// Filter sales table
+function filterSales(q){
+  const rows=$('salesTable')?.querySelectorAll('tr')||[];
+  const lq=q.toLowerCase();
+  rows.forEach(row=>{
+    row.style.display=(!q||row.textContent.toLowerCase().includes(lq))?'':'none';
+  });
+}
+
+// Filter transfers table
+function filterTransfers(q){
+  const rows=$('transfersTable')?.querySelectorAll('tr')||[];
+  const lq=q.toLowerCase();
+  rows.forEach(row=>{
+    row.style.display=(!q||row.textContent.toLowerCase().includes(lq))?'':'none';
+  });
+}
+
+// Filter conversations (support)
+function filterConvs(q){
+  const items=$('adminConvList')?.querySelectorAll('.conv-item')||[];
+  const lq=q.toLowerCase();
+  items.forEach(item=>{
+    item.style.display=(!q||item.textContent.toLowerCase().includes(lq))?'':'none';
+  });
+}
+
+// Also override popTransferSelects/popSelects to include search-friendly selects
+const _origPopTransferSelects=window.popTransferSelects;
+window.popTransferSelects=function(){
+  _origPopTransferSelects&&_origPopTransferSelects();
+  // Also update trFromUser/trToUser in admin transfers section
+  const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
+  ['trFromUser','trToUser'].forEach(id=>{const e=$(id);if(e)e.innerHTML=opts;});
+};
 const _origInitAdmin2 = window.initAdmin;
 window.initAdmin = function(){
   _origInitAdmin2 && _origInitAdmin2();
@@ -2579,7 +2654,7 @@ async function clearNotifs(){
   $('notifList').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد إشعارات</div>';
 }
 async function pushNotif(uid,type,title,body){
-  try{await col('notifications').add({uid,type,title,body,date:new Date().toLocaleString('ar-YE'),ts:Date.now(),read:false,createdAt:TS()});}catch(e){}
+  try{await col('notifications').add({uid,type,title,body,date:serverDate(),ts:Date.now(),read:false,createdAt:TS()});}catch(e){}
 }
 
 // ── Server timestamp (يمنع التلاعب بالتاريخ) ──
@@ -2591,7 +2666,7 @@ async function getServerDate(){
     const st=snap.data()?.t?.toDate?.();
     if(st) return st.toLocaleString('ar-YE');
   }catch(e){}
-  return new Date().toLocaleString('ar-YE');
+  return serverDate();
 }
 
 // ── Fix addBal to log in manualRecharges ──
@@ -2745,7 +2820,7 @@ async function trConfirm(){
   const amt=parseInt($('trAmountInput')?.value);
   if(!amt||amt>(S.user?.balance||0)){toast('مبلغ غير صحيح أو رصيد غير كافٍ','err');return;}
   const btn=$('trActionBtn');if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
-  const now=new Date().toLocaleString('ar-YE');
+  const now=serverDate();
   try{
     const newFrom=(S.user.balance||0)-amt;
     const toSnap=await col('users').doc(_trTarget.fbId).get();
@@ -2814,7 +2889,7 @@ async function adminTransfer(){
   const fu=S.users?.find(u=>u.fbId===fid),tu=S.users?.find(u=>u.fbId===tid);
   if(!fu||!tu)return;
   if((fu.balance||0)<amt){toast(`رصيد ${fu.name||fu.username} غير كافٍ`,'err');return;}
-  const now=new Date().toLocaleString('ar-YE');
+  const now=serverDate();
   try{
     await col('users').doc(fid).update({balance:(fu.balance||0)-amt});
     await col('users').doc(tid).update({balance:(tu.balance||0)+amt});
