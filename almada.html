@@ -266,6 +266,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="bal-pill">💰 <span id="hBal">0</span> <span class="cur">ر.ي</span></div>
+      <button class="hbtn" onclick="openNotifs()" style="position:relative">
+        🔔 <span id="notifCount" style="position:absolute;top:-4px;right:-4px;background:var(--err);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:700">0</span>
+      </button>
       <button class="hbtn sup" onclick="openSup()">💬 الدعم<span class="ndot" id="supDot"></span></button>
       <button class="hbtn" onclick="doLogout()">خروج</button>
     </div>
@@ -325,6 +328,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="nav-item" onclick="nav('rc')">💳 طلبات الشحن <span class="nb" id="nbRc">0</span></button>
       <button class="nav-item" onclick="nav('users')">👥 المستخدمون</button>
       <button class="nav-item" onclick="nav('sales')">📋 المبيعات</button>
+      <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>
       <button class="nav-item" onclick="nav('sup')">💬 الدعم <span class="nb" id="nbSup">0</span></button>
       <button class="nav-item" onclick="nav('ads')">📢 الإعلانات</button>
       <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>    </nav>
@@ -468,7 +472,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div></div></div>
     </div>
 
-    <div class="adm-sec" id="sec-sup">
+    <div class="adm-sec" id="sec-transfers">
+      <div class="adm-hdr"><h2>💸 التحويلات بين المستخدمين</h2></div>
+      <div class="panel"><div class="ph"><h3>تحويل يدوي</h3></div><div class="pb">
+        <div style="display:grid;grid-template-columns:1fr 1fr 120px;gap:12px;margin-bottom:12px;align-items:end">
+          <div><label class="fl">من</label><select class="sel" id="trFromUser"></select></div>
+          <div><label class="fl">إلى</label><select class="sel" id="trToUser"></select></div>
+          <div><label class="fl">المبلغ</label><input class="inp" type="number" id="trAmt" placeholder="500"></div>
+        </div>
+        <button class="b2" onclick="adminTransfer()">💸 تحويل</button>
+      </div></div>
+      <div class="panel"><div class="ph"><h3>سجل التحويلات</h3><button class="b5" onclick="loadAdminTransfers()">🔄 تحديث</button></div>
+        <div class="pb"><div class="tw">
+          <table><thead><tr><th>#</th><th>من</th><th>إلى</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
+          <tbody id="transfersTable"></tbody></table>
+        </div></div>
+      </div>
+    </div>
       <div class="adm-hdr"><h2>💬 الدعم الفني</h2></div>
       <div style="display:grid;grid-template-columns:260px 1fr;gap:14px;height:calc(100vh - 180px)">
         <div class="panel" style="overflow-y:auto;margin-bottom:0">
@@ -788,6 +808,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="mcancel" onclick="closeOv('transferModal');$('transferConfirmBox').style.display='none'">إلغاء</button>
       <button class="mok" id="transferBtn" onclick="doTransfer()">🔍 بحث عن المستخدم</button>
     </div>
+  </div>
+</div>
+
+<!-- Notifications Overlay -->
+<div class="ov" id="notifModal">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h3 style="margin:0">🔔 الإشعارات</h3>
+      <button onclick="clearNotifs()" style="background:none;border:1px solid var(--brd);border-radius:8px;padding:4px 10px;color:var(--t2);cursor:pointer;font-size:12px;font-family:var(--ff)">مسح الكل</button>
+    </div>
+    <div id="notifList" style="max-height:400px;overflow-y:auto"></div>
+    <button class="mok" style="width:100%;margin-top:14px" onclick="closeOv('notifModal')">إغلاق</button>
   </div>
 </div>
 
@@ -1126,9 +1158,11 @@ async function saveAd(){
 // USER PAGE
 // ═══════════════════════════════════════════════
 function initUser(){
-  _salesPage=0;_rcPage=0;
-  updateBal();renderGrid();renderHist();applySettings();
-  initSlider();
+  _salesPage=0; _rcPage=0;
+  S.notifs=S.notifs||[];
+  updateBal();renderGrid();renderHist();applySettings();initSlider();
+  // Load notifications
+  loadNotifs();
 }
 function updateBal(){const b=S.user?.balance||0;const h=$('hBal'),u=$('uBal');if(h)h.textContent=b.toLocaleString();if(u)u.textContent=b.toLocaleString();}
 
@@ -1746,7 +1780,7 @@ async function delUserMsg(uid,idx){
 // ═══════════════════════════════════════════════
 function initAdmin(){
   $('todayDate').textContent=new Date().toLocaleDateString('ar-YE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  refreshStats();renderRcList();renderUsersTable();renderSalesTable();renderCardsTable();renderCatsAdmin();renderOffersAdmin();renderRcOffers();renderConvList();renderPopAds();renderSliderAdmin();popSelects();applySettings();
+  refreshStats();renderRcList();renderUsersTable();renderSalesTable();renderCardsTable();renderCatsAdmin();renderOffersAdmin();renderRcOffers();renderConvList();renderPopAds();renderSliderAdmin();popSelects();popTransferSelects();applySettings();
   loadAllChats();
 }
 
@@ -1863,6 +1897,10 @@ async function approveRc(id){
       await col('users').doc(req.userId).update({balance:newBal});
       const lu=S.users.find(u=>u.fbId===req.userId);if(lu)lu.balance=newBal;
       if(S.user?.fbId===req.userId){S.user.balance=newBal;updateBal();}
+      // Notification
+      const notifBody=bonus?`تم شحن ${req.amount.toLocaleString()} + ${bonus.toLocaleString()} هدية = ${(req.amount+bonus).toLocaleString()} ${S.cfg.currency||'ر.ي'}`:
+        `تم شحن ${req.amount.toLocaleString()} ${S.cfg.currency||'ر.ي'} لحسابك`;
+      await addNotif(req.userId,{type:'recharge',title:'💳 تم قبول طلب الشحن',body:notifBody,date:new Date().toLocaleString('ar-YE'),ts:Date.now()});
       toast(bonus?`✅ تم الشحن + ${bonus.toLocaleString()} هدية لـ ${req.user}`:`✅ تم شحن ${req.amount.toLocaleString()} ريال لـ ${req.user}`,'ok');
     }
     req.status='approved';await col('rechargeRequests').doc(id).update({status:'approved'});renderRcList();renderUsersTable();refreshStats();
@@ -1877,13 +1915,11 @@ async function manRc(){
   const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'شحن من الإدارة',ts:Date.now()};
   // Save balance + log entry
   const prev=(u.manualRecharges||[]);
-  await col('users').doc(uid).update({
-    balance:newBal,
-    manualRecharges:[...prev,entry]
-  });
-  u.balance=newBal;
-  u.manualRecharges=[...prev,entry];
+  await col('users').doc(uid).update({balance:newBal,manualRecharges:[...prev,entry]});
+  u.balance=newBal; u.manualRecharges=[...prev,entry];
   if(S.user?.fbId===uid){S.user.balance=newBal;updateBal();}
+  // Notify user
+  await addNotif(uid,{type:'gift',title:'🎁 هدية من الإدارة',body:`تم إضافة ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} لحسابك كهدية من الإدارة`,date:entry.date,ts:entry.ts});
   $('manAmt').value='';
   toast(`✅ تم شحن ${amt.toLocaleString()} ريال 🎁 هدية من الإدارة`,'ok');
   renderUsersTable();refreshStats();
@@ -2041,24 +2077,6 @@ function switchHistTab(tab){
   $('rcHistDiv').style.display=tab==='rc'?'block':'none';
 }
 
-function renderRcHist(){
-  const list=$('rcHistList');if(!list)return;
-  const uid=S.user?.fbId;if(!uid)return;
-  // Get approved recharge requests for this user from state
-  const myRc=(S.reqs||[]).filter(r=>r.userId===uid&&r.status==='approved');
-  if(!myRc.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
-  list.innerHTML=myRc.slice().reverse().map(r=>`
-    <div class="hi">
-      <div style="display:flex;align-items:center;gap:10px;flex:1">
-        <div style="width:36px;height:36px;background:rgba(0,214,143,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">💳</div>
-        <div>
-          <div style="font-size:13px;font-weight:600">شحن رصيد</div>
-          <div style="font-size:11px;color:var(--t2)">${r.date}</div>
-        </div>
-      </div>
-      <div style="font-size:14px;font-weight:700;color:var(--ok)">+${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span></div>
-    </div>`).join('');
-}
 
 // ── EDIT OFFER ──
 function editOffer(id){
@@ -2473,6 +2491,19 @@ async function confirmTransfer(){
     };
     await col('transfers').add(transferLog);
 
+    // Notify receiver
+    await addNotif(_transferTarget.fbId,{
+      type:'transfer_in', title:'💸 استلمت تحويلاً',
+      body:`استلمت ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} من ${S.user.name||S.user.username}`,
+      date:now, ts:Date.now()
+    });
+    // Notify sender (self)
+    await addNotif(S.user.fbId,{
+      type:'transfer_out', title:'💸 تم التحويل',
+      body:`أرسلت ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} إلى ${_transferTarget.name}`,
+      date:now, ts:Date.now()
+    });
+
     // Update local state
     S.user.balance = newSenderBal;
     updateBal();
@@ -2486,6 +2517,132 @@ async function confirmTransfer(){
     $('transferBtn').disabled = false;
     $('transferBtn').textContent = '✅ تأكيد التحويل';
   }
+}
+
+// ══════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════
+async function addNotif(uid, notif){
+  // notif = {type, title, body, ts}
+  try{
+    await col('notifications').add({uid, ...notif, read:false, createdAt:TS()});
+  }catch(e){console.error('notif:',e);}
+}
+
+async function loadNotifs(){
+  const uid=S.user?.fbId; if(!uid) return;
+  try{
+    const snap=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));
+    const notifs=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    S.notifs=notifs;
+    updateNotifBadge();
+  }catch(e){}
+}
+
+function updateNotifBadge(){
+  const unread=(S.notifs||[]).filter(n=>!n.read).length;
+  const cnt=$('notifCount');
+  if(cnt){
+    cnt.textContent=unread;
+    cnt.style.display=unread>0?'flex':'none';
+  }
+}
+
+function openNotifs(){
+  const list=$('notifList');
+  if(!list) return;
+  const notifs=S.notifs||[];
+  // Mark all as read
+  (S.notifs||[]).forEach(n=>{
+    if(!n.read && n.fbId){
+      n.read=true;
+      col('notifications').doc(n.fbId).update({read:true}).catch(()=>{});
+    }
+  });
+  updateNotifBadge();
+  if(!notifs.length){
+    list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد إشعارات</div>';
+  } else {
+    const iconMap={recharge:'💳',transfer_in:'💸',transfer_out:'💸',support:'💬',gift:'🎁',system:'📢'};
+    list.innerHTML=notifs.map(n=>`
+      <div style="padding:11px 4px;border-bottom:1px solid var(--brd);display:flex;gap:10px;align-items:flex-start;opacity:${n.read?'0.6':'1'}">
+        <div style="width:34px;height:34px;background:var(--bg2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${iconMap[n.type]||'🔔'}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">${n.title||''}</div>
+          <div style="font-size:12px;color:var(--t2);margin-top:2px">${n.body||''}</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px">${n.date||''}</div>
+        </div>
+        ${!n.read?'<div style="width:8px;height:8px;background:var(--p);border-radius:50%;flex-shrink:0;margin-top:5px"></div>':''}
+      </div>`).join('');
+  }
+  openOv('notifModal');
+}
+
+async function clearNotifs(){
+  const uid=S.user?.fbId; if(!uid) return;
+  try{
+    const snap=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));
+    for(const d of snap.docs) await d.ref.delete();
+    S.notifs=[];
+    updateNotifBadge();
+    $('notifList').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد إشعارات</div>';
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════
+// ADMIN TRANSFERS
+// ══════════════════════════════════════════
+async function loadAdminTransfers(){
+  const tb=$('transfersTable');if(!tb)return;
+  tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t2)">⏳ جاري التحميل...</td></tr>';
+  try{
+    const snap=await col('transfers').get().catch(()=>({docs:[]}));
+    const transfers=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if(!transfers.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا توجد تحويلات</td></tr>';return;}
+    tb.innerHTML=transfers.map((t,i)=>`<tr>
+      <td>${i+1}</td>
+      <td style="color:var(--err);font-weight:600">${t.fromName||t.fromId}</td>
+      <td style="color:var(--ok);font-weight:600">${t.toName||t.toId}</td>
+      <td style="font-weight:700">${(t.amount||0).toLocaleString()} <span class="cur">ر.ي</span></td>
+      <td style="font-size:11px;color:var(--t2)">${t.date||''}</td>
+    </tr>`).join('');
+  }catch(e){tb.innerHTML=`<tr><td colspan="5" style="color:var(--err)">خطأ: ${e.message}</td></tr>`;}
+}
+
+// Populate transfers user selects
+function popTransferSelects(){
+  const opts='<option value="">— اختر —</option>'+S.users.map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
+  ['trFromUser','trToUser'].forEach(id=>{const e=$(id);if(e)e.innerHTML=opts;});
+}
+
+async function adminTransfer(){
+  const fromId=$('trFromUser').value, toId=$('trToUser').value, amt=parseInt($('trAmt').value);
+  if(!fromId||!toId){toast('اختر المستخدمين','err');return;}
+  if(fromId===toId){toast('لا يمكن التحويل لنفس المستخدم','err');return;}
+  if(!amt||amt<1){toast('أدخل مبلغاً صحيحاً','err');return;}
+  const fromUser=S.users.find(u=>u.fbId===fromId);
+  const toUser=S.users.find(u=>u.fbId===toId);
+  if(!fromUser||!toUser)return;
+  if((fromUser.balance||0)<amt){toast(`رصيد ${fromUser.name||fromUser.username} غير كافٍ`,'err');return;}
+  const now=new Date().toLocaleString('ar-YE');
+  try{
+    // Update balances
+    const newFrom=(fromUser.balance||0)-amt;
+    const newTo=(toUser.balance||0)+amt;
+    await col('users').doc(fromId).update({balance:newFrom});
+    await col('users').doc(toId).update({balance:newTo});
+    fromUser.balance=newFrom; toUser.balance=newTo;
+    // Log
+    const log={fromId,fromName:fromUser.name||fromUser.username,toId,toName:toUser.name||toUser.username,amount:amt,date:now,ts:Date.now(),byAdmin:true,createdAt:TS()};
+    await col('transfers').add(log);
+    // Notify both
+    const notifData={date:now,ts:Date.now()};
+    await addNotif(fromId,{...notifData,type:'transfer_out',title:'💸 تم تحويل رصيد',body:`تم خصم ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} من حسابك وتحويلها إلى ${toUser.name||toUser.username} بواسطة الإدارة`});
+    await addNotif(toId,{...notifData,type:'transfer_in',title:'💸 استلمت تحويلاً',body:`استلمت ${amt.toLocaleString()} ${S.cfg.currency||'ر.ي'} من ${fromUser.name||fromUser.username} بواسطة الإدارة`});
+    $('trAmt').value='';
+    toast(`✅ تم تحويل ${amt.toLocaleString()} من ${fromUser.name||fromUser.username} إلى ${toUser.name||toUser.username}`,'ok');
+    renderUsersTable();loadAdminTransfers();refreshStats();
+  }catch(e){toast('خطأ: '+e.message,'err');}
 }
 
 // ═══════════════════════════════════════════════
