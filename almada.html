@@ -15,10 +15,84 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-<style>/* ─ Sidebar & Admin Layout ─ */
-.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:200;overflow-y:auto}
-.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
+<style>
+:root{
+  --p:#00c6ff;--pd:#0072ff;--acc:#ff6b35;--ok:#00d68f;
+  --warn:#ffaa00;--err:#ff3d71;--bg:#070b14;--bg2:#0d1424;--bg3:#111827;
+  --card:#131d2e;--card2:#1a2540;--brd:rgba(0,198,255,.12);
+  --txt:#e8edf5;--t2:#7a8ba8;--t3:#4a5a72;--r:16px;--ff:'Tajawal',sans-serif
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+.pg{display:none;min-height:100vh}.pg.on{display:block}
+#authPg.on{display:flex;align-items:center;justify-content:center}
 #adminPg.on{display:flex}
+
+/* ─ AUTH ─ */
+.auth-bg{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,114,255,.15),transparent 60%);pointer-events:none}
+.auth-box{position:relative;width:420px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--brd);border-radius:24px;padding:36px;box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 60px rgba(0,114,255,.08);animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.logo-box{width:70px;height:70px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;box-shadow:0 0 30px rgba(0,198,255,.3)}
+.logo-box img{width:100%;height:100%;object-fit:cover}
+.tabs{display:flex;background:var(--bg2);border-radius:10px;padding:4px;gap:4px;margin:20px 0}
+.tab{flex:1;padding:9px;text-align:center;font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;color:var(--t2);border:none;background:transparent;font-family:var(--ff);transition:all .2s}
+.tab.on{background:var(--pd);color:#fff}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:12px;color:var(--t2);margin-bottom:5px;font-weight:500}
+.inp,.sel,.ta{width:100%;background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--txt);font-family:var(--ff);outline:none;transition:border-color .2s}
+.inp:focus,.sel:focus{border-color:var(--p)}.inp::placeholder{color:var(--t3)}.sel{cursor:pointer}
+.pw{position:relative}.pw .inp{padding-left:40px}
+.eye{position:absolute;left:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;color:var(--t3)}
+.rem-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:var(--t2);cursor:pointer}
+.rem-row input{width:16px;height:16px;accent-color:var(--p)}
+.btn-main{width:100%;padding:13px;background:linear-gradient(135deg,var(--pd),var(--p));border:none;border-radius:11px;color:#fff;font-size:15px;font-weight:600;font-family:var(--ff);cursor:pointer;box-shadow:0 4px 20px rgba(0,114,255,.3);transition:opacity .2s}
+.btn-main:hover{opacity:.9}.hint{font-size:11px;color:var(--t2);margin-top:5px;line-height:1.6}
+
+/* ─ USER ─ */
+.u-hdr{background:var(--card);border-bottom:1px solid var(--brd);height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.h-logo{display:flex;align-items:center;gap:9px}
+.h-icon{width:35px;height:35px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0}
+.h-icon img{width:100%;height:100%;object-fit:cover}
+.bal-pill{background:var(--bg2);border:1px solid var(--brd);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--p)}
+.hbtn{background:transparent;border:1px solid var(--brd);border-radius:8px;padding:5px 10px;color:var(--t2);font-size:12px;font-family:var(--ff);cursor:pointer;position:relative;white-space:nowrap}
+.hbtn.sup{border-color:var(--p);color:var(--p)}
+.ndot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:var(--err);border-radius:50%;border:2px solid var(--bg);display:none}
+.u-body{padding:16px;max-width:560px;margin:0 auto}
+
+/* Balance card */
+.bal-card{background:linear-gradient(135deg,var(--pd),#005bbf 50%,var(--p));border-radius:20px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(0,114,255,.3)}
+.bal-lbl{font-size:12px;opacity:.8;margin-bottom:4px}
+.bal-amt{font-size:36px;font-weight:900}
+.bal-row{display:flex;gap:9px;margin-top:16px}
+.rc-btn{flex:1;padding:9px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;color:#fff;font-size:12px;font-weight:600;font-family:var(--ff);cursor:pointer;backdrop-filter:blur(10px)}
+
+/* Cards */
+.sec-ttl{font-size:15px;font-weight:700;margin-bottom:12px}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;margin-bottom:18px}
+.ci{background:var(--card);border:2px solid var(--brd);border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:visible}
+.ci:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,198,255,.15)}
+.ci.sel{border-color:var(--p);background:rgba(0,114,255,.1)}
+.ci.has-offer{border-color:var(--acc)!important;box-shadow:0 0 22px rgba(255,107,53,.2)!important}
+.offer-tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.cp{font-size:20px;font-weight:900;background:linear-gradient(135deg,var(--pd),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cp.disc{background:linear-gradient(135deg,var(--ok),#00a86b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cp-old{font-size:11px;color:var(--t3);text-decoration:line-through;margin-bottom:2px}
+.cp-cur{font-size:10px;color:var(--t2);margin-top:2px}
+.cp-cnt{font-size:10px;margin-top:5px;background:var(--bg2);border-radius:20px;padding:2px 7px;display:inline-block}
+.btn-buy{width:100%;padding:14px;background:linear-gradient(135deg,var(--acc),#e05500);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:var(--ff);cursor:pointer;margin-bottom:20px;box-shadow:0 4px 20px rgba(255,107,53,.35);transition:all .2s}
+.btn-buy:disabled{opacity:.4;cursor:not-allowed}
+
+/* History */
+.hist-list{display:flex;flex-direction:column;gap:9px}
+.hi{background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between}
+.hi-code{font-size:11px;color:var(--t2);direction:ltr;background:var(--bg2);border-radius:6px;padding:2px 7px;margin-top:3px;cursor:pointer;display:inline-block}
+.hi-code:hover{color:var(--p)}
+
+/* Banner */
+.banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+
+/* ─ ADMIN ─ */
+.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100;overflow-y:auto}
 .sb-logo{padding:18px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0}
 .sb-icon img{width:100%;height:100%;object-fit:cover}
@@ -26,15 +100,7 @@
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .2s;border:none;background:transparent;font-family:var(--ff);width:100%;text-align:right}
 .nav-item:hover{background:var(--bg2);color:var(--txt)}.nav-item.on{background:rgba(0,114,255,.15);color:var(--p)}
 .nb{margin-right:auto;background:var(--err);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;display:none}.nb.on{display:inline}
-/* Mobile sidebar */
-.sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
-.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
-@media(max-width:768px){
-  .sb{display:none!important}.sb.open{display:flex!important}
-  .sb-dim.on{display:block}.sb-menu-btn{display:flex!important}
-  .adm-main{margin-right:0!important;padding:14px;padding-top:58px}
-  .stats-row{grid-template-columns:repeat(2,1fr)!important}
-}
+.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
 .adm-sec{display:none}.adm-sec.on{display:block}
 .adm-hdr{margin-bottom:20px}.adm-hdr h2{font-size:20px;font-weight:700}.adm-hdr p{font-size:12px;color:var(--t2);margin-top:3px}
 
@@ -200,8 +266,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="bal-pill">💰 <span id="hBal">0</span> <span class="cur">ر.ي</span></div>
-      <button class="hbtn" onclick="openNotifs()" style="position:relative;font-size:16px">🔔<span id="notifBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--err);color:#fff;border-radius:50%;width:17px;height:17px;font-size:10px;font-weight:700;align-items:center;justify-content:center;line-height:17px;text-align:center">0</span></button>
-      <button onclick="openProfile()" style="background:transparent;border:2px solid var(--brd);border-radius:50%;width:34px;height:34px;padding:0;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><img id="uAvatarH" src="" style="width:100%;height:100%;object-fit:cover;display:none"><span id="uAvatarE" style="font-size:16px">👤</span></button>
       <button class="hbtn sup" onclick="openSup()">💬 الدعم<span class="ndot" id="supDot"></span></button>
       <button class="hbtn" onclick="doLogout()">خروج</button>
     </div>
@@ -222,8 +286,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="bal-amt"><span class="cur">ر.ي</span> <span id="uBal">0</span></div>
       <div class="bal-row">
         <button class="rc-btn" onclick="openRcModal()" id="btnRC">+ شحن رصيد</button>
-        <button class="rc-btn" onclick="openTransferModal()">💸 تحويل</button>
-        <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 السجل</button>
+        <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 سجل العمليات</button>
       </div>
     </div>
     <div class="sec-ttl" id="lblCards">اختر فئة الكرت</div>
@@ -232,9 +295,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="histSec">
       <!-- Tabs -->
       <div style="display:flex;background:var(--bg2);border-radius:10px;padding:4px;gap:4px;margin-bottom:14px">
-        <button class="tab on" id="tabSales" onclick="switchHistTab('sales')" style="flex:1;padding:8px;font-size:12px">🛒 الشراء</button>
-        <button class="tab" id="tabRc" onclick="switchHistTab('rc')" style="flex:1;padding:8px;font-size:12px">💳 الشحن</button>
-        <button class="tab" id="tabTr" onclick="switchHistTab('tr')" style="flex:1;padding:8px;font-size:12px">💸 التحويلات</button>
+        <button class="tab on" id="tabSales" onclick="switchHistTab('sales')" style="flex:1;padding:8px;font-size:13px">🛒 سجل الشراء</button>
+        <button class="tab" id="tabRc" onclick="switchHistTab('rc')" style="flex:1;padding:8px;font-size:13px">💳 سجل الشحن</button>
       </div>
       <!-- Sales list -->
       <div id="salesHistDiv">
@@ -242,10 +304,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <!-- Recharge list -->
       <div id="rcHistDiv" style="display:none">
-        <div class="hist-list" id="rcHistList"></div>
-      </div>
-      <div id="trHistDiv" style="display:none">
-        <div class="hist-list" id="trHistList"></div>
+        <div class="hist-list" id="rcHistList"><div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div></div>
       </div>
     </div>
   </div>
@@ -253,10 +312,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ══ ADMIN ══ -->
 <div id="adminPg" class="pg">
-<button class="sb-menu-btn" onclick="toggleSB()">☰</button>
-<div class="sb-dim" id="sbDim" onclick="closeSB()"></div>
-  <div class="sb" id="sbEl">
-    <button class="sb-toggle-btn" id="sbColBtn" onclick="toggleCollapse()">◀</button>
+  <div class="sb">
     <div class="sb-logo">
       <div class="sb-icon" id="sbIcon"><span id="sbEmoji">📡</span><img id="sbImg" src="" style="display:none"></div>
       <div><div style="font-size:14px;font-weight:700" id="sbName">المدى نت</div><div style="font-size:11px;color:var(--t2)">لوحة الإدارة</div></div>
@@ -268,7 +324,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="nav-item" onclick="nav('rc')">💳 طلبات الشحن <span class="nb" id="nbRc">0</span></button>
       <button class="nav-item" onclick="nav('users')">👥 المستخدمون</button>
       <button class="nav-item" onclick="nav('sales')">📋 المبيعات</button>
-      <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>
       <button class="nav-item" onclick="nav('sup')">💬 الدعم <span class="nb" id="nbSup">0</span></button>
       <button class="nav-item" onclick="nav('ads')">📢 الإعلانات</button>
       <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>    </nav>
@@ -374,10 +429,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="panel"><div class="ph"><h3>الطلبات المعلقة</h3></div><div class="pb" id="rcList"><p style="color:var(--t3);text-align:center">لا توجد طلبات</p></div></div>
       <div class="panel"><div class="ph"><h3>شحن يدوي مباشر</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label>
-            <input class="inp" id="manUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSelect('manUserSearch','manUser',this.value)" style="margin-bottom:4px">
-            <select class="sel" id="manUser"></select>
-          </div>
+          <div><label class="fl">المستخدم</label><select class="sel" id="manUser"></select></div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="manAmt" placeholder="5000"></div>
         </div>
         <button class="b2" onclick="manRc()">✅ شحن</button>
@@ -388,10 +440,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="adm-hdr"><h2>👥 المستخدمون</h2></div>
       <div class="panel"><div class="ph"><h3>إضافة رصيد</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label>
-            <input class="inp" id="addBalSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSelect('addBalSearch','addBalUser',this.value)" style="margin-bottom:4px">
-            <select class="sel" id="addBalUser"></select>
-          </div>
+          <div><label class="fl">المستخدم</label><select class="sel" id="addBalUser"></select></div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="addBalAmt" placeholder="5000"></div>
         </div>
         <div style="display:flex;gap:8px">
@@ -399,10 +448,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="b3" onclick="deductBal()">➖ خصم / تعيين رصيد</button>
         </div>
       </div></div>
-      <div class="panel"><div class="ph"><h3>قائمة المستخدمين</h3></div><div class="pb">
-        <input class="inp" id="userSearch" placeholder="🔍 بحث بالاسم أو البريد..." oninput="filterUsers(this.value)" style="max-width:340px;margin-bottom:10px">
-        <div class="tw"><table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>الكروت</th><th>إجراءات</th></tr></thead>
-        <tbody id="usersTable"></tbody></table></div>
+      <div class="panel"><div class="ph"><h3>قائمة المستخدمين</h3></div><div class="pb"><div class="tw">
+        <table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>الكروت</th><th>إجراءات</th></tr></thead>
+        <tbody id="usersTable"></tbody></table>
       </div></div></div>
     </div>
 
@@ -413,10 +461,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button class="b5" id="filterSales" onclick="filterStatement('sales')" style="padding:6px 14px">🛒 المشتريات</button>
         <button class="b5" id="filterRc" onclick="filterStatement('rc')" style="padding:6px 14px">💳 الشحن</button>
       </div>
-      <div class="panel"><div class="pb">
-        <input class="inp" id="salesSearch" placeholder="🔍 بحث بالمستخدم أو النوع..." oninput="filterSales(this.value)" style="max-width:340px;margin-bottom:10px">
-        <div class="tw"><table><thead><tr><th>#</th><th>المستخدم</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
-        <tbody id="salesTable"></tbody></table></div>
+      <div class="panel"><div class="pb"><div class="tw">
+        <table><thead><tr><th>#</th><th>المستخدم</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th><th>التاريخ</th></tr></thead>
+        <tbody id="salesTable"></tbody></table>
       </div></div></div>
     </div>
 
@@ -425,9 +472,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div style="display:grid;grid-template-columns:260px 1fr;gap:14px;height:calc(100vh - 180px)">
         <div class="panel" style="overflow-y:auto;margin-bottom:0">
           <div class="ph"><h3>المحادثات</h3></div>
-          <div style="padding:8px 8px 0">
-            <input class="inp" id="convSearch" placeholder="🔍 بحث في المحادثات..." oninput="filterConvs(this.value)" style="margin-bottom:8px;font-size:13px">
-          </div>
           <div id="adminConvList" style="padding:8px"></div>
         </div>
         <div class="panel" style="display:flex;flex-direction:column;margin-bottom:0;overflow:hidden">
@@ -572,27 +616,81 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     </div><!-- end sec-set -->
 
-
-    <!-- ── TRANSFERS ── -->
-    <div class="adm-sec" id="sec-transfers">
-      <div class="adm-hdr"><h2>💸 التحويلات بين المستخدمين</h2></div>
-      <div class="panel"><div class="ph"><h3>تحويل يدوي من الإدارة</h3></div><div class="pb">
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">من</label><select class="sel" id="trFromUser"></select></div>
-          <div><label class="fl">إلى</label><select class="sel" id="trToUser"></select></div>
-        </div>
-        <div style="margin-bottom:12px"><label class="fl">المبلغ</label><input class="inp" type="number" id="trAmt" placeholder="500" style="max-width:160px"></div>
-        <button class="b2" onclick="adminTransfer()">💸 تحويل</button>
-      </div></div>
-      <div class="panel"><div class="ph"><h3>سجل التحويلات</h3><button class="b5" onclick="loadAdminTransfers()">🔄 تحديث</button></div><div class="pb"><div class="tw">
-        <table><thead><tr><th>#</th><th>من</th><th>إلى</th><th>المبلغ</th><th>التاريخ</th><th>نوع</th></tr></thead>
-        <tbody id="transfersTable"></tbody></table></div>
-      </div></div>
-    </div>
-
 </div><!-- admin-main -->
 </div><!-- adminPg -->
 
+<!-- User Support Sheet -->
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <button class="b1" onclick="$('logoFile').click()">📁 رفع شعار</button>
+            <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="uploadLogo(this)">
+            <button class="b4" onclick="removeLogo()">✕ إزالة</button>
+          </div>
+          <div><label class="fl">لون خلفية الشعار</label><input type="color" id="logoBgClr" value="#0072ff" style="width:60px;height:34px;border:1px solid var(--brd);border-radius:8px;cursor:pointer;background:var(--bg2);padding:2px" oninput="applyLogoBg(this.value)"></div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">اسم الموقع</label><input class="inp" id="cf_siteName" value="المدى نت"></div>
+          <div><label class="fl">رمز احتياطي</label><input class="inp" id="cf_siteIcon" value="📡" style="max-width:80px"></div>
+        </div>
+        <div class="fr" style="margin-bottom:14px">
+          <div><label class="fl">وصف الموقع</label><input class="inp" id="cf_siteDesc" value="بوابة كروت الإنترنت"></div>
+          <div><label class="fl">رقم الجوال</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr"></div>
+        </div>
+        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
+      </div></div>
+
+      <div class="panel"><div class="ph" style="background:rgba(255,107,53,.05)"><h3>🎨 الألوان</h3></div><div class="pb">
+        <div class="cg">
+          <div><label>اللون الأساسي</label><input type="color" id="cl_p" value="#00c6ff" oninput="applyColor('--p',this.value)"></div>
+          <div><label>الأساسي الداكن</label><input type="color" id="cl_pd" value="#0072ff" oninput="applyColor('--pd',this.value)"></div>
+          <div><label>زر الشراء</label><input type="color" id="cl_acc" value="#ff6b35" oninput="applyColor('--acc',this.value)"></div>
+          <div><label>النجاح</label><input type="color" id="cl_ok" value="#00d68f" oninput="applyColor('--ok',this.value)"></div>
+          <div><label>الخلفية</label><input type="color" id="cl_bg" value="#070b14" oninput="applyColor('--bg',this.value)"></div>
+          <div><label>البطاقات</label><input type="color" id="cl_card" value="#131d2e" oninput="applyColor('--card',this.value)"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:9px">
+          <button class="b1" onclick="saveSettings()">💾 حفظ</button>
+          <button class="b4" onclick="resetColors()">↺ افتراضي</button>
+        </div>
+      </div></div>
+
+      <div class="panel"><div class="ph" style="background:rgba(0,214,143,.05)"><h3>📝 النصوص</h3></div><div class="pb">
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">عنوان قسم الكروت</label><input class="inp" id="cf_lblCards" value="اختر فئة الكرت"></div>
+          <div><label class="fl">عنوان السجل</label><input class="inp" id="cf_lblHist" value="آخر عمليات الشراء"></div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">تسمية الرصيد</label><input class="inp" id="cf_lblBal" value="رصيدك الحالي"></div>
+          <div><label class="fl">رمز العملة</label><input class="inp" id="cf_currency" value="ر.ي" style="max-width:90px"></div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">زر شحن الرصيد</label><input class="inp" id="cf_btnRC" value="+ شحن رصيد"></div>
+          <div><label class="fl">زر السجل</label><input class="inp" id="cf_btnHist" value="📋 سجل العمليات"></div>
+        </div>
+        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
+      </div></div>
+
+      <div class="panel"><div class="ph" style="background:rgba(0,198,255,.05)"><h3>🏦 بيانات البنك</h3></div><div class="pb">
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">اسم البنك</label><input class="inp" id="cf_bankName" value="بنك الكريمي"></div>
+          <div><label class="fl">رقم الحساب</label><input class="inp" id="cf_bankNum" value="777-XXXX-XXXX" style="direction:ltr"></div>
+        </div>
+        <div style="margin-bottom:12px"><label class="fl">اسم صاحب الحساب</label><input class="inp" id="cf_bankOwner" value="المدى نت"></div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">تسمية حقل البنك</label><input class="inp" id="cf_bankLbl1" value="البنك"></div>
+          <div><label class="fl">تسمية حقل رقم الحساب</label><input class="inp" id="cf_bankLbl2" value="رقم الحساب"></div>
+        </div>
+        <div style="margin-bottom:14px"><label class="fl">تسمية حقل اسم الحساب</label><input class="inp" id="cf_bankLbl3" value="اسم الحساب"></div>
+        <div style="margin-bottom:14px"><label class="fl">تعليمات الشحن</label><textarea class="inp ta" id="cf_bankInstr" style="min-height:70px;resize:vertical">حوّل المبلغ للحساب أعلاه ثم أرسل الإيصال.</textarea></div>
+        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
+      </div></div>
+
+      <div class="panel"><div class="ph" style="background:rgba(255,61,113,.05)"><h3>🔐 كلمة مرور لوحة التحكم</h3></div><div class="pb">
+        <div style="margin-bottom:12px"><label class="fl">الحالية</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apCur" placeholder="••••••••"><button class="eye" onclick="togglePw('apCur',this)" type="button">👁</button></div></div>
+        <div style="margin-bottom:12px"><label class="fl">الجديدة</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apNew" placeholder="••••••••"><button class="eye" onclick="togglePw('apNew',this)" type="button">👁</button></div></div>
+        <div style="margin-bottom:14px"><label class="fl">تأكيد</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apConf" placeholder="••••••••"><button class="eye" onclick="togglePw('apConf',this)" type="button">👁</button></div></div>
+        <button class="b3" onclick="changeAdminPass()">🔒 تغيير</button>
+      </div></div>
+    </div><!-- end sec-set -->
 <div class="sup-overlay" id="supOverlay">
   <div class="sup-sheet">
     <div class="sup-hdr">
@@ -753,9 +851,6 @@ const au  = firebase.auth();
 const st  = firebase.storage();
 const TS  = () => firebase.firestore.FieldValue.serverTimestamp();
 const col = n     => db.collection(n);
-// تاريخ من السيرفر (يمنع التلاعب)
-function serverNow(){ return new Date(Date.now()+(window._serverOffset||0)); }
-function serverDate(){ return serverNow().toLocaleString('ar-YE'); }
 const doc = (c,i) => db.collection(c).doc(i);
 
 // ═══════════════════════════════════════════════
@@ -1079,9 +1174,7 @@ function initUser(){
 function updateBal(){const b=S.user?.balance||0;const h=$('hBal'),u=$('uBal');if(h)h.textContent=b.toLocaleString();if(u)u.textContent=b.toLocaleString();}
 
 function getOffer(catId){
-  // استخدام وقت السيرفر لمنع التلاعب بالتاريخ
-  const now=serverNow();
-  now.setHours(0,0,0,0);
+  const now=new Date();now.setHours(0,0,0,0);
   return S.offers.find(o=>{
     if(!o.active)return false;
     const tc=o.triggerCat||o.cat||'all';
@@ -1134,7 +1227,7 @@ async function confirmBuy(){
   if((S.user.balance||0)<price){toast('رصيدك غير كافٍ','err');closeOv('buyModal');return;}
   const card=S.cards.find(c=>c.cat===S.selCat&&c.status==='available');if(!card){toast('لا توجد كروت متاحة','err');closeOv('buyModal');return;}
   S.user.balance-=price;card.status='sold';
-  const now=serverDate();
+  const now=new Date().toLocaleString('ar-YE');
   let freeCard=null,bonusMsg='';
   if(o){
     if(o.type==='free_card'){freeCard=S.cards.find(c=>c.cat===o.freeCat&&c.status==='available'&&c.fbId!==card.fbId);if(freeCard)freeCard.status='sold';}
@@ -1203,7 +1296,7 @@ async function submitRc(){
   if(!S.user){toast('يرجى تسجيل الدخول','err');return;}
   if(btn){btn.disabled=true;btn.textContent='⏳ جاري الإرسال...';}
   try{
-    await col('rechargeRequests').add({user:S.user.name||S.user.username||S.user.email||'مستخدم',userId:S.user.fbId,amount:amt,receiptImg:S.rcB64,date:serverDate(),status:'pending',createdAt:TS()});
+    await col('rechargeRequests').add({user:S.user.name||S.user.username||S.user.email||'مستخدم',userId:S.user.fbId,amount:amt,receiptImg:S.rcB64,date:new Date().toLocaleString('ar-YE'),status:'pending',createdAt:TS()});
     const match=(S.rcOffers||[]).filter(o=>o.active&&amt>=(o.minAmt||0)).sort((a,b)=>b.bonus-a.bonus)[0];
     closeOv('rcModal');resetRc();$('rcAmt').value='';
     toast('✅ تم إرسال طلب الشحن — سيتم المراجعة قريباً','ok');
@@ -1255,23 +1348,21 @@ async function renderRcHist(){
   list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px;font-size:13px">⏳ جاري التحميل...</div>';
   try{
     // Load directly from Firebase — user-specific
-    const snap=await col('rechargeRequests').where('userId','==',uid).get();
+    const snap=await col('rechargeRequests')
+      .where('userId','==',uid)
+      .orderBy('createdAt','desc')
+      .get();
     const rcs=snap.docs.map(d=>({fbId:d.id,...d.data()}));
     // Also get admin manual recharges from user doc
     const userSnap=await col('users').doc(uid).get();
     const manualRcs=(userSnap.data()?.manualRecharges||[]);
     // Combine
     const all=[
-      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'💳 شحن رصيد',type:'approved'})),
-      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'⏳ قيد المراجعة',type:'pending'})),
-      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'❌ مرفوض',type:'rejected'})),
-      ...manualRcs.map(r=>({
-        date:r.date,ts:(r.ts||0)/1000,
-        amount:r.amount||0,
-        note:r.type==='deduct'?'➖ '+(r.note||'خصم من الإدارة'):'🎁 '+(r.note||'شحن من الإدارة'),
-        type:r.type==='deduct'?'deduct':'admin'
-      }))
-    ].sort((a,b)=>b.ts-a.ts);
+      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,amount:r.amount,note:'💳 شحن رصيد',type:'approved'})),
+      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,amount:r.amount,note:'⏳ قيد المراجعة',type:'pending'})),
+      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,amount:r.amount,note:'❌ مرفوض',type:'rejected'})),
+      ...manualRcs.map(r=>({date:r.date,amount:r.amount,note:'🎁 شحن من الإدارة',type:'admin'}))
+    ].sort((a,b)=>(b.ts||0)-(a.ts||0));
     if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
     const page=all.slice(0,(_rcPage+1)*PAGE_SIZE);
     const hasMore=all.length>(_rcPage+1)*PAGE_SIZE;
@@ -1279,16 +1370,16 @@ async function renderRcHist(){
     list.innerHTML=page.map(r=>`
       <div class="hi">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <div style="width:36px;height:36px;background:${r.type==='deduct'?'rgba(255,61,113,.1)':r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
-            ${r.type==='deduct'?'➖':r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
+          <div style="width:36px;height:36px;background:${r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
+            ${r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
           </div>
           <div>
             <div style="font-size:13px;font-weight:600">${r.note}</div>
             <div style="font-size:11px;color:var(--t2)">${r.date||''}</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:${r.type==='deduct'||r.type==='rejected'?'var(--err)':r.type==='pending'?'var(--warn)':'var(--ok)'}">
-          ${r.type==='deduct'?'':r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
+        <div style="font-size:14px;font-weight:700;color:${r.type==='approved'||r.type==='admin'?'var(--ok)':r.type==='pending'?'var(--warn)':'var(--err)'}">
+          ${r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
         </div>
       </div>`).join('');
     const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:10px';
@@ -1674,15 +1765,8 @@ function initAdmin(){
 }
 
 function nav(s){
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
-  if(event&&event.currentTarget)event.currentTarget.classList.add('on');
-  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
-  $('sec-'+s)?.classList.add('on');
-  // adm-main has overflow-y:auto so scroll IT to top
-  const m=document.querySelector('.adm-main');
-  if(m) m.scrollTop=0;
-  if(window.innerWidth<=768) closeSB();
-  if(s==='transfers') loadAdminTransfers();
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));$('sec-'+s)?.classList.add('on');
 }
 
 function refreshStats(){
@@ -1804,7 +1888,7 @@ async function manRc(){
   if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
   const u=S.users.find(x=>x.fbId===uid);if(!u)return;
   const newBal=(u.balance||0)+amt;
-  const entry={amount:amt,date:serverDate(),note:'شحن من الإدارة',ts:Date.now()};
+  const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'شحن من الإدارة',ts:Date.now()};
   // Save balance + log entry
   const prev=(u.manualRecharges||[]);
   await col('users').doc(uid).update({
@@ -1971,7 +2055,24 @@ function switchHistTab(tab){
   $('rcHistDiv').style.display=tab==='rc'?'block':'none';
 }
 
-// renderRcHist moved above
+function renderRcHist(){
+  const list=$('rcHistList');if(!list)return;
+  const uid=S.user?.fbId;if(!uid)return;
+  // Get approved recharge requests for this user from state
+  const myRc=(S.reqs||[]).filter(r=>r.userId===uid&&r.status==='approved');
+  if(!myRc.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
+  list.innerHTML=myRc.slice().reverse().map(r=>`
+    <div class="hi">
+      <div style="display:flex;align-items:center;gap:10px;flex:1">
+        <div style="width:36px;height:36px;background:rgba(0,214,143,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">💳</div>
+        <div>
+          <div style="font-size:13px;font-weight:600">شحن رصيد</div>
+          <div style="font-size:11px;color:var(--t2)">${r.date}</div>
+        </div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--ok)">+${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span></div>
+    </div>`).join('');
+}
 
 // ── EDIT OFFER ──
 function editOffer(id){
@@ -2029,62 +2130,43 @@ async function downloadPDF(uid){
   const userSales=S.sales.filter(s=>s.userId===uid);
   const userRc=S.reqs.filter(r=>r.userId===uid&&r.status==='approved');
   const manualRc=(u.manualRecharges||[]);
-  // Load transfers from Firebase
-  const [s1,s2]=await Promise.all([
-    col('transfers').where('fromId','==',uid).get().catch(()=>({docs:[]})),
-    col('transfers').where('toId','==',uid).get().catch(()=>({docs:[]}))
-  ]);
-  const sentTr=s1.docs.map(d=>d.data());
-  const rcvTr=s2.docs.map(d=>d.data());
   const all=[
-    ...userSales.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'🛒 شراء — '+x.catName,code:x.code||'',amount:-(x.price||0)})),
+    ...userSales.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'🛒 شراء كرت — '+x.catName,code:x.code||'',amount:-(x.price||0)})),
     ...userRc.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'💳 شحن رصيد',code:'',amount:+(x.amount||0)})),
-    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:(x.note||'عملية يدوية'),code:'',amount:x.amount||0})),
-    ...rcvTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📥 تحويل من '+x.fromName+(x.byAdmin?' (إدارة)':''),code:'',amount:+(x.amount||0)})),
-    ...sentTr.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'📤 تحويل إلى '+x.toName+(x.byAdmin?' (إدارة)':''),code:'',amount:-(x.amount||0)}))
-  ].sort((a,b)=>a.ts-b.ts);
+    ...manualRc.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:'🎁 '+(x.note||'شحن من الإدارة'),code:'',amount:+(x.amount||0)}))
+  ].sort((a,b)=>a.ts-b.ts); // oldest first for correct running balance
   const totalIn=all.filter(x=>x.amount>0).reduce((s,x)=>s+x.amount,0);
   const totalOut=all.filter(x=>x.amount<0).reduce((s,x)=>s+Math.abs(x.amount),0);
   const c=S.cfg;
   let running=0;
-  const rows=all.map(x=>{running+=x.amount;return`<tr><td>${x.date}</td><td>${x.label}</td><td style="direction:ltr;font-size:11px;color:#666">${x.code}</td><td style="font-weight:600;color:${x.amount>0?'#00a86b':'#cc0000'}">${x.amount>0?'+':''}${x.amount.toLocaleString()}</td><td style="font-weight:600">${running.toLocaleString()} ${c.currency||'ر.ي'}</td></tr>`;}).join('');
+  const rows=all.map(x=>{running+=x.amount;return`<tr><td>${x.date}</td><td>${x.label}</td><td style="direction:ltr;font-size:11px">${x.code}</td><td style="${x.amount>0?'color:green':'color:red'}">${x.amount>0?'+':''}${x.amount.toLocaleString()}</td><td>${running.toLocaleString()}</td></tr>`;}).join('');
   const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>كشف حساب — ${u.name||u.username}</title>
   <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px;color:#222}
   .header{display:flex;align-items:center;gap:16px;margin-bottom:20px;border-bottom:2px solid #0072ff;padding-bottom:14px}
-  .logo-box{width:60px;height:60px;background:#0072ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;overflow:hidden}
+  .logo-box{width:60px;height:60px;background:#0072ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff}
   h1{font-size:22px;color:#0072ff;margin:0}p{font-size:13px;color:#555;margin:3px 0}
   .info-row{display:flex;gap:20px;margin-bottom:18px;flex-wrap:wrap}
-  .info-box{background:#f0f5ff;border-radius:10px;padding:12px 18px;flex:1;min-width:120px;text-align:center}
-  .info-box .val{font-size:18px;font-weight:700}.info-box .lbl{font-size:12px;color:#777}
-  .user-row{display:flex;align-items:center;gap:12px;background:#f8f9ff;border-radius:10px;padding:10px 16px;margin-bottom:14px}
-  .avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-  .avatar img{width:100%;height:100%;object-fit:cover}
+  .info-box{background:#f0f5ff;border-radius:10px;padding:12px 18px;flex:1;min-width:140px;text-align:center}
+  .info-box .val{font-size:20px;font-weight:700;color:#0072ff}.info-box .lbl{font-size:12px;color:#777}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th{background:#0072ff;color:#fff;padding:9px 12px;text-align:right}
   td{padding:8px 12px;border-bottom:1px solid #eee}tr:nth-child(even){background:#f9f9f9}
   .footer{margin-top:20px;font-size:12px;color:#888;text-align:center}
   </style></head><body>
   <div class="header">
-    <div class="logo-box">${c.siteLogoImg?`<img src="${c.siteLogoImg}" style="width:100%;height:100%;object-fit:cover">`:(c.siteIcon||'📡')}</div>
-    <div><h1>${c.siteName||'المدى نت'}</h1><p>${c.siteDesc||''}</p>${c.sitePhone?`<p>📞 ${c.sitePhone}</p>`:''}</div>
-    <div style="margin-right:auto;text-align:left;font-size:12px;color:#777">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-YE')}</div>
+    <div class="logo-box">${c.siteLogoImg?`<img src="${c.siteLogoImg}" style="width:100%;height:100%;object-fit:cover;border-radius:14px">`:c.siteIcon||'📡'}</div>
+    <div><h1>${c.siteName||'المدى نت'}</h1><p>${c.siteDesc||'بوابة كروت الإنترنت'}</p><p>📞 ${c.phone||''}</p></div>
   </div>
-  <div class="user-row">
-    <div class="avatar">${u.avatarImg?`<img src="${u.avatarImg}">`:'👤'}</div>
-    <div><div style="font-weight:700;font-size:15px">${u.name||u.username}</div><div style="font-size:12px;color:#666">${u.email||u.username||''}</div></div>
-    <div style="margin-right:auto;text-align:left"><div style="font-size:12px;color:#666">الرصيد الحالي</div><div style="font-size:18px;font-weight:700;color:#0072ff">${(u.balance||0).toLocaleString()} ${c.currency||'ر.ي'}</div></div>
-  </div>
+  <div style="margin-bottom:14px"><b>كشف حساب:</b> ${u.name||u.username} &nbsp;|&nbsp; <b>الرصيد الحالي:</b> ${(u.balance||0).toLocaleString()} ${c.currency||'ر.ي'} &nbsp;|&nbsp; <b>تاريخ الطباعة:</b> ${new Date().toLocaleDateString('ar-YE')}</div>
   <div class="info-row">
-    <div class="info-box"><div class="val" style="color:#00a86b">+${totalIn.toLocaleString()}</div><div class="lbl">إجمالي الواردات</div></div>
-    <div class="info-box"><div class="val" style="color:#cc0000">-${totalOut.toLocaleString()}</div><div class="lbl">إجمالي المصروفات</div></div>
-    <div class="info-box"><div class="val" style="color:#0072ff">${(u.balance||0).toLocaleString()}</div><div class="lbl">الرصيد الحالي</div></div>
+    <div class="info-box"><div class="val">+${totalIn.toLocaleString()}</div><div class="lbl">إجمالي الشحن</div></div>
+    <div class="info-box"><div class="val" style="color:red">-${totalOut.toLocaleString()}</div><div class="lbl">إجمالي الشراء</div></div>
+    <div class="info-box"><div class="val">${(u.balance||0).toLocaleString()}</div><div class="lbl">الرصيد الحالي</div></div>
   </div>
-  <table><thead><tr><th>التاريخ</th><th>البيان</th><th>الرمز</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead><tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:#999">لا توجد عمليات</td></tr>'}</tbody></table>
-  <div class="footer">${c.siteName||'المدى نت'} — كشف حساب سري وخاص</div>
+  <table><thead><tr><th>التاريخ</th><th>البيان</th><th>الرمز</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="footer">${c.siteName||'المدى نت'} — كشف حساب خاص وسري</div>
   </body></html>`;
-  const w=window.open('','_blank');
-  if(!w){toast('السماح بالنوافذ المنبثقة في المتصفح','err');return;}
-  w.document.write(html);w.document.close();setTimeout(()=>w.print(),600);
+  const w=window.open('','_blank');if(!w)return;w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);
 }
 async function doForgotPass(){
   const u=$('loginU').value.trim();
@@ -2320,22 +2402,9 @@ async function addSliderItemVideo(input){
 // ═══════════════════════════════════════════════
 // STARTUP
 // ═══════════════════════════════════════════════
-// Load settings + server time before auth
+// Load settings before auth (faster UI)
 (async()=>{
   try{const s=await doc('settings','main').get();if(s.exists){Object.assign(S.cfg,s.data());applySettings();}}catch(e){}
-  // جلب وقت السيرفر — يُحدَّث كل 5 دقائق
-  async function refreshServerTime(){
-    try{
-      const ref=col('_ping').doc('ts');
-      await ref.set({t:TS()});
-      const snap=await ref.get();
-      const st=snap.data()?.t?.toDate?.();
-      if(st){ window._serverNow=st.getTime(); window._serverOffset=st.getTime()-Date.now(); }
-    }catch(e){ window._serverOffset=0; }
-  }
-  window._serverOffset=0;
-  await refreshServerTime();
-  setInterval(refreshServerTime, 5*60*1000); // تحديث كل 5 دقائق
   loadRem();
 })();
 </script>
@@ -2347,533 +2416,6 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_pp=e;setTi
 function showPWA(){if($('pwaBnr'))return;const b=document.createElement('div');b.id='pwaBnr';b.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0d1424,#131d2e);border:1px solid rgba(0,198,255,.25);border-radius:16px;padding:13px 18px;z-index:9000;display:flex;align-items:center;gap:12px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-family:Tajawal,sans-serif;direction:rtl;max-width:340px;width:calc(100vw - 32px);animation:fadeUp .4s ease';b.innerHTML='<div style="font-size:28px">📲</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:#e8edf5">ثبّت تطبيق المدى نت</div><div style="font-size:11px;color:#7a8ba8;margin-top:2px">يعمل مثل التطبيق الحقيقي</div></div><div style="display:flex;gap:7px"><button onclick="instPWA()" style="background:linear-gradient(135deg,#0072ff,#00c6ff);border:none;border-radius:9px;color:#fff;padding:7px 14px;font-size:12px;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer">تثبيت</button><button onclick="this.closest(\'[id=pwaBnr]\').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#7a8ba8;padding:7px 10px;font-size:12px;cursor:pointer">لاحقاً</button></div>';document.body.appendChild(b);setTimeout(()=>{if(b.parentNode)b.remove();},12000);}
 async function instPWA(){const b=$('pwaBnr');if(b)b.remove();if(!_pp){toast('افتح في Chrome واضغط ⋮ ← "إضافة للشاشة الرئيسية"');return;}_pp.prompt();const{outcome}=await _pp.userChoice;if(outcome==='accepted')toast('✅ تم تثبيت التطبيق!');_pp=null;}
 window.addEventListener('appinstalled',()=>{toast('🎉 تم تثبيت التطبيق!');const b=$('pwaBnr');if(b)b.remove();});
-</script>
-
-<!-- ── NEW FEATURES: Notifications, Profile, Transfers ── -->
-
-<!-- Profile Modal -->
-<div class="ov" id="profileModal">
-<div class="modal" style="max-width:420px">
-  <h3>👤 الملف الشخصي</h3>
-  <div style="text-align:center;margin-bottom:16px">
-    <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;cursor:pointer;position:relative" onclick="$('avatarFileInput').click()">
-      <img id="profileAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover">
-      <span id="profileAvatarEmoji">👤</span>
-      <div style="position:absolute;bottom:0;right:0;background:var(--pd);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px">✏️</div>
-    </div>
-    <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-    <div style="font-size:11px;color:var(--t2);margin-top:5px">اضغط لتغيير الصورة</div>
-  </div>
-  <div class="fg"><label>اسم المستخدم</label><input class="inp" id="profName" readonly style="opacity:.6"></div>
-  <div class="fg"><label>البريد</label><input class="inp" id="profEmail" readonly style="opacity:.6"></div>
-  <div style="border-top:1px solid var(--brd);padding-top:14px;margin-top:4px">
-    <div style="font-size:13px;font-weight:600;margin-bottom:12px">🔑 تغيير كلمة المرور</div>
-    <div class="fg"><label>الحالية</label><div class="pw"><input class="inp" type="password" id="profCur" placeholder="••••••••"><button class="eye" onclick="togglePw('profCur',this)" type="button">👁</button></div></div>
-    <div class="fg"><label>الجديدة</label><div class="pw"><input class="inp" type="password" id="profNew" placeholder="••••••••"><button class="eye" onclick="togglePw('profNew',this)" type="button">👁</button></div></div>
-    <div class="fg"><label>تأكيد</label><div class="pw"><input class="inp" type="password" id="profConf" placeholder="••••••••"><button class="eye" onclick="togglePw('profConf',this)" type="button">👁</button></div></div>
-    <button class="btn-main" onclick="changePassProfile()">🔒 تغيير كلمة المرور</button>
-  </div>
-  <button class="mbtn-cancel" style="width:100%;margin-top:10px" onclick="closeOv('profileModal')">إغلاق</button>
-</div></div>
-
-<!-- Transfer Modal -->
-<div class="ov" id="transferModal">
-<div class="modal">
-  <h3>💸 تحويل رصيد</h3>
-  <div style="background:rgba(0,114,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--p)">رصيدك: <strong id="trMyBal">0</strong> <span class="cur">ر.ي</span></div>
-  <div class="fg"><label>اسم المستخدم أو البريد</label><input class="inp" id="trTargetInput" placeholder="ahmed99 أو ahmed@email.com"></div>
-  <div class="fg"><label>المبلغ (<span class="cur">ر.ي</span>)</label><input class="inp" type="number" id="trAmountInput" placeholder="500"></div>
-  <div id="trConfirmBox" style="display:none;background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-      <div id="trTargetAv" style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
-      <div><div style="font-weight:600" id="trTargetNameShow"></div><div style="font-size:11px;color:var(--t2)">المستقبل</div></div>
-    </div>
-    <div>المبلغ: <strong id="trAmtShow" style="color:var(--ok)"></strong></div>
-    <div style="font-size:11px;color:var(--t3);margin-top:5px">⚠️ لا يمكن التراجع عن التحويل</div>
-  </div>
-  <div class="mrow">
-    <button class="mcancel" onclick="closeOv('transferModal')">إلغاء</button>
-    <button class="mok" id="trActionBtn" onclick="trSearch()">🔍 بحث</button>
-  </div>
-</div></div>
-
-<!-- Notifications Modal -->
-<div class="ov" id="notifModal">
-<div class="modal" style="max-width:420px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <h3 style="margin:0">🔔 الإشعارات</h3>
-    <button onclick="clearNotifs()" style="background:none;border:1px solid var(--brd);border-radius:8px;padding:4px 10px;color:var(--t2);cursor:pointer;font-size:12px;font-family:var(--ff)">مسح الكل</button>
-  </div>
-  <div id="notifList" style="max-height:380px;overflow-y:auto"></div>
-  <button class="mok" style="width:100%;margin-top:14px" onclick="closeOv('notifModal')">إغلاق</button>
-</div></div>
-
-<script>
-// ═══════════════════════════════════════════════
-// NEW FEATURES — Safe additions (no overrides)
-// ═══════════════════════════════════════════════
-
-// ── Fix switchHistTab to support 3 tabs ──
-window.switchHistTab = async function(tab){
-  ['Sales','Rc','Tr'].forEach(t=>{
-    const id='tab'+t;const b=$(id);
-    if(b)b.className=t.toLowerCase()===tab?'tab on':'tab';
-  });
-  $('salesHistDiv').style.display=tab==='sales'?'block':'none';
-  $('rcHistDiv').style.display=tab==='rc'?'block':'none';
-  const trDiv=$('trHistDiv');if(trDiv)trDiv.style.display=tab==='tr'?'block':'none';
-  if(tab==='rc') await renderRcHist();
-  if(tab==='tr') await renderTrHist();
-};
-
-// ── Fix nav to close sidebar on mobile + load transfers ──
-
-
-// ── Fix initUser to add avatar + notifications ──
-const _origInitUser2 = window.initUser;
-window.initUser = function(){
-  _origInitUser2 && _origInitUser2();
-  applyAvatar();
-  loadNotifs();
-};
-
-// ── SIDEBAR FUNCTIONS ──
-function toggleSB(){
-  const sb=$('sbEl'),dim=$('sbDim');
-  if(!sb)return;
-  const isOpen=sb.classList.contains('open');
-  if(isOpen){
-    sb.classList.remove('open');
-    if(dim)dim.classList.remove('on');
-  }else{
-    sb.classList.add('open');
-    if(dim)dim.classList.add('on');
-  }
-}
-function closeSB(){
-  $('sbEl')?.classList.remove('open');
-  $('sbDim')?.classList.remove('on');
-}
-let _sbCollapsed=false;
-function toggleCollapse(){
-  const sb=$('sbEl'),main=document.querySelector('.adm-main'),btn=$('sbColBtn');
-  if(!sb)return;
-  _sbCollapsed=!_sbCollapsed;
-  sb.classList.toggle('collapsed',_sbCollapsed);
-  if(main)main.style.marginRight=_sbCollapsed?'52px':'230px';
-  if(btn)btn.textContent=_sbCollapsed?'▶':'◀';
-}
-
-// nav already fixed above
-
-// ── SEARCH/FILTER FUNCTIONS ──
-
-// Filter users table
-function filterUsers(q){
-  const rows=$('usersTable')?.querySelectorAll('tr')||[];
-  const lq=q.toLowerCase();
-  rows.forEach(row=>{
-    const text=row.textContent.toLowerCase();
-    row.style.display=(!q||text.includes(lq))?'':'none';
-  });
-}
-
-// Filter users in select dropdowns (for addBal, manRc, transfers)
-function searchUserSelect(searchId, selectId, q){
-  const sel=$(selectId);if(!sel)return;
-  const lq=q.toLowerCase();
-  const opts=S.users?.filter(u=>{
-    const t=(u.name||u.username||u.email||'').toLowerCase();
-    return !lq||t.includes(lq);
-  })||[];
-  sel.innerHTML='<option value="">— اختر —</option>'+opts.map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
-}
-
-// Filter sales table
-function filterSales(q){
-  const rows=$('salesTable')?.querySelectorAll('tr')||[];
-  const lq=q.toLowerCase();
-  rows.forEach(row=>{
-    row.style.display=(!q||row.textContent.toLowerCase().includes(lq))?'':'none';
-  });
-}
-
-// Filter transfers table
-function filterTransfers(q){
-  const rows=$('transfersTable')?.querySelectorAll('tr')||[];
-  const lq=q.toLowerCase();
-  rows.forEach(row=>{
-    row.style.display=(!q||row.textContent.toLowerCase().includes(lq))?'':'none';
-  });
-}
-
-// Filter conversations (support)
-function filterConvs(q){
-  const items=$('adminConvList')?.querySelectorAll('.conv-item')||[];
-  const lq=q.toLowerCase();
-  items.forEach(item=>{
-    item.style.display=(!q||item.textContent.toLowerCase().includes(lq))?'':'none';
-  });
-}
-
-// Also override popTransferSelects/popSelects to include search-friendly selects
-const _origPopTransferSelects=window.popTransferSelects;
-window.popTransferSelects=function(){
-  _origPopTransferSelects&&_origPopTransferSelects();
-  // Also update trFromUser/trToUser in admin transfers section
-  const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
-  ['trFromUser','trToUser'].forEach(id=>{const e=$(id);if(e)e.innerHTML=opts;});
-};
-const _origInitAdmin2 = window.initAdmin;
-window.initAdmin = function(){
-  _origInitAdmin2 && _origInitAdmin2();
-  popTransferSelects();
-  // Patch renderUsersTable to show avatars
-  patchUsersTable();
-  // Patch renderRcList to show avatars
-  patchRcList();
-};
-
-function patchUsersTable(){
-  const tb=$('usersTable');if(!tb||!S.users.length)return;
-  // Re-render with avatars
-  tb.innerHTML=S.users.map((u,i)=>`<tr>
-    <td>${i+1}</td>
-    <td><div style="display:flex;align-items:center;gap:8px">
-      <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">
-        ${u.avatarImg?`<img src="${u.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤'}
-      </div>
-      <div><div style="font-weight:600">${u.name||u.username||'—'}</div><div style="font-size:11px;color:var(--t2)">${u.email||u.username||''}</div></div>
-    </div></td>
-    <td style="color:var(--ok);font-weight:600">${(u.balance||0).toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span></td>
-    <td>${(u.cards||[]).length}</td>
-    <td style="display:flex;gap:5px;flex-wrap:wrap">
-      <button class="b2" onclick="qAddBal('${u.fbId}')">+ رصيد</button>
-      <button class="b1" onclick="viewUserStatement('${u.fbId}')">📊 كشف</button>
-      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑</button>
-      <button class="b3" onclick="delUser('${u.fbId}')">🗑️</button>
-    </td>
-  </tr>`).join('');
-  popTransferSelects();
-}
-
-function patchRcList(){
-  const el=$('rcList');if(!el)return;
-  const pend=S.reqs?.filter(r=>r.status==='pending')||[];
-  if(!pend.length)return;
-  el.innerHTML=pend.map(r=>{
-    const u=S.users?.find(x=>x.fbId===r.userId);
-    const av=u?.avatarImg?`<img src="${u.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤';
-    return`<div style="padding:14px 0;border-bottom:1px solid var(--brd)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:rgba(0,198,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${av}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:600">${r.user}</div><div style="font-size:11px;color:var(--t2)">${r.date}</div></div>
-        <div style="text-align:left"><div style="font-size:16px;font-weight:700;color:var(--ok)" id="ra_${r.fbId}">${(r.amount||0).toLocaleString()}</div><div style="font-size:11px;color:var(--t2)">${S.cfg?.currency||'ر.ي'}</div></div>
-      </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="b2" onclick="approveRc('${r.fbId}')">✅ موافقة</button>
-        <button class="b3" onclick="rejectRc('${r.fbId}')">❌ رفض</button>
-        <button class="b4" onclick="editRcAmt('${r.fbId}')">✏️ تعديل</button>
-        ${r.receiptImg?`<button class="b1" onclick="viewReceipt('${r.fbId}')">🖼️ إيصال</button>`:''}
-      </div>
-    </div>`;}).join('');
-}
-
-// ── NOTIFICATIONS ──
-S._notifs = S._notifs || [];
-
-async function loadNotifs(){
-  const uid=S.user?.fbId;if(!uid)return;
-  try{
-    const snap=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));
-    S._notifs=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    updateNotifBadge();
-  }catch(e){}
-}
-function updateNotifBadge(){
-  const unread=(S._notifs||[]).filter(n=>!n.read).length;
-  const b=$('notifBadge');
-  if(b){b.textContent=unread;b.style.display=unread>0?'flex':'none';}
-}
-function openNotifs(){
-  (S._notifs||[]).forEach(n=>{
-    if(!n.read&&n.fbId){n.read=true;col('notifications').doc(n.fbId).update({read:true}).catch(()=>{});}
-  });
-  updateNotifBadge();
-  const list=$('notifList');if(!list)return;
-  const notifs=S._notifs||[];
-  if(!notifs.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد إشعارات</div>';openOv('notifModal');return;}
-  const icons={recharge:'💳',transfer_in:'📥',transfer_out:'📤',gift:'🎁',support:'💬'};
-  list.innerHTML=notifs.map(n=>`
-    <div style="padding:11px 4px;border-bottom:1px solid var(--brd);display:flex;gap:10px;align-items:flex-start;opacity:${n.read?'0.55':'1'}">
-      <div style="width:34px;height:34px;background:var(--bg2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${icons[n.type]||'🔔'}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600">${n.title||''}</div>
-        <div style="font-size:12px;color:var(--t2);margin-top:2px">${n.body||''}</div>
-        <div style="font-size:10px;color:var(--t3);margin-top:3px">${n.date||''}</div>
-      </div>
-    </div>`).join('');
-  openOv('notifModal');
-}
-async function clearNotifs(){
-  const uid=S.user?.fbId;if(!uid)return;
-  try{const s=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));for(const d of s.docs)await d.ref.delete();}catch(e){}
-  S._notifs=[];updateNotifBadge();
-  $('notifList').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد إشعارات</div>';
-}
-async function pushNotif(uid,type,title,body){
-  try{await col('notifications').add({uid,type,title,body,date:serverDate(),ts:Date.now(),read:false,createdAt:TS()});}catch(e){}
-}
-
-// ── Server timestamp (يمنع التلاعب بالتاريخ) ──
-async function getServerDate(){
-  try{
-    const ref=col('_ping').doc('ts');
-    await ref.set({t:TS()});
-    const snap=await ref.get();
-    const st=snap.data()?.t?.toDate?.();
-    if(st) return st.toLocaleString('ar-YE');
-  }catch(e){}
-  return serverDate();
-}
-
-// ── Fix addBal to log in manualRecharges ──
-const _origAddBal2=window.addBal;
-window.addBal=async function(){
-  const uid=$('addBalUser')?.value,amt=parseInt($('addBalAmt')?.value);
-  if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
-  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
-  const nb=(u.balance||0)+amt;
-  const now=await getServerDate();
-  const entry={amount:amt,date:now,note:'شحن يدوي من الإدارة',type:'add',ts:Date.now()};
-  const prev=u.manualRecharges||[];
-  await col('users').doc(uid).update({balance:nb,manualRecharges:[...prev,entry]});
-  u.balance=nb;u.manualRecharges=[...prev,entry];
-  if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}
-  $('addBalAmt').value='';
-  toast(`✅ تمت إضافة ${amt.toLocaleString()} ريال`,'ok');
-  window.renderUsersTable&&renderUsersTable();window.refreshStats&&refreshStats();
-  await pushNotif(uid,'gift','💳 إضافة رصيد',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك من الإدارة`);
-};
-
-// ── Fix deductBal to log deductions ──
-const _origDeductBal2=window.deductBal;
-window.deductBal=async function(){
-  const uid=$('addBalUser')?.value;
-  if(!uid){toast('اختر مستخدماً','err');return;}
-  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
-  const mode=prompt(`رصيد ${u.name||u.username}: ${(u.balance||0).toLocaleString()}\n\n• خصم مبلغ → اكتب: خصم 500\n• تعيين رصيد → اكتب: تعيين 1000`);
-  if(!mode)return;
-  let newBal,amt,note;
-  if(mode.includes('خصم')){
-    amt=parseInt(mode.replace(/[^\d]/g,''));
-    if(!amt){toast('مبلغ غير صحيح','err');return;}
-    newBal=Math.max(0,(u.balance||0)-amt);
-    note='خصم من الإدارة';
-  }else if(mode.includes('تعيين')){
-    newBal=parseInt(mode.replace(/[^\d]/g,''));
-    if(isNaN(newBal)){toast('مبلغ غير صحيح','err');return;}
-    amt=Math.abs((u.balance||0)-newBal);
-    note='تعيين رصيد من الإدارة';
-  }else{toast('اكتب خصم أو تعيين','err');return;}
-  const now=await getServerDate();
-  const entry={amount:-Math.abs(amt),date:now,note,type:'deduct',ts:Date.now()};
-  const prev=u.manualRecharges||[];
-  await col('users').doc(uid).update({balance:newBal,manualRecharges:[...prev,entry]});
-  u.balance=newBal;u.manualRecharges=[...prev,entry];
-  if(S.user?.fbId===uid){S.user.balance=newBal;updateBal();}
-  toast(`✅ ${note} ${amt.toLocaleString()} — الرصيد: ${newBal.toLocaleString()}`,'ok');
-  window.renderUsersTable&&renderUsersTable();window.refreshStats&&refreshStats();
-  await pushNotif(uid,'gift','⚠️ تعديل رصيد',`${note}: ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`);
-};
-
-// Patch approveRc
-const _origApproveRc2=window.approveRc;
-if(_origApproveRc2){
-  window.approveRc=async function(id){
-    await _origApproveRc2(id);
-    const req=S.reqs?.find(r=>r.fbId===id);
-    if(req)await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك`);
-  };
-}
-
-// Patch manRc
-const _origManRc2=window.manRc;
-if(_origManRc2){
-  window.manRc=async function(){
-    const uid=$('manUser')?.value,amt=parseInt($('manAmt')?.value);
-    await _origManRc2();
-    if(uid&&amt&&!isNaN(amt))await pushNotif(uid,'gift','🎁 هدية من الإدارة',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك كهدية من الإدارة`);
-  };
-}
-
-// ── PROFILE ──
-function openProfile(){
-  const u=S.user;if(!u)return;
-  $('profName').value=u.username||u.name||'';
-  $('profEmail').value=u.email||u.authEmail||'';
-  ['profCur','profNew','profConf'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  const img=$('profileAvatarImg'),em=$('profileAvatarEmoji');
-  if(u.avatarImg){if(img){img.src=u.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
-  else{if(img)img.style.display='none';if(em){em.textContent='👤';em.style.display='';}}
-  openOv('profileModal');
-}
-async function uploadAvatar(input){
-  const f=input.files[0];if(!f)return;
-  if(f.size>2*1024*1024){toast('الصورة كبيرة — الحد 2MB','err');return;}
-  try{
-    const b64=await compressImage(f,300,0.8);
-    S.user.avatarImg=b64;
-    const img=$('profileAvatarImg'),em=$('profileAvatarEmoji');
-    if(img){img.src=b64;img.style.display='block';}if(em)em.style.display='none';
-    applyAvatar();
-    await col('users').doc(S.user.fbId).update({avatarImg:b64});
-    toast('✅ تم تحديث الصورة','ok');
-  }catch(e){toast('خطأ: '+e.message,'err');}
-}
-function applyAvatar(){
-  const img=$('uAvatarH'),em=$('uAvatarE');
-  if(S.user?.avatarImg){if(img){img.src=S.user.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
-  else{if(img)img.style.display='none';if(em){em.textContent='👤';em.style.display='';}}
-}
-async function changePassProfile(){
-  const cur=$('profCur').value.trim(),np=$('profNew').value.trim(),conf=$('profConf').value.trim();
-  if(!cur){toast('أدخل كلمة المرور الحالية','err');return;}
-  if(!np||np.length<6){toast('كلمة المرور الجديدة 6 أحرف+','err');return;}
-  if(np!==conf){toast('كلمة المرور غير متطابقة','err');return;}
-  try{
-    const cred=firebase.auth.EmailAuthProvider.credential(au.currentUser.email,cur);
-    await au.currentUser.reauthenticateWithCredential(cred);
-    await au.currentUser.updatePassword(np);
-    ['profCur','profNew','profConf'].forEach(id=>{const e=$(id);if(e)e.value='';});
-    toast('✅ تم تغيير كلمة المرور','ok');
-  }catch(e){if(e.code==='auth/wrong-password')toast('كلمة المرور الحالية خاطئة','err');else toast('خطأ: '+e.message,'err');}
-}
-
-// ── TRANSFER BETWEEN USERS ──
-let _trTarget=null;
-function openTransferModal(){
-  _trTarget=null;
-  if($('trTargetInput'))$('trTargetInput').value='';
-  if($('trAmountInput'))$('trAmountInput').value='';
-  if($('trConfirmBox'))$('trConfirmBox').style.display='none';
-  const btn=$('trActionBtn');if(btn){btn.textContent='🔍 بحث';btn.onclick=trSearch;}
-  if($('trMyBal'))$('trMyBal').textContent=(S.user?.balance||0).toLocaleString();
-  openOv('transferModal');
-}
-async function trSearch(){
-  const q=$('trTargetInput')?.value.trim().toLowerCase();
-  const amt=parseInt($('trAmountInput')?.value);
-  if(!q){toast('أدخل اسم المستخدم أو البريد','err');return;}
-  if(!amt||amt<1){toast('أدخل مبلغاً صحيحاً','err');return;}
-  if(amt>(S.user?.balance||0)){toast('رصيدك غير كافٍ','err');return;}
-  const btn=$('trActionBtn');if(btn){btn.disabled=true;btn.textContent='⏳';}
-  try{
-    let snap=await col('users').where('username','==',q).limit(1).get();
-    if(snap.empty)snap=await col('users').where('email','==',q).limit(1).get();
-    if(snap.empty){toast('المستخدم غير موجود','err');if(btn){btn.disabled=false;btn.textContent='🔍 بحث';}return;}
-    const d=snap.docs[0];
-    if(d.id===S.user.fbId){toast('لا يمكنك التحويل لنفسك','err');if(btn){btn.disabled=false;btn.textContent='🔍 بحث';}return;}
-    _trTarget={fbId:d.id,...d.data()};
-    const av=$('trTargetAv');
-    if(av)av.innerHTML=_trTarget.avatarImg?`<img src="${_trTarget.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤';
-    if($('trTargetNameShow'))$('trTargetNameShow').textContent=_trTarget.name||_trTarget.username||_trTarget.email;
-    if($('trAmtShow'))$('trAmtShow').textContent=amt.toLocaleString()+' '+(S.cfg?.currency||'ر.ي');
-    if($('trConfirmBox'))$('trConfirmBox').style.display='block';
-    if(btn){btn.disabled=false;btn.textContent='✅ تأكيد التحويل';btn.onclick=trConfirm;}
-  }catch(e){toast('خطأ: '+e.message,'err');if(btn){btn.disabled=false;btn.textContent='🔍 بحث';}}
-}
-async function trConfirm(){
-  if(!_trTarget)return;
-  const amt=parseInt($('trAmountInput')?.value);
-  if(!amt||amt>(S.user?.balance||0)){toast('مبلغ غير صحيح أو رصيد غير كافٍ','err');return;}
-  const btn=$('trActionBtn');if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
-  const now=serverDate();
-  try{
-    const newFrom=(S.user.balance||0)-amt;
-    const toSnap=await col('users').doc(_trTarget.fbId).get();
-    const newTo=(toSnap.data()?.balance||0)+amt;
-    await col('users').doc(S.user.fbId).update({balance:newFrom});
-    await col('users').doc(_trTarget.fbId).update({balance:newTo});
-    await col('transfers').add({fromId:S.user.fbId,fromName:S.user.name||S.user.username,toId:_trTarget.fbId,toName:_trTarget.name||_trTarget.username,amount:amt,date:now,ts:Date.now(),createdAt:TS()});
-    await pushNotif(_trTarget.fbId,'transfer_in','📥 استلمت تحويلاً',`استلمت ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} من ${S.user.name||S.user.username}`);
-    await pushNotif(S.user.fbId,'transfer_out','📤 تم التحويل',`أرسلت ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} إلى ${_trTarget.name||_trTarget.username}`);
-    S.user.balance=newFrom;updateBal();
-    closeOv('transferModal');_trTarget=null;
-    toast('✅ تم التحويل بنجاح','ok');
-  }catch(e){toast('فشل التحويل: '+e.message,'err');if(btn){btn.disabled=false;btn.textContent='✅ تأكيد التحويل';}}
-}
-
-// ── TRANSFERS HISTORY (user) ──
-async function renderTrHist(){
-  const list=$('trHistList');if(!list)return;
-  const uid=S.user?.fbId;if(!uid)return;
-  list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px">⏳ جاري التحميل...</div>';
-  try{
-    const [s1,s2]=await Promise.all([
-      col('transfers').where('fromId','==',uid).get().catch(()=>({docs:[]})),
-      col('transfers').where('toId','==',uid).get().catch(()=>({docs:[]}))
-    ]);
-    const all=[...s1.docs.map(d=>({...d.data(),dir:'out'})),...s2.docs.map(d=>({...d.data(),dir:'in'}))].sort((a,b)=>(b.ts||0)-(a.ts||0));
-    if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد تحويلات بعد</div>';return;}
-    list.innerHTML=all.map(t=>`
-      <div class="hi">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <div style="width:36px;height:36px;background:${t.dir==='in'?'rgba(0,214,143,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${t.dir==='in'?'📥':'📤'}</div>
-          <div>
-            <div style="font-size:13px;font-weight:600">${t.dir==='in'?'من '+t.fromName:'إلى '+t.toName}${t.byAdmin?' (إدارة)':''}</div>
-            <div style="font-size:11px;color:var(--t2)">${t.date||''}</div>
-          </div>
-        </div>
-        <div style="font-size:14px;font-weight:700;color:${t.dir==='in'?'var(--ok)':'var(--err)'}">
-          ${t.dir==='in'?'+':'−'}${(t.amount||0).toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span>
-        </div>
-      </div>`).join('');
-  }catch(e){list.innerHTML=`<div style="color:var(--err);text-align:center;padding:20px">⚠️ ${e.message}</div>`;}
-}
-
-// ── ADMIN TRANSFERS ──
-async function loadAdminTransfers(){
-  const tb=$('transfersTable');if(!tb)return;
-  tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t2)">⏳</td></tr>';
-  try{
-    const snap=await col('transfers').get().catch(()=>({docs:[]}));
-    const all=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    if(!all.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد تحويلات</td></tr>';return;}
-    tb.innerHTML=all.map((t,i)=>`<tr>
-      <td>${i+1}</td>
-      <td style="color:var(--err);font-weight:600">${t.fromName||t.fromId||''}</td>
-      <td style="color:var(--ok);font-weight:600">${t.toName||t.toId||''}</td>
-      <td style="font-weight:700">${(t.amount||0).toLocaleString()} <span class="cur">ر.ي</span></td>
-      <td style="font-size:11px;color:var(--t2)">${t.date||''}</td>
-      <td><span class="badge ${t.byAdmin?'bb':'bg'}">${t.byAdmin?'إدارة':'مستخدم'}</span></td>
-    </tr>`).join('');
-  }catch(e){tb.innerHTML=`<tr><td colspan="6" style="color:var(--err)">خطأ: ${e.message}</td></tr>`;}
-}
-async function adminTransfer(){
-  const fid=$('trFromUser')?.value,tid=$('trToUser')?.value,amt=parseInt($('trAmt')?.value);
-  if(!fid||!tid||fid===tid){toast('اختر مستخدمين مختلفين','err');return;}
-  if(!amt||amt<1){toast('أدخل مبلغاً صحيحاً','err');return;}
-  const fu=S.users?.find(u=>u.fbId===fid),tu=S.users?.find(u=>u.fbId===tid);
-  if(!fu||!tu)return;
-  if((fu.balance||0)<amt){toast(`رصيد ${fu.name||fu.username} غير كافٍ`,'err');return;}
-  const now=serverDate();
-  try{
-    await col('users').doc(fid).update({balance:(fu.balance||0)-amt});
-    await col('users').doc(tid).update({balance:(tu.balance||0)+amt});
-    fu.balance=(fu.balance||0)-amt;tu.balance=(tu.balance||0)+amt;
-    await col('transfers').add({fromId:fid,fromName:fu.name||fu.username,toId:tid,toName:tu.name||tu.username,amount:amt,date:now,ts:Date.now(),byAdmin:true,createdAt:TS()});
-    await pushNotif(fid,'transfer_out','💸 خصم رصيد',`تم خصم ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} وتحويله إلى ${tu.name||tu.username} بواسطة الإدارة`);
-    await pushNotif(tid,'transfer_in','💸 شحن رصيد',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} من ${fu.name||fu.username} بواسطة الإدارة`);
-    if($('trAmt'))$('trAmt').value='';
-    toast(`✅ تم تحويل ${amt.toLocaleString()} من ${fu.name||fu.username} إلى ${tu.name||tu.username}`,'ok');
-    window.renderUsersTable&&renderUsersTable();window.refreshStats&&refreshStats();loadAdminTransfers();
-  }catch(e){toast('خطأ: '+e.message,'err');}
-}
-function popTransferSelects(){
-  const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
-  ['trFromUser','trToUser'].forEach(id=>{const e=$(id);if(e)e.innerHTML=opts;});
-}
 </script>
 </body>
 </html>
