@@ -26,7 +26,7 @@
 body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 .pg{display:none;min-height:100vh}.pg.on{display:block}
 #authPg.on{display:flex;align-items:center;justify-content:center}
-#adminPg.on{display:block;min-height:100vh;position:relative;width:100%}
+#adminPg.on{display:flex}
 
 /* ─ AUTH ─ */
 .auth-bg{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,114,255,.15),transparent 60%);pointer-events:none}
@@ -92,24 +92,31 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 
 /* ─ ADMIN ─ */
-.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:200;overflow-y:auto;transition:transform .3s ease}
+.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:200;overflow-y:auto}
 .sb.collapsed{width:52px}
 .sb.collapsed .nav-item span,.sb.collapsed .nav-item .nb,.sb.collapsed .sb-logo-text,.sb.collapsed nav a span{display:none}
 .sb-toggle-btn{position:absolute;bottom:60px;left:-14px;width:28px;height:28px;background:var(--pd);border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.sb.collapsed~.adm-main{margin-right:230px;padding:24px;min-height:100vh;transition:margin-right .3s ease;width:calc(100% - 230px);box-sizing:border-box}
+.sb.collapsed~.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
 /* Mobile admin */
 .sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
+
+  .sb.open{display:flex!important}
+  .sb-dim.on{display:block}
+  .sb-menu-btn{display:flex!important}
+  .adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
+  .stats-row{grid-template-columns:repeat(2,1fr)!important}
+  .fr{flex-direction:column}
+  #sec-sup>div[style*="grid"]{display:flex!important;flex-direction:column}
+  #adminPg.on{display:flex}
+}
 @media(max-width:768px){
   .sb{display:none!important;width:260px!important;z-index:500!important}
   .sb.open{display:flex!important}
   .sb-dim.on{display:block}
   .sb-menu-btn{display:flex!important}
-  .adm-main{margin-right:0!important;padding:14px;padding-top:58px;width:100%!important}
+  .adm-main{margin-right:0!important;padding:14px;padding-top:58px}
   .stats-row{grid-template-columns:repeat(2,1fr)!important}
-  .fr{flex-direction:column}
-  #sec-sup>div[style*="grid"]{display:flex!important;flex-direction:column}
-  #adminPg.on{display:block!important}
 }
 .sb-logo{padding:18px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0}
@@ -118,20 +125,19 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .2s;border:none;background:transparent;font-family:var(--ff);width:100%;text-align:right}
 .nav-item:hover{background:var(--bg2);color:var(--txt)}.nav-item.on{background:rgba(0,114,255,.15);color:var(--p)}
 .nb{margin-right:auto;background:var(--err);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;display:none}.nb.on{display:inline}
-.adm-main{margin-right:230px;padding:24px;min-height:100vh;transition:margin-right .3s ease;width:calc(100% - 230px);box-sizing:border-box}
+.adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
 /* Mobile */
 .sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
-@media(max-width:768px){
-  .sb{display:none!important;width:260px!important;z-index:500!important}
+
   .sb.open{display:flex!important}
   .sb-dim.on{display:block}
   .sb-menu-btn{display:flex!important}
-  .adm-main{margin-right:0!important;padding:14px;padding-top:58px;width:100%!important}
+  .adm-main{flex:1;margin-right:230px;padding:24px;overflow-y:auto;min-height:100vh}
   .stats-row{grid-template-columns:repeat(2,1fr)!important}
   .fr{flex-direction:column}
   #sec-sup>div[style*="grid"]{display:flex!important;flex-direction:column}
-  #adminPg.on{display:block!important}
+  #adminPg.on{display:flex}
 }
 .adm-sec{display:none}.adm-sec.on{display:block}
 .adm-hdr{margin-bottom:20px}.adm-hdr h2{font-size:20px;font-weight:700}.adm-hdr p{font-size:12px;color:var(--t2);margin-top:3px}
@@ -1775,14 +1781,10 @@ function nav(s){
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
   if(event&&event.currentTarget)event.currentTarget.classList.add('on');
   document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
-  const sec=$('sec-'+s);
-  if(sec) sec.classList.add('on');
-  // scroll to top
-  window.scrollTo({top:0,behavior:'instant'});
-  document.documentElement.scrollTop=0;
-  document.body.scrollTop=0;
-  const main=document.querySelector('.adm-main');
-  if(main){main.scrollTop=0;main.scrollIntoView();}
+  $('sec-'+s)?.classList.add('on');
+  // adm-main has overflow-y:auto so scroll IT to top
+  const m=document.querySelector('.adm-main');
+  if(m) m.scrollTop=0;
   if(window.innerWidth<=768) closeSB();
   if(s==='transfers') loadAdminTransfers();
 }
