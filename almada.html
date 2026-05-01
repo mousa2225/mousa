@@ -619,78 +619,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div><!-- admin-main -->
 </div><!-- adminPg -->
 
-<!-- User Support Sheet -->
-          <div style="display:flex;flex-direction:column;gap:7px">
-            <button class="b1" onclick="$('logoFile').click()">📁 رفع شعار</button>
-            <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="uploadLogo(this)">
-            <button class="b4" onclick="removeLogo()">✕ إزالة</button>
-          </div>
-          <div><label class="fl">لون خلفية الشعار</label><input type="color" id="logoBgClr" value="#0072ff" style="width:60px;height:34px;border:1px solid var(--brd);border-radius:8px;cursor:pointer;background:var(--bg2);padding:2px" oninput="applyLogoBg(this.value)"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم الموقع</label><input class="inp" id="cf_siteName" value="المدى نت"></div>
-          <div><label class="fl">رمز احتياطي</label><input class="inp" id="cf_siteIcon" value="📡" style="max-width:80px"></div>
-        </div>
-        <div class="fr" style="margin-bottom:14px">
-          <div><label class="fl">وصف الموقع</label><input class="inp" id="cf_siteDesc" value="بوابة كروت الإنترنت"></div>
-          <div><label class="fl">رقم الجوال</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr"></div>
-        </div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(255,107,53,.05)"><h3>🎨 الألوان</h3></div><div class="pb">
-        <div class="cg">
-          <div><label>اللون الأساسي</label><input type="color" id="cl_p" value="#00c6ff" oninput="applyColor('--p',this.value)"></div>
-          <div><label>الأساسي الداكن</label><input type="color" id="cl_pd" value="#0072ff" oninput="applyColor('--pd',this.value)"></div>
-          <div><label>زر الشراء</label><input type="color" id="cl_acc" value="#ff6b35" oninput="applyColor('--acc',this.value)"></div>
-          <div><label>النجاح</label><input type="color" id="cl_ok" value="#00d68f" oninput="applyColor('--ok',this.value)"></div>
-          <div><label>الخلفية</label><input type="color" id="cl_bg" value="#070b14" oninput="applyColor('--bg',this.value)"></div>
-          <div><label>البطاقات</label><input type="color" id="cl_card" value="#131d2e" oninput="applyColor('--card',this.value)"></div>
-        </div>
-        <div style="margin-top:14px;display:flex;gap:9px">
-          <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-          <button class="b4" onclick="resetColors()">↺ افتراضي</button>
-        </div>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(0,214,143,.05)"><h3>📝 النصوص</h3></div><div class="pb">
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">عنوان قسم الكروت</label><input class="inp" id="cf_lblCards" value="اختر فئة الكرت"></div>
-          <div><label class="fl">عنوان السجل</label><input class="inp" id="cf_lblHist" value="آخر عمليات الشراء"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">تسمية الرصيد</label><input class="inp" id="cf_lblBal" value="رصيدك الحالي"></div>
-          <div><label class="fl">رمز العملة</label><input class="inp" id="cf_currency" value="ر.ي" style="max-width:90px"></div>
-        </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">زر شحن الرصيد</label><input class="inp" id="cf_btnRC" value="+ شحن رصيد"></div>
-          <div><label class="fl">زر السجل</label><input class="inp" id="cf_btnHist" value="📋 سجل العمليات"></div>
-        </div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(0,198,255,.05)"><h3>🏦 بيانات البنك</h3></div><div class="pb">
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم البنك</label><input class="inp" id="cf_bankName" value="بنك الكريمي"></div>
-          <div><label class="fl">رقم الحساب</label><input class="inp" id="cf_bankNum" value="777-XXXX-XXXX" style="direction:ltr"></div>
-        </div>
-        <div style="margin-bottom:12px"><label class="fl">اسم صاحب الحساب</label><input class="inp" id="cf_bankOwner" value="المدى نت"></div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">تسمية حقل البنك</label><input class="inp" id="cf_bankLbl1" value="البنك"></div>
-          <div><label class="fl">تسمية حقل رقم الحساب</label><input class="inp" id="cf_bankLbl2" value="رقم الحساب"></div>
-        </div>
-        <div style="margin-bottom:14px"><label class="fl">تسمية حقل اسم الحساب</label><input class="inp" id="cf_bankLbl3" value="اسم الحساب"></div>
-        <div style="margin-bottom:14px"><label class="fl">تعليمات الشحن</label><textarea class="inp ta" id="cf_bankInstr" style="min-height:70px;resize:vertical">حوّل المبلغ للحساب أعلاه ثم أرسل الإيصال.</textarea></div>
-        <button class="b1" onclick="saveSettings()">💾 حفظ</button>
-      </div></div>
-
-      <div class="panel"><div class="ph" style="background:rgba(255,61,113,.05)"><h3>🔐 كلمة مرور لوحة التحكم</h3></div><div class="pb">
-        <div style="margin-bottom:12px"><label class="fl">الحالية</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apCur" placeholder="••••••••"><button class="eye" onclick="togglePw('apCur',this)" type="button">👁</button></div></div>
-        <div style="margin-bottom:12px"><label class="fl">الجديدة</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apNew" placeholder="••••••••"><button class="eye" onclick="togglePw('apNew',this)" type="button">👁</button></div></div>
-        <div style="margin-bottom:14px"><label class="fl">تأكيد</label><div class="pw" style="max-width:300px"><input class="inp" type="password" id="apConf" placeholder="••••••••"><button class="eye" onclick="togglePw('apConf',this)" type="button">👁</button></div></div>
-        <button class="b3" onclick="changeAdminPass()">🔒 تغيير</button>
-      </div></div>
-    </div><!-- end sec-set -->
 <div class="sup-overlay" id="supOverlay">
   <div class="sup-sheet">
     <div class="sup-hdr">
@@ -2407,6 +2335,124 @@ async function addSliderItemVideo(input){
   try{const s=await doc('settings','main').get();if(s.exists){Object.assign(S.cfg,s.data());applySettings();}}catch(e){}
   loadRem();
 })();
+</script>
+
+<!-- ── إضافات آمنة: فلتر البحث + صور البروفايل ── -->
+<script>
+
+// ── فلتر البحث في قائمة المستخدمين ──
+document.addEventListener('DOMContentLoaded', function(){
+  // أضف حقل بحث فوق جدول المستخدمين
+  const utb = document.querySelector('#usersTable');
+  if(utb){
+    const wrap = utb.closest('.tw') || utb.parentElement;
+    const inp = document.createElement('input');
+    inp.className='inp'; inp.placeholder='🔍 بحث بالاسم أو البريد...';
+    inp.style.cssText='max-width:340px;margin-bottom:10px;display:block';
+    inp.oninput=function(){ filterTable('usersTable', this.value); };
+    wrap.parentElement.insertBefore(inp, wrap);
+  }
+
+  // أضف حقل بحث فوق جدول المبيعات
+  const stb = document.querySelector('#salesTable');
+  if(stb){
+    const wrap = stb.closest('.tw') || stb.parentElement;
+    const inp = document.createElement('input');
+    inp.className='inp'; inp.placeholder='🔍 بحث بالمستخدم أو الفئة...';
+    inp.style.cssText='max-width:340px;margin-bottom:10px;display:block';
+    inp.oninput=function(){ filterTable('salesTable', this.value); };
+    wrap.parentElement.insertBefore(inp, wrap);
+  }
+
+  // أضف حقل بحث فوق قائمة المحادثات
+  const cl = document.querySelector('#adminConvList');
+  if(cl){
+    const inp = document.createElement('input');
+    inp.className='inp'; inp.placeholder='🔍 بحث في المحادثات...';
+    inp.style.cssText='width:100%;margin-bottom:8px;display:block;font-size:13px';
+    inp.oninput=function(){
+      const q=this.value.toLowerCase();
+      cl.querySelectorAll('.conv-item').forEach(el=>{
+        el.style.display=(!q||el.textContent.toLowerCase().includes(q))?'':'none';
+      });
+    };
+    cl.parentElement.insertBefore(inp, cl);
+  }
+});
+
+// فلتر عام للجداول
+function filterTable(tableId, q){
+  const tb=document.getElementById(tableId);
+  if(!tb)return;
+  tb.querySelectorAll('tr').forEach(row=>{
+    row.style.display=(!q||row.textContent.toLowerCase().includes(q.toLowerCase()))?'':'none';
+  });
+}
+
+// فلتر الـ select (للاختيار اليدوي)
+function filterSelectUser(searchId, selectId){
+  const q=document.getElementById(searchId)?.value.toLowerCase()||'';
+  const sel=document.getElementById(selectId);
+  if(!sel||!window.S?.users)return;
+  sel.innerHTML='<option value="">— اختر —</option>'+
+    S.users.filter(u=>{
+      const t=(u.name||u.username||u.email||'').toLowerCase();
+      return !q||t.includes(q);
+    }).map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
+}
+
+// ── صور البروفايل ──
+// Override renderUsersTable لإضافة صور
+const _origRUT = window.renderUsersTable;
+if(_origRUT){
+  window.renderUsersTable = function(){
+    _origRUT();
+    // أضف الصور بعد الرندر
+    setTimeout(addAvatarsToTable, 50);
+  };
+}
+
+function addAvatarsToTable(){
+  const tb=document.getElementById('usersTable');
+  if(!tb||!window.S?.users)return;
+  const rows=tb.querySelectorAll('tr');
+  rows.forEach((row,i)=>{
+    if(!S.users[i])return;
+    const u=S.users[i];
+    const nameTd=row.cells[1];
+    if(!nameTd||nameTd.querySelector('img'))return;
+    const nameText=nameTd.innerHTML;
+    const av=u.avatarImg
+      ?`<img src="${u.avatarImg}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-left:7px;vertical-align:middle">`
+      :`<span style="font-size:18px;margin-left:6px;vertical-align:middle">👤</span>`;
+    nameTd.innerHTML=`<div style="display:flex;align-items:center">${nameText}<div style="display:flex;align-items:center;margin-right:auto">${av}</div></div>`;
+  });
+}
+
+// Override renderRcList لإضافة صور في طلبات الشحن
+const _origRRL = window.renderRcList;
+if(_origRRL){
+  window.renderRcList = function(){
+    _origRRL();
+    setTimeout(addAvatarsToRcList, 50);
+  };
+}
+
+function addAvatarsToRcList(){
+  const el=document.getElementById('rcList');
+  if(!el||!window.S)return;
+  const pend=S.reqs?.filter(r=>r.status==='pending')||[];
+  const rows=el.querySelectorAll('[style*="padding:14px"]');
+  rows.forEach((row,i)=>{
+    if(!pend[i])return;
+    const u=S.users?.find(x=>x.fbId===pend[i].userId);
+    if(!u?.avatarImg)return;
+    const icon=row.querySelector('[style*="font-size:18px"]');
+    if(!icon||icon.querySelector('img'))return;
+    icon.innerHTML=`<img src="${u.avatarImg}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`;
+  });
+}
+
 </script>
 
 <!-- PWA -->
