@@ -1262,13 +1262,7 @@ function checkDot(){
   const d=$('supDot');
   if(d)d.style.display=unread.length>0?'block':'none';
 }
-async function switchHistTab(tab){
-  $('tabSales').className=tab==='sales'?'tab on':'tab';
-  $('tabRc').className=tab==='rc'?'tab on':'tab';
-  $('salesHistDiv').style.display=tab==='sales'?'block':'none';
-  $('rcHistDiv').style.display=tab==='rc'?'block':'none';
-  if(tab==='rc') await renderRcHist();
-}
+// switchHistTab replaced by new version below
 
 async function renderRcHist(){
   const list=$('rcHistList');if(!list)return;
@@ -2453,6 +2447,371 @@ function addAvatarsToRcList(){
   });
 }
 
+</script>
+
+<!-- ── إضافات: الإشعارات + التحويل + كشف PDF ── -->
+
+<!-- Notification Bell + Profile + Transfer buttons in user header -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // أضف زر الإشعارات وزر البروفايل وزر التحويل في header المستخدم
+  const supBtn = document.querySelector('.hbtn.sup');
+  if(supBtn && !document.getElementById('notifBell')){
+    // زر الإشعارات
+    const bell = document.createElement('button');
+    bell.className='hbtn'; bell.id='notifBell';
+    bell.style.cssText='position:relative';
+    bell.innerHTML='🔔<span id="notifBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--err);color:#fff;border-radius:50%;width:17px;height:17px;font-size:10px;font-weight:700;line-height:17px;text-align:center">0</span>';
+    bell.onclick=openNotifs;
+    supBtn.parentElement.insertBefore(bell, supBtn);
+
+    // زر البروفايل
+    const profBtn = document.createElement('button');
+    profBtn.id='profileBtn';
+    profBtn.style.cssText='background:transparent;border:2px solid var(--brd);border-radius:50%;width:34px;height:34px;padding:0;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+    profBtn.innerHTML='<img id="uAvatarH" src="" style="width:100%;height:100%;object-fit:cover;display:none"><span id="uAvatarE">👤</span>';
+    profBtn.onclick=openProfile;
+    supBtn.parentElement.insertBefore(profBtn, supBtn);
+  }
+
+  // أضف زر التحويل في bal-row
+  const btnRC = document.getElementById('btnRC');
+  if(btnRC && !document.getElementById('trBtn')){
+    const trBtn = document.createElement('button');
+    trBtn.className='rc-btn'; trBtn.id='trBtn';
+    trBtn.textContent='💸 تحويل';
+    trBtn.onclick=openTransferModal;
+    btnRC.parentElement.insertBefore(trBtn, btnRC.nextSibling);
+  }
+
+  // أضف تبويب التحويلات في السجل
+  const tabRc = document.getElementById('tabRc');
+  if(tabRc && !document.getElementById('tabTr')){
+    tabRc.style.fontSize='12px'; tabRc.style.padding='8px';
+    document.getElementById('tabSales').style.fontSize='12px';
+    document.getElementById('tabSales').style.padding='8px';
+    const tabTr = document.createElement('button');
+    tabTr.className='tab'; tabTr.id='tabTr';
+    tabTr.style.cssText='flex:1;padding:8px;font-size:12px';
+    tabTr.textContent='💸 التحويلات';
+    tabTr.onclick=function(){ switchHistTab('tr'); };
+    tabRc.parentElement.appendChild(tabTr);
+
+    // أضف div التحويلات
+    const rcDiv = document.getElementById('rcHistDiv');
+    if(rcDiv){
+      const trDiv = document.createElement('div');
+      trDiv.id='trHistDiv'; trDiv.style.display='none';
+      trDiv.innerHTML='<div class="hist-list" id="trHistList"></div>';
+      rcDiv.parentElement.appendChild(trDiv);
+    }
+  }
+});
+</script>
+
+<!-- Modals: Profile + Transfer + Notifications -->
+<div class="ov" id="profileModal">
+<div class="modal" style="max-width:420px">
+  <h3>👤 الملف الشخصي</h3>
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;cursor:pointer;position:relative" onclick="document.getElementById('avatarFileInp').click()">
+      <img id="profileAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover">
+      <span id="profileAvatarEmoji">👤</span>
+    </div>
+    <input type="file" id="avatarFileInp" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+    <div style="font-size:11px;color:var(--t2);margin-top:5px">اضغط لتغيير الصورة</div>
+  </div>
+  <div class="fg"><label>اسم المستخدم</label><input class="inp" id="profName" readonly style="opacity:.6"></div>
+  <div class="fg"><label>البريد</label><input class="inp" id="profEmail" readonly style="opacity:.6"></div>
+  <div style="border-top:1px solid var(--brd);padding-top:14px;margin-top:4px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">🔑 تغيير كلمة المرور</div>
+    <div class="fg"><label>الحالية</label><div class="pw"><input class="inp" type="password" id="profCur" placeholder="••••••••"><button class="eye" onclick="togglePw('profCur',this)" type="button">👁</button></div></div>
+    <div class="fg"><label>الجديدة</label><div class="pw"><input class="inp" type="password" id="profNew" placeholder="••••••••"><button class="eye" onclick="togglePw('profNew',this)" type="button">👁</button></div></div>
+    <div class="fg"><label>تأكيد</label><div class="pw"><input class="inp" type="password" id="profConf" placeholder="••••••••"><button class="eye" onclick="togglePw('profConf',this)" type="button">👁</button></div></div>
+    <button class="btn-main" onclick="changePassProfile()">🔒 تغيير</button>
+  </div>
+  <button class="mbtn-cancel" style="width:100%;margin-top:10px" onclick="closeOv('profileModal')">إغلاق</button>
+</div></div>
+
+<div class="ov" id="transferModal">
+<div class="modal">
+  <h3>💸 تحويل رصيد</h3>
+  <div style="background:rgba(0,114,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--p)">رصيدك: <strong id="trMyBal">0</strong> <span class="cur">ر.ي</span></div>
+  <div class="fg"><label>اسم المستخدم أو البريد</label><input class="inp" id="trTargetInp" placeholder="ahmed99 أو ahmed@email.com"></div>
+  <div class="fg"><label>المبلغ</label><input class="inp" type="number" id="trAmountInp" placeholder="500"></div>
+  <div id="trConfirmBox" style="display:none;background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div id="trTargetAv" style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
+      <div><div style="font-weight:600" id="trTargetNameTxt"></div><div style="font-size:11px;color:var(--t2)">المستقبل</div></div>
+    </div>
+    <div>المبلغ: <strong id="trAmtTxt" style="color:var(--ok)"></strong></div>
+    <div style="font-size:11px;color:var(--t3);margin-top:5px">⚠️ لا يمكن التراجع</div>
+  </div>
+  <div class="mrow">
+    <button class="mcancel" onclick="closeOv('transferModal')">إلغاء</button>
+    <button class="mok" id="trActionBtn" onclick="trSearch()">🔍 بحث</button>
+  </div>
+</div></div>
+
+<div class="ov" id="notifModal">
+<div class="modal" style="max-width:420px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h3 style="margin:0">🔔 الإشعارات</h3>
+    <button onclick="clearNotifs()" style="background:none;border:1px solid var(--brd);border-radius:8px;padding:4px 10px;color:var(--t2);cursor:pointer;font-size:12px;font-family:var(--ff)">مسح الكل</button>
+  </div>
+  <div id="notifList" style="max-height:380px;overflow-y:auto"></div>
+  <button class="mok" style="width:100%;margin-top:14px" onclick="closeOv('notifModal')">إغلاق</button>
+</div></div>
+
+<script>
+// ══ NOTIFICATIONS ══
+S._notifs=[];
+async function loadNotifs(){
+  const uid=S.user?.fbId;if(!uid)return;
+  try{
+    const snap=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));
+    S._notifs=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    updateNotifBadge();
+  }catch(e){}
+}
+function updateNotifBadge(){
+  const n=(S._notifs||[]).filter(x=>!x.read).length;
+  const b=document.getElementById('notifBadge');
+  if(b){b.textContent=n;b.style.display=n?'inline-block':'none';}
+}
+function openNotifs(){
+  (S._notifs||[]).forEach(n=>{if(!n.read&&n.fbId){n.read=true;col('notifications').doc(n.fbId).update({read:true}).catch(()=>{});}});
+  updateNotifBadge();
+  const list=document.getElementById('notifList');if(!list)return;
+  if(!S._notifs?.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد إشعارات</div>';openOv('notifModal');return;}
+  const ic={recharge:'💳',transfer_in:'📥',transfer_out:'📤',gift:'🎁',support:'💬'};
+  list.innerHTML=S._notifs.map(n=>`
+    <div style="padding:11px 4px;border-bottom:1px solid var(--brd);display:flex;gap:10px;opacity:${n.read?.55:1}">
+      <div style="width:34px;height:34px;background:var(--bg2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${ic[n.type]||'🔔'}</div>
+      <div><div style="font-size:13px;font-weight:600">${n.title||''}</div>
+      <div style="font-size:12px;color:var(--t2)">${n.body||''}</div>
+      <div style="font-size:10px;color:var(--t3)">${n.date||''}</div></div>
+    </div>`).join('');
+  openOv('notifModal');
+}
+async function clearNotifs(){
+  const uid=S.user?.fbId;if(!uid)return;
+  try{const s=await col('notifications').where('uid','==',uid).get().catch(()=>({docs:[]}));for(const d of s.docs)await d.ref.delete();}catch(e){}
+  S._notifs=[];updateNotifBadge();
+  document.getElementById('notifList').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد إشعارات</div>';
+}
+async function pushNotif(uid,type,title,body){
+  try{await col('notifications').add({uid,type,title,body,date:new Date().toLocaleString('ar-YE'),ts:Date.now(),read:false,createdAt:TS()});}catch(e){}
+}
+
+// ══ PROFILE ══
+function openProfile(){
+  const u=S.user;if(!u)return;
+  document.getElementById('profName').value=u.username||u.name||'';
+  document.getElementById('profEmail').value=u.email||u.authEmail||'';
+  ['profCur','profNew','profConf'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const img=document.getElementById('profileAvatarImg'),em=document.getElementById('profileAvatarEmoji');
+  if(u.avatarImg){if(img){img.src=u.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
+  else{if(img)img.style.display='none';if(em){em.textContent='👤';em.style.display='';}}
+  openOv('profileModal');
+}
+async function uploadAvatar(input){
+  const f=input.files[0];if(!f)return;
+  if(f.size>2*1024*1024){toast('الصورة كبيرة — الحد 2MB','err');return;}
+  try{
+    const b64=await compressImage(f,300,0.8);
+    S.user.avatarImg=b64;
+    const img=document.getElementById('profileAvatarImg'),em=document.getElementById('profileAvatarEmoji');
+    if(img){img.src=b64;img.style.display='block';}if(em)em.style.display='none';
+    const hImg=document.getElementById('uAvatarH'),hEm=document.getElementById('uAvatarE');
+    if(hImg){hImg.src=b64;hImg.style.display='block';}if(hEm)hEm.style.display='none';
+    await col('users').doc(S.user.fbId).update({avatarImg:b64});
+    toast('✅ تم تحديث الصورة','ok');
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+async function changePassProfile(){
+  const cur=document.getElementById('profCur').value.trim();
+  const np=document.getElementById('profNew').value.trim();
+  const conf=document.getElementById('profConf').value.trim();
+  if(!cur){toast('أدخل كلمة المرور الحالية','err');return;}
+  if(!np||np.length<6){toast('6 أحرف على الأقل','err');return;}
+  if(np!==conf){toast('كلمة المرور غير متطابقة','err');return;}
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(au.currentUser.email,cur);
+    await au.currentUser.reauthenticateWithCredential(cred);
+    await au.currentUser.updatePassword(np);
+    ['profCur','profNew','profConf'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    toast('✅ تم تغيير كلمة المرور','ok');
+  }catch(e){if(e.code==='auth/wrong-password')toast('كلمة المرور الحالية خاطئة','err');else toast('خطأ: '+e.message,'err');}
+}
+
+// ══ TRANSFER ══
+let _trTarget=null;
+function openTransferModal(){
+  _trTarget=null;
+  document.getElementById('trTargetInp').value='';
+  document.getElementById('trAmountInp').value='';
+  document.getElementById('trConfirmBox').style.display='none';
+  const btn=document.getElementById('trActionBtn');
+  if(btn){btn.textContent='🔍 بحث';btn.onclick=trSearch;btn.disabled=false;}
+  document.getElementById('trMyBal').textContent=(S.user?.balance||0).toLocaleString();
+  openOv('transferModal');
+}
+async function trSearch(){
+  const q=document.getElementById('trTargetInp').value.trim().toLowerCase();
+  const amt=parseInt(document.getElementById('trAmountInp').value);
+  if(!q){toast('أدخل اسم المستخدم أو البريد','err');return;}
+  if(!amt||amt<1){toast('أدخل مبلغاً صحيحاً','err');return;}
+  if(amt>(S.user?.balance||0)){toast('رصيدك غير كافٍ','err');return;}
+  const btn=document.getElementById('trActionBtn');
+  btn.disabled=true;btn.textContent='⏳';
+  try{
+    let snap=await col('users').where('username','==',q).limit(1).get();
+    if(snap.empty)snap=await col('users').where('email','==',q).limit(1).get();
+    if(snap.empty){toast('المستخدم غير موجود','err');btn.disabled=false;btn.textContent='🔍 بحث';return;}
+    const d=snap.docs[0];
+    if(d.id===S.user.fbId){toast('لا يمكنك التحويل لنفسك','err');btn.disabled=false;btn.textContent='🔍 بحث';return;}
+    _trTarget={fbId:d.id,...d.data()};
+    const av=document.getElementById('trTargetAv');
+    if(av)av.innerHTML=_trTarget.avatarImg?`<img src="${_trTarget.avatarImg}" style="width:100%;height:100%;object-fit:cover">`:'👤';
+    document.getElementById('trTargetNameTxt').textContent=_trTarget.name||_trTarget.username||_trTarget.email;
+    document.getElementById('trAmtTxt').textContent=amt.toLocaleString()+' '+(S.cfg?.currency||'ر.ي');
+    document.getElementById('trConfirmBox').style.display='block';
+    btn.textContent='✅ تأكيد';btn.disabled=false;btn.onclick=trConfirm;
+  }catch(e){toast('خطأ: '+e.message,'err');btn.disabled=false;btn.textContent='🔍 بحث';}
+}
+async function trConfirm(){
+  if(!_trTarget)return;
+  const amt=parseInt(document.getElementById('trAmountInp').value);
+  if(!amt||amt>(S.user?.balance||0)){toast('مبلغ غير صحيح','err');return;}
+  const btn=document.getElementById('trActionBtn');
+  btn.disabled=true;btn.textContent='⏳';
+  const now=new Date().toLocaleString('ar-YE');
+  try{
+    const newFrom=(S.user.balance||0)-amt;
+    const toSnap=await col('users').doc(_trTarget.fbId).get();
+    const newTo=(toSnap.data()?.balance||0)+amt;
+    await col('users').doc(S.user.fbId).update({balance:newFrom});
+    await col('users').doc(_trTarget.fbId).update({balance:newTo});
+    await col('transfers').add({fromId:S.user.fbId,fromName:S.user.name||S.user.username,toId:_trTarget.fbId,toName:_trTarget.name||_trTarget.username,amount:amt,date:now,ts:Date.now(),createdAt:TS()});
+    await pushNotif(_trTarget.fbId,'transfer_in','📥 استلمت تحويلاً',`استلمت ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} من ${S.user.name||S.user.username}`);
+    await pushNotif(S.user.fbId,'transfer_out','📤 تم التحويل',`أرسلت ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} إلى ${_trTarget.name||_trTarget.username}`);
+    S.user.balance=newFrom;updateBal();
+    closeOv('transferModal');_trTarget=null;
+    toast('✅ تم التحويل بنجاح','ok');
+  }catch(e){toast('فشل: '+e.message,'err');btn.disabled=false;btn.textContent='✅ تأكيد';}
+}
+
+// ══ TRANSFERS HISTORY ══
+const _origSwitchHistTab=window.switchHistTab;
+window.switchHistTab=async function(tab){
+  ['Sales','Rc','Tr'].forEach(t=>{
+    const b=document.getElementById('tab'+t);if(b)b.className=t.toLowerCase()===tab?'tab on':'tab';
+    const d=document.getElementById((t==='Sales'?'salesHistDiv':t==='Rc'?'rcHistDiv':'trHistDiv'));
+    if(d)d.style.display=t.toLowerCase()===tab?'block':'none';
+  });
+  if(tab==='rc'&&_origSwitchHistTab)_origSwitchHistTab('rc');
+  if(tab==='tr')renderTrHist();
+};
+async function renderTrHist(){
+  const list=document.getElementById('trHistList');if(!list)return;
+  const uid=S.user?.fbId;if(!uid)return;
+  list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px">⏳</div>';
+  try{
+    const [s1,s2]=await Promise.all([
+      col('transfers').where('fromId','==',uid).get().catch(()=>({docs:[]})),
+      col('transfers').where('toId','==',uid).get().catch(()=>({docs:[]}))
+    ]);
+    const all=[...s1.docs.map(d=>({...d.data(),dir:'out'})),...s2.docs.map(d=>({...d.data(),dir:'in'}))].sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد تحويلات</div>';return;}
+    list.innerHTML=all.map(t=>`<div class="hi"><div style="display:flex;align-items:center;gap:10px;flex:1">
+      <div style="width:36px;height:36px;background:${t.dir==='in'?'rgba(0,214,143,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${t.dir==='in'?'📥':'📤'}</div>
+      <div><div style="font-size:13px;font-weight:600">${t.dir==='in'?'من '+t.fromName:'إلى '+t.toName}</div><div style="font-size:11px;color:var(--t2)">${t.date||''}</div></div></div>
+      <div style="font-size:14px;font-weight:700;color:${t.dir==='in'?'var(--ok)':'var(--err)'}">
+        ${t.dir==='in'?'+':'−'}${(t.amount||0).toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span></div></div>`).join('');
+  }catch(e){list.innerHTML=`<div style="color:var(--err);padding:20px">⚠️ ${e.message}</div>`;}
+}
+
+// ══ INIT USER — add notifs + avatar ══
+const _origInitUser=window.initUser;
+window.initUser=function(){
+  _origInitUser&&_origInitUser();
+  // apply avatar
+  const img=document.getElementById('uAvatarH'),em=document.getElementById('uAvatarE');
+  if(S.user?.avatarImg){if(img){img.src=S.user.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
+  // load notifications
+  loadNotifs();
+};
+
+// ══ PATCH approveRc to notify ══
+const _origApproveRc=window.approveRc;
+if(_origApproveRc){window.approveRc=async function(id){
+  await _origApproveRc(id);
+  const req=S.reqs?.find(r=>r.fbId===id);
+  if(req)await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك`);
+};}
+
+// ══ PDF — يشمل كل العمليات ══
+window.downloadStatementPDF=async function(uid){
+  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
+  const sales=S.sales?.filter(s=>s.userId===uid)||[];
+  const rcs=S.reqs?.filter(r=>r.userId===uid&&r.status==='approved')||[];
+  const manuals=u.manualRecharges||[];
+  const [s1,s2]=await Promise.all([
+    col('transfers').where('fromId','==',uid).get().catch(()=>({docs:[]})),
+    col('transfers').where('toId','==',uid).get().catch(()=>({docs:[]}))
+  ]);
+  const all=[
+    ...sales.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'🛒 شراء — '+x.catName,amount:-(x.price||0)})),
+    ...rcs.map(x=>({date:x.date,ts:x.createdAt?.seconds||0,label:'💳 شحن رصيد',amount:+(x.amount||0)})),
+    ...manuals.map(x=>({date:x.date,ts:(x.ts||0)/1000,label:(x.note||'شحن من الإدارة'),amount:x.amount||0})),
+    ...s2.docs.map(d=>({date:d.data().date,ts:(d.data().ts||0)/1000,label:'📥 تحويل من '+d.data().fromName,amount:+(d.data().amount||0)})),
+    ...s1.docs.map(d=>({date:d.data().date,ts:(d.data().ts||0)/1000,label:'📤 تحويل إلى '+d.data().toName,amount:-(d.data().amount||0)}))
+  ].sort((a,b)=>a.ts-b.ts);
+  const totalIn=all.filter(x=>x.amount>0).reduce((s,x)=>s+x.amount,0);
+  const totalOut=all.filter(x=>x.amount<0).reduce((s,x)=>s+Math.abs(x.amount),0);
+  const c=S.cfg||{};let running=0;
+  const rows=all.map(x=>{running+=x.amount;return`<tr><td>${x.date||''}</td><td>${x.label}</td><td style="font-weight:600;color:${x.amount>0?'#00a86b':'#cc0000'}">${x.amount>0?'+':''}${x.amount.toLocaleString()}</td><td style="font-weight:600">${running.toLocaleString()} ${c.currency||'ر.ي'}</td></tr>`;}).join('');
+  const html=`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>كشف حساب</title>
+  <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px;color:#222}
+  .hdr{display:flex;align-items:center;gap:16px;margin-bottom:20px;border-bottom:2px solid #0072ff;padding-bottom:14px}
+  .logo{width:56px;height:56px;background:#0072ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;overflow:hidden;flex-shrink:0}
+  .logo img{width:100%;height:100%;object-fit:cover}
+  h1{font-size:20px;color:#0072ff;margin:0}p{font-size:12px;color:#555;margin:2px 0}
+  .stats{display:flex;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .stat{background:#f0f5ff;border-radius:10px;padding:10px 16px;flex:1;min-width:120px;text-align:center}
+  .stat .v{font-size:18px;font-weight:700}.stat .l{font-size:11px;color:#777}
+  .urow{display:flex;align-items:center;gap:12px;background:#f8f9ff;border-radius:10px;padding:10px 16px;margin-bottom:14px}
+  .av{width:38px;height:38px;border-radius:50%;overflow:hidden;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .av img{width:100%;height:100%;object-fit:cover}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#0072ff;color:#fff;padding:8px 12px;text-align:right}
+  td{padding:7px 12px;border-bottom:1px solid #eee}tr:nth-child(even){background:#f9f9f9}
+  .footer{margin-top:18px;font-size:11px;color:#888;text-align:center}
+  </style></head><body>
+  <div class="hdr">
+    <div class="logo">${c.siteLogoImg?`<img src="${c.siteLogoImg}">`:c.siteIcon||'📡'}</div>
+    <div><h1>${c.siteName||'المدى نت'}</h1><p>${c.siteDesc||''}</p>${c.sitePhone?`<p>📞 ${c.sitePhone}</p>`:''}</div>
+    <div style="margin-right:auto;text-align:left;font-size:11px;color:#777">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-YE')}</div>
+  </div>
+  <div class="urow">
+    <div class="av">${u.avatarImg?`<img src="${u.avatarImg}">`:'👤'}</div>
+    <div><div style="font-weight:700;font-size:14px">${u.name||u.username}</div><div style="font-size:11px;color:#666">${u.email||''}</div></div>
+    <div style="margin-right:auto;text-align:left"><div style="font-size:11px;color:#666">الرصيد الحالي</div><div style="font-size:17px;font-weight:700;color:#0072ff">${(u.balance||0).toLocaleString()} ${c.currency||'ر.ي'}</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="v" style="color:#00a86b">+${totalIn.toLocaleString()}</div><div class="l">إجمالي الواردات</div></div>
+    <div class="stat"><div class="v" style="color:#cc0000">-${totalOut.toLocaleString()}</div><div class="l">إجمالي المصروفات</div></div>
+    <div class="stat"><div class="v" style="color:#0072ff">${(u.balance||0).toLocaleString()}</div><div class="l">الرصيد الحالي</div></div>
+  </div>
+  <table><thead><tr><th>التاريخ</th><th>البيان</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+  <tbody>${rows||'<tr><td colspan="4" style="text-align:center;color:#999">لا توجد عمليات</td></tr>'}</tbody></table>
+  <div class="footer">${c.siteName||'المدى نت'} — كشف حساب سري وخاص</div>
+  </body></html>`;
+  const w=window.open('','_blank');
+  if(!w){toast('السماح بالنوافذ المنبثقة','err');return;}
+  w.document.write(html);w.document.close();setTimeout(()=>w.print(),600);
+};
 </script>
 
 <!-- PWA -->
