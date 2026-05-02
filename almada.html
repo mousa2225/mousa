@@ -646,6 +646,27 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <!-- ── TRANSFERS SECTION ── -->
     <div class="adm-sec" id="sec-transfers">
       <div class="adm-hdr"><h2>💸 التحويلات بين المستخدمين</h2><p>سجل كل التحويلات التي تمت بين المستخدمين</p></div>
+
+      <!-- تحويل يدوي من الإدارة -->
+      <div class="panel"><div class="ph"><h3>💸 تحويل يدوي</h3></div><div class="pb">
+        <div class="fr" style="margin-bottom:12px">
+          <div style="flex:1">
+            <label class="fl">من (المُحوِّل)</label>
+            <input class="inp" id="trAdminFromSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSel('trAdminFromSearch','trAdminFrom',this.value)" style="margin-bottom:4px;font-size:12px">
+            <select class="sel" id="trAdminFrom"></select>
+          </div>
+          <div style="flex:1">
+            <label class="fl">إلى (المُستلِم)</label>
+            <input class="inp" id="trAdminToSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSel('trAdminToSearch','trAdminTo',this.value)" style="margin-bottom:4px;font-size:12px">
+            <select class="sel" id="trAdminTo"></select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label class="fl">المبلغ (<span class="cur">ر.ي</span>)</label>
+          <input class="inp" type="number" id="trAdminAmt" placeholder="500" style="max-width:180px">
+        </div>
+        <button class="b2" onclick="doAdminTransfer()">💸 تحويل الآن</button>
+      </div></div>
       <div class="panel"><div class="ph"><h3>سجل التحويلات</h3><button class="b5" onclick="loadTransfersAdmin()" style="margin-right:auto">🔄 تحديث</button></div>
         <div class="pb">
           <input class="inp" id="trAdminSearch" placeholder="🔍 بحث بالاسم..." oninput="filterTransfersAdmin(this.value)" style="max-width:340px;margin-bottom:10px;display:block">
@@ -2027,11 +2048,20 @@ function toggleAdminVoiceRec(){
 
 
 // ── HISTORY TABS ──
-function switchHistTab(tab){
-  document.querySelectorAll('#histSec .tab').forEach(b=>b.classList.remove('on'));
-  $('tab'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('on');
-  $('salesHistDiv').style.display=tab==='sales'?'block':'none';
-  $('rcHistDiv').style.display=tab==='rc'?'block':'none';
+async function switchHistTab(tab){
+  // Update tab buttons
+  ['Sales','Rc','Tr'].forEach(t=>{
+    const b=document.getElementById('tab'+t);
+    if(b) b.className = t.toLowerCase()===tab ? 'tab on' : 'tab';
+  });
+  // Show/hide divs
+  const salesDiv=$('salesHistDiv'), rcDiv=$('rcHistDiv'), trDiv=$('trHistDiv');
+  if(salesDiv) salesDiv.style.display=tab==='sales'?'block':'none';
+  if(rcDiv)    rcDiv.style.display=tab==='rc'?'block':'none';
+  if(trDiv)    trDiv.style.display=tab==='tr'?'block':'none';
+  // Load data
+  if(tab==='rc') await renderRcHist();
+  if(tab==='tr' && typeof renderTrHist==='function') await renderTrHist();
 }
 
 // renderRcHist defined above
@@ -2380,6 +2410,41 @@ async function addSliderItemVideo(input){
 <!-- ── إضافات آمنة: فلتر البحث + صور البروفايل ── -->
 <script>
 
+// ── ADMIN MANUAL TRANSFER ──
+async function doAdminTransfer(){
+  const fromId=document.getElementById('trAdminFrom')?.value;
+  const toId=document.getElementById('trAdminTo')?.value;
+  const amt=parseInt(document.getElementById('trAdminAmt')?.value);
+  if(!fromId||!toId){toast('اختر المستخدمين','err');return;}
+  if(fromId===toId){toast('لا يمكن التحويل لنفس المستخدم','err');return;}
+  if(!amt||amt<1){toast('أدخل مبلغاً صحيحاً','err');return;}
+  const fu=S.users?.find(u=>u.fbId===fromId);
+  const tu=S.users?.find(u=>u.fbId===toId);
+  if(!fu||!tu)return;
+  if((fu.balance||0)<amt){toast(`رصيد ${fu.name||fu.username} غير كافٍ (${(fu.balance||0).toLocaleString()})` ,'err');return;}
+  if(!confirm(`تحويل ${amt.toLocaleString()} من ${fu.name||fu.username} إلى ${tu.name||tu.username}؟`))return;
+  try{
+    const now=new Date().toLocaleString('ar-YE');
+    await col('users').doc(fromId).update({balance:(fu.balance||0)-amt});
+    await col('users').doc(toId).update({balance:(tu.balance||0)+amt});
+    fu.balance=(fu.balance||0)-amt;
+    tu.balance=(tu.balance||0)+amt;
+    await col('transfers').add({
+      fromId,fromName:fu.name||fu.username,
+      toId,toName:tu.name||tu.username,
+      amount:amt,date:now,ts:Date.now(),
+      byAdmin:true,createdAt:TS()
+    });
+    if(window.pushNotif){
+      await window.pushNotif(fromId,'transfer_out','💸 تحويل رصيد',`تم خصم ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} من حسابك وتحويلها إلى ${tu.name||tu.username} بواسطة الإدارة`);
+      await window.pushNotif(toId,'transfer_in','💸 استلمت رصيداً',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك من ${fu.name||fu.username} بواسطة الإدارة`);
+    }
+    document.getElementById('trAdminAmt').value='';
+    toast(`✅ تم تحويل ${amt.toLocaleString()} من ${fu.name||fu.username} إلى ${tu.name||tu.username}`,'ok');
+    renderUsersTable();refreshStats();loadTransfersAdmin();
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+
 // ── ADMIN TRANSFERS SECTION ──
 async function loadTransfersAdmin(){
   const tb=document.getElementById('transfersAdminTable');
@@ -2429,7 +2494,12 @@ window.nav=function(s){
   const m=document.querySelector('.adm-main');
   if(m)m.scrollTop=0;
   closeAdminSB();
-  if(s==='transfers') loadTransfersAdmin();
+  if(s==='transfers'){
+    loadTransfersAdmin();
+    // populate transfer selects
+    const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
+    ['trAdminFrom','trAdminTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts;});
+  }
 };
 function toggleAdminSB(){
   const sb=document.getElementById('sbEl'),dim=document.getElementById('sbDim');
@@ -2812,16 +2882,7 @@ async function trConfirm(){
 }
 
 // ══ TRANSFERS HISTORY ══
-const _origSwitchHistTab=window.switchHistTab;
-window.switchHistTab=async function(tab){
-  ['Sales','Rc','Tr'].forEach(t=>{
-    const b=document.getElementById('tab'+t);if(b)b.className=t.toLowerCase()===tab?'tab on':'tab';
-    const d=document.getElementById((t==='Sales'?'salesHistDiv':t==='Rc'?'rcHistDiv':'trHistDiv'));
-    if(d)d.style.display=t.toLowerCase()===tab?'block':'none';
-  });
-  if(tab==='rc'&&_origSwitchHistTab)_origSwitchHistTab('rc');
-  if(tab==='tr')renderTrHist();
-};
+// switchHistTab already fixed above in main script
 async function renderTrHist(){
   const list=document.getElementById('trHistList');if(!list)return;
   const uid=S.user?.fbId;if(!uid)return;
