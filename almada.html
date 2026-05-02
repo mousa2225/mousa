@@ -350,7 +350,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="nav-item" onclick="nav('sales')">📋 المبيعات</button>
       <button class="nav-item" onclick="nav('sup')">💬 الدعم <span class="nb" id="nbSup">0</span></button>
       <button class="nav-item" onclick="nav('ads')">📢 الإعلانات</button>
-      <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>    </nav>
+      <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>
+      <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>    </nav>
     <div style="padding:12px 10px;border-top:1px solid var(--brd)">
       <div style="display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px">
         <div style="width:30px;height:30px;background:linear-gradient(135deg,var(--acc),#e05500);border-radius:8px;display:flex;align-items:center;justify-content:center">👨‍💼</div>
@@ -453,7 +454,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="panel"><div class="ph"><h3>الطلبات المعلقة</h3></div><div class="pb" id="rcList"><p style="color:var(--t3);text-align:center">لا توجد طلبات</p></div></div>
       <div class="panel"><div class="ph"><h3>شحن يدوي مباشر</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label><select class="sel" id="manUser"></select></div>
+          <div><label class="fl">المستخدم</label>
+            <input class="inp" id="manUserSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSel('manUserSearch','manUser',this.value)" style="margin-bottom:4px;font-size:12px">
+            <select class="sel" id="manUser"></select>
+          </div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="manAmt" placeholder="5000"></div>
         </div>
         <button class="b2" onclick="manRc()">✅ شحن</button>
@@ -464,7 +468,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="adm-hdr"><h2>👥 المستخدمون</h2></div>
       <div class="panel"><div class="ph"><h3>إضافة رصيد</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">المستخدم</label><select class="sel" id="addBalUser"></select></div>
+          <div><label class="fl">المستخدم</label>
+            <input class="inp" id="addBalSearch" placeholder="🔍 ابحث عن مستخدم..." oninput="searchUserSel('addBalSearch','addBalUser',this.value)" style="margin-bottom:4px;font-size:12px">
+            <select class="sel" id="addBalUser"></select>
+          </div>
           <div><label class="fl">المبلغ</label><input class="inp" type="number" id="addBalAmt" placeholder="5000"></div>
         </div>
         <div style="display:flex;gap:8px">
@@ -639,6 +646,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div></div>
 
     </div><!-- end sec-set -->
+
+    <!-- ── TRANSFERS SECTION ── -->
+    <div class="adm-sec" id="sec-transfers">
+      <div class="adm-hdr"><h2>💸 التحويلات بين المستخدمين</h2><p>سجل كل التحويلات التي تمت بين المستخدمين</p></div>
+      <div class="panel"><div class="ph"><h3>سجل التحويلات</h3><button class="b5" onclick="loadTransfersAdmin()" style="margin-right:auto">🔄 تحديث</button></div>
+        <div class="pb">
+          <input class="inp" id="trAdminSearch" placeholder="🔍 بحث بالاسم..." oninput="filterTransfersAdmin(this.value)" style="max-width:340px;margin-bottom:10px;display:block">
+          <div class="tw"><table><thead><tr><th>#</th><th>من</th><th>إلى</th><th>المبلغ</th><th>التاريخ</th><th>نوع</th></tr></thead>
+          <tbody id="transfersAdminTable"></tbody></table></div>
+        </div>
+      </div>
+    </div><!-- end sec-transfers -->
 
 </div><!-- admin-main -->
 </div><!-- adminPg -->
@@ -2358,7 +2377,57 @@ async function addSliderItemVideo(input){
 <!-- ── إضافات آمنة: فلتر البحث + صور البروفايل ── -->
 <script>
 
-// ── Mobile Sidebar Toggle ──
+// ── ADMIN TRANSFERS SECTION ──
+async function loadTransfersAdmin(){
+  const tb=document.getElementById('transfersAdminTable');
+  if(!tb)return;
+  tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t2)">⏳ جاري التحميل...</td></tr>';
+  try{
+    const snap=await col('transfers').get().catch(()=>({docs:[]}));
+    window._allTransfers=snap.docs.map(d=>({fbId:d.id,...d.data()})).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    renderTransfersTable(window._allTransfers);
+  }catch(e){
+    tb.innerHTML=`<tr><td colspan="6" style="color:var(--err);text-align:center">خطأ: ${e.message}</td></tr>`;
+  }
+}
+function renderTransfersTable(data){
+  const tb=document.getElementById('transfersAdminTable');if(!tb)return;
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد تحويلات</td></tr>';return;}
+  tb.innerHTML=data.map((t,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="color:var(--err);font-weight:600">${t.fromName||t.fromId||'—'}</td>
+    <td style="color:var(--ok);font-weight:600">${t.toName||t.toId||'—'}</td>
+    <td style="font-weight:700">${(t.amount||0).toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span></td>
+    <td style="font-size:11px;color:var(--t2)">${t.date||''}</td>
+    <td><span style="background:${t.byAdmin?'rgba(0,114,255,.15)':'rgba(0,214,143,.15)'};color:${t.byAdmin?'var(--p)':'var(--ok)'};border-radius:6px;padding:2px 8px;font-size:11px">${t.byAdmin?'إدارة':'مستخدم'}</span></td>
+  </tr>`).join('');
+}
+function filterTransfersAdmin(q){
+  if(!window._allTransfers)return;
+  const lq=q.toLowerCase();
+  const filtered=!lq?window._allTransfers:window._allTransfers.filter(t=>
+    (t.fromName||'').toLowerCase().includes(lq)||(t.toName||'').toLowerCase().includes(lq)
+  );
+  renderTransfersTable(filtered);
+}
+
+// ── SEARCH USER SELECT ──
+function searchUserSel(searchId,selectId,q){
+  const sel=document.getElementById(selectId);if(!sel||!S.users)return;
+  const lq=q.toLowerCase();
+  const filtered=!lq?S.users:S.users.filter(u=>(u.name||u.username||u.email||'').toLowerCase().includes(lq));
+  sel.innerHTML='<option value="">— اختر —</option>'+filtered.map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
+}
+
+// Load transfers when nav to section
+const _origNavX=window.nav;
+window.nav=function(s){
+  if(_origNavX)_origNavX.call(this,s);
+  const m=document.querySelector('.adm-main');
+  if(m)m.scrollTop=0;
+  closeAdminSB();
+  if(s==='transfers') loadTransfersAdmin();
+};
 function toggleAdminSB(){
   const sb=document.getElementById('sbEl'),dim=document.getElementById('sbDim');
   if(!sb)return;
@@ -2369,14 +2438,7 @@ function closeAdminSB(){
   document.getElementById('sbEl')?.classList.remove('mob-open');
   document.getElementById('sbDim')?.classList.remove('on');
 }
-// Fix nav to scroll to top + close mobile sidebar
-const _origNav=window.nav;
-window.nav=function(s){
-  if(_origNav)_origNav.call(this,s);
-  const m=document.querySelector('.adm-main');
-  if(m)m.scrollTop=0;
-  closeAdminSB();
-};
+// nav handled above
 
 // ── فلتر البحث في قائمة المستخدمين ──
 document.addEventListener('DOMContentLoaded', function(){
