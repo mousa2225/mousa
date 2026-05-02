@@ -1008,18 +1008,15 @@ async function syncServerTime(){
   try{
     const ref = col('_ping').doc('ts');
     const t1 = Date.now();
-    await ref.set({t: firebase.firestore.FieldValue.serverTimestamp()});
+    await ref.set({t: TS()});
     const snap = await ref.get();
     const t2 = Date.now();
-    const serverTime = snap.data()?.t?.toMillis?.();
-    if(serverTime){
-      // حساب الفرق مع تعويض زمن الشبكة
-      window._serverOffset = serverTime - ((t1+t2)/2);
-      console.log('⏰ Server offset:', Math.round(window._serverOffset/1000), 'sec');
+    const serverMs = snap.data()?.t?.toMillis?.();
+    if(serverMs){
+      window._serverOffset = serverMs - Math.round((t1+t2)/2);
     }
   }catch(e){ window._serverOffset = 0; }
-  // تحديث كل 10 دقائق
-  setTimeout(syncServerTime, 10 * 60 * 1000);
+  setTimeout(syncServerTime, 10*60*1000);
 }
 
 // وقت السيرفر الحالي كـ Date
@@ -1199,14 +1196,6 @@ async function doRegister(){
       ['regU','regP','regPC'].forEach(id=>{const e=$(id);if(e){e.value='';if(id!=='regU')e.type='password';}});
       document.querySelectorAll('#regForm .eye').forEach(btn=>btn.textContent='👁');
       $('loginU').value=''; $('loginP').value='';
-      $('loginU').focus();
-    },700);
-  }catch(e){
-    ld(false);
-    if(e.code==='auth/email-already-in-use') toast('هذا المعرّف مسجل مسبقاً','err');
-    else toast('خطأ: '+e.message,'err');
-  }
-}
       $('loginU').focus();
     },700);
   }catch(e){
@@ -2731,8 +2720,8 @@ window.nav=function(s){
     loadCompSettings().then(()=>loadCompSettingsToForm());
     loadDeviceFingerprints();
   }
+  if(s==='transfers'){
     loadTransfersAdmin();
-    // populate transfer selects
     const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
     ['trAdminFrom','trAdminTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts;});
   }
@@ -3747,8 +3736,24 @@ function toggleDailyPrize(){
   const cardDiv=document.getElementById('dailyCardCatDiv');
   if(cardDiv)cardDiv.style.display=type==='card'?'block':'none';
 }
+
+function openAuthSupport(){
+  const cfg=S.cfg||{};
+  const links=document.getElementById('authSupportLinks');
+  if(!links)return;
+  const items=[];
+  if(cfg.supportPhone||cfg.sitePhone)
+    items.push(`<a href="tel:${cfg.supportPhone||cfg.sitePhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.supportPhone||cfg.sitePhone}</div></div></a>`);
+  if(cfg.supportWhatsapp)
+    items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
+  if(cfg.supportTelegram)
+    items.push(`<a href="https://t.me/${cfg.supportTelegram}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">✈️</span><div><div style="font-weight:600">تيليجرام</div><div style="font-size:12px;color:var(--t2)">@${cfg.supportTelegram}</div></div></a>`);
+  links.innerHTML=items.length?items.join(''):'<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
+  openOv('authSupportModal');
+}
 </script>
 
+<script>
 // ══════════════════════════════════════════
 // DEVICE FINGERPRINT
 // ══════════════════════════════════════════
@@ -3858,6 +3863,7 @@ async function setFpStatus(fpId, action){
     loadDeviceFingerprints();
   }catch(e){toast('خطأ: '+e.message,'err');}
 }
+</script>
 
 <!-- ── Auth Support Modal ── -->
 <div class="ov" id="authSupportModal">
@@ -3865,36 +3871,11 @@ async function setFpStatus(fpId, action){
   <div style="text-align:center;margin-bottom:16px">
     <div style="font-size:40px">💬</div>
     <h3>تواصل مع الدعم</h3>
-    <p style="font-size:13px;color:var(--t2)" id="authSupportDesc">هل تواجه مشكلة في تسجيل الدخول؟ تواصل معنا</p>
+    <p style="font-size:13px;color:var(--t2)">هل تواجه مشكلة في تسجيل الدخول؟ تواصل معنا</p>
   </div>
   <div id="authSupportLinks" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="mbtn-cancel" style="width:100%;margin-top:14px" onclick="closeOv('authSupportModal')">إغلاق</button>
 </div></div>
-
-<script>
-function openAuthSupport(){
-  const cfg=S.cfg||{};
-  const links=document.getElementById('authSupportLinks');
-  if(links){
-    const items=[];
-    if(cfg.supportPhone||cfg.sitePhone){
-      items.push(`<a href="tel:${cfg.supportPhone||cfg.sitePhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none">
-        <span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.supportPhone||cfg.sitePhone}</div></div></a>`);
-    }
-    if(cfg.supportWhatsapp){
-      items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none">
-        <span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
-    }
-    if(cfg.supportTelegram){
-      items.push(`<a href="https://t.me/${cfg.supportTelegram}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none">
-        <span style="font-size:22px">✈️</span><div><div style="font-weight:600">تيليجرام</div><div style="font-size:12px;color:var(--t2)">@${cfg.supportTelegram}</div></div></a>`);
-    }
-    links.innerHTML = items.length ? items.join('') :
-      '<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
-  }
-  openOv('authSupportModal');
-}
-</script>
 
 <!-- PWA -->
 <script>
