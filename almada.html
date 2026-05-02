@@ -92,7 +92,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
 .banner{border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 
 /* ─ ADMIN ─ */
-.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100;overflow-y:auto}
+.sb{width:230px;background:var(--card);border-left:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:400;overflow-y:auto}
 .sb-logo{padding:18px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;overflow:hidden;flex-shrink:0}
 .sb-icon img{width:100%;height:100%;object-fit:cover}
@@ -219,23 +219,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 /* ── Mobile Responsive ── */
 .sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
-.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:350}
 @media(max-width:768px){
-  /* Admin */
-  .sb{display:none!important}.sb.mob-open{display:flex!important}
+  .sb{display:none!important}.sb.mob-open{display:flex!important;z-index:500!important}
   .sb-dim.on{display:block}
   .sb-menu-btn{display:flex!important}
   .adm-main{margin-right:0!important;padding:12px!important;padding-top:56px!important}
   .stats-row{grid-template-columns:repeat(2,1fr)!important}
   .panel .fr{flex-direction:column}
   #sec-sup>div[style*="grid-template"]{display:flex!important;flex-direction:column!important;height:auto!important}
-  /* User */
   .u-header{padding:8px 12px!important}
   .bal-pill{font-size:11px!important;padding:4px 9px!important}
   .hbtn{padding:6px 10px!important;font-size:12px!important}
   .grid{grid-template-columns:repeat(2,1fr)!important}
-  .card{padding:12px!important}
-  .histSec{padding:12px!important}
   .modal{margin:10px!important;max-height:90vh;overflow-y:auto}
 }
 </style>
