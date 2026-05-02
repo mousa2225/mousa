@@ -3849,8 +3849,21 @@ function toggleTieredPrize(prefix,rank){
 
 // ── Get Top Winners ──
 async function getTopWinners(type,period,limit3=3){
-  const cutoff=getPeriodCutoff(period||'month');
-  if(type==='buyer'){
+  const isBuyer=type==='buyer';
+  const cfg=S.comp?.[isBuyer?'topBuyer':'topRc']||{};
+  // ابدأ العد من تاريخ آخر توزيع أو من بداية الفترة — أيهما أحدث
+  const periodCutoff=getPeriodCutoff(period||'month');
+  let cutoff=periodCutoff;
+  if(cfg.lastDistributed){
+    // Parse the Arabic date stored — use timestamp approach
+    const distSnap=await col('compDistributions').orderBy&&null; // skip
+    // We store lastDistributedTs for accurate comparison
+  }
+  if(cfg.lastDistributedTs){
+    const distDate=new Date(cfg.lastDistributedTs);
+    if(distDate>cutoff)cutoff=distDate;
+  }
+  if(isBuyer){
     const snap=await col('sales').get().catch(()=>({docs:[]}));
     const counts={};
     snap.docs.forEach(d=>{const s=d.data();if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
@@ -3887,6 +3900,15 @@ async function distributeTopPrizes(type){
   }
   // Save record
   const today=serverNow().toISOString().split('T')[0];
+  // Save last distribution timestamp to restart counting from this point
+  const distUpdate={};
+  distUpdate[`${isBuyer?'topBuyer':'topRc'}.lastDistributed`]=serverDate();
+  distUpdate[`${isBuyer?'topBuyer':'topRc'}.lastDistributedTs`]=serverNow().getTime();
+  await doc('settings','competitions').update(distUpdate).catch(()=>{});
+  // Update local cfg
+  if(S.comp?.[isBuyer?'topBuyer':'topRc']){
+    S.comp[isBuyer?'topBuyer':'topRc'].lastDistributedTs=serverNow().getTime();
+  }
   await col('compDistributions').doc(`${type}_${today}`).set({
     type,distributedAt:serverDate(),
     winners:winners.map((w,i)=>({uid:w.uid,rank:i+1,score:w.score}))
@@ -4167,24 +4189,7 @@ async function submitDailyAnswer(){
 }
 
 // ── Redeem Loyalty Points ──
-async function redeemLoyaltyPoints(){
-  const cfg=S.comp?.loyalty;if(!cfg)return;
-  const pts=S.user?.loyaltyPoints||0;
-  const needed=cfg.ptsRedeem||100;
-  if(pts<needed){toast(`تحتاج ${needed} نقطة (عندك ${pts})`,'err');return;}
-  // If user_choice, show options
-  if(cfg.prizeType==='user_choice'){
-    openRedeemChoiceModal();return;
-  }
-  if(!confirm(`استبدال ${needed} نقطة مقابل جائزتك؟`))return;
-  const label=`⭐ استبدال ${needed} نقطة ولاء`;
-  const ok=await givePrize(S.user.fbId,cfg.prizeType,cfg.prizeVal,cfg.cardCat,label);
-  if(!ok){toast('فشل الاستبدال','err');return;}
-  const newPts=pts-needed;
-  await col('users').doc(S.user.fbId).update({loyaltyPoints:newPts});
-  S.user.loyaltyPoints=newPts;
-  toast('✅ تم الاستبدال!','ok');loadUserComp();
-}
+// redeemLoyaltyPoints defined above with full support
 
 function openRedeemChoiceModal(){
   const cfg=S.comp?.loyalty;if(!cfg)return;
@@ -4398,7 +4403,7 @@ function openAuthSupport(){
   if(cfg.sitePhone||cfg.supportPhone)
     items.push(`<a href="tel:${cfg.sitePhone||cfg.supportPhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.sitePhone||cfg.supportPhone}</div></div></a>`);
   if(cfg.supportWhatsapp)
-    items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
+    items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'').replace(/^0/,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
   if(cfg.supportTelegram)
     items.push(`<a href="https://t.me/${cfg.supportTelegram}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">✈️</span><div><div style="font-weight:600">تيليجرام</div><div style="font-size:12px;color:var(--t2)">@${cfg.supportTelegram}</div></div></a>`);
   links.innerHTML=items.length?items.join(''):'<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
