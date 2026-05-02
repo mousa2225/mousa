@@ -602,6 +602,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div><label class="fl">وصف الموقع</label><input class="inp" id="cf_siteDesc" value="بوابة كروت الإنترنت"></div>
           <div><label class="fl">رقم الجوال / التواصل</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr"></div>
         </div>
+        <div class="fr" style="margin-bottom:14px">
+          <div><label class="fl">💚 واتساب الدعم</label><input class="inp" id="cf_supportWhatsapp" placeholder="9677XXXXXXXX" style="direction:ltr"><span class="hint">الرقم مع رمز الدولة بدون +</span></div>
+          <div><label class="fl">✈️ تيليجرام الدعم</label><input class="inp" id="cf_supportTelegram" placeholder="اسم المستخدم بدون @" style="direction:ltr"></div>
+        </div>
         <button class="b1" onclick="saveSettings()">💾 حفظ</button>
       </div></div>
 
@@ -744,18 +748,33 @@ tr:hover td{background:rgba(255,255,255,.02)}
             </select>
           </div>
         </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="topBuyerPrizeType" onchange="toggleTopPrize('topBuyer')">
-              <option value="balance">رصيد نقدي</option><option value="card">كرت مجاني</option>
+        <!-- طريقة التوزيع -->
+        <div style="margin-bottom:12px">
+          <label class="fl">طريقة توزيع الجوائز</label>
+          <select class="sel" id="topBuyerDistrib">
+            <option value="admin_btn">الإدارة تضغط زر التوزيع يدوياً</option>
+            <option value="auto_end">تلقائي في نهاية الفترة</option>
+            <option value="user_claim">المستخدم يطالب بجائزته</option>
+            <option value="admin_pick">الإدارة تختار الفائز يدوياً</option>
+          </select>
+        </div>
+        <!-- جوائز تدرجية -->
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px">🏆 الجوائز التدرجية</div>
+          ${['1','2','3'].map(r=>`
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">${r==='1'?'🥇':r==='2'?'🥈':'🥉'}</span>
+            <select class="sel" id="topBuyerPrize${r}Type" onchange="toggleTieredPrize('topBuyer','${r}')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
             </select>
-          </div>
-          <div id="topBuyerBalDiv"><label class="fl">قيمة الرصيد</label><input class="inp" type="number" id="topBuyerPrizeVal" value="2000"></div>
-          <div id="topBuyerCardDiv" style="display:none"><label class="fl">فئة الكرت</label><select class="sel" id="topBuyerCardCat"></select></div>
+            <input class="inp" type="number" id="topBuyerPrize${r}Val" placeholder="المبلغ" value="${r==='1'?3000:r==='2'?2000:1000}" style="width:100px">
+            <select class="sel" id="topBuyerPrize${r}Card" style="display:none"></select>
+          </div>`).join('')}
         </div>
         <button class="b2" onclick="showTopBuyers()">👁 الترتيب الحالي</button>
+        <button class="b1" onclick="distributeTopPrizes('buyer')" style="background:var(--ok);border-color:var(--ok)">🎁 توزيع الجوائز الآن</button>
         <div id="topBuyersTable" style="margin-top:10px"></div>
-        <button class="b1" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
+        <button class="b5" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
       </div></div>
 
       <!-- 💳 أكثر شاحن -->
@@ -770,18 +789,31 @@ tr:hover td{background:rgba(255,255,255,.02)}
             </select>
           </div>
         </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="topRcPrizeType" onchange="toggleTopPrize('topRc')">
-              <option value="balance">رصيد نقدي</option><option value="card">كرت مجاني</option>
+        <div style="margin-bottom:12px">
+          <label class="fl">طريقة توزيع الجوائز</label>
+          <select class="sel" id="topRcDistrib">
+            <option value="admin_btn">الإدارة تضغط زر التوزيع يدوياً</option>
+            <option value="auto_end">تلقائي في نهاية الفترة</option>
+            <option value="user_claim">المستخدم يطالب بجائزته</option>
+            <option value="admin_pick">الإدارة تختار الفائز يدوياً</option>
+          </select>
+        </div>
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px">🏆 الجوائز التدرجية</div>
+          ${['1','2','3'].map(r=>`
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">${r==='1'?'🥇':r==='2'?'🥈':'🥉'}</span>
+            <select class="sel" id="topRcPrize${r}Type" onchange="toggleTieredPrize('topRc','${r}')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
             </select>
-          </div>
-          <div id="topRcBalDiv"><label class="fl">قيمة الرصيد</label><input class="inp" type="number" id="topRcPrizeVal" value="2000"></div>
-          <div id="topRcCardDiv" style="display:none"><label class="fl">فئة الكرت</label><select class="sel" id="topRcCardCat"></select></div>
+            <input class="inp" type="number" id="topRcPrize${r}Val" placeholder="المبلغ" value="${r==='1'?3000:r==='2'?2000:1000}" style="width:100px">
+            <select class="sel" id="topRcPrize${r}Card" style="display:none"></select>
+          </div>`).join('')}
         </div>
         <button class="b2" onclick="showTopRc()">👁 الترتيب الحالي</button>
+        <button class="b1" onclick="distributeTopPrizes('recharge')" style="background:var(--ok);border-color:var(--ok)">🎁 توزيع الجوائز الآن</button>
         <div id="topRcTable" style="margin-top:10px"></div>
-        <button class="b1" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
+        <button class="b5" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
       </div></div>
 
       <!-- 📅 سؤال اليوم -->
@@ -1397,13 +1429,13 @@ function applySettings(){
   sv('adIcon',c.adIcon);sv('adTitle',c.adTitle);sv('adText',c.adText);
   if(c.colors)Object.entries(c.colors).forEach(([k,v])=>{if(v)applyColor(k,v);});
   const lb=$('logoBgClr');if(lb)lb.value=c.logoBgColor||'#0072ff';
-  ['siteName','siteIcon','siteDesc','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)el.value=c[k]||'';});
+  ['siteName','siteIcon','siteDesc','sitePhone','supportWhatsapp','supportTelegram','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)el.value=c[k]||'';});
 }
 function applyLogoBg(c){S.cfg.logoBgColor=c;[[$('aLogoBox')],[$('uHIcon')],[$('sbIcon')],[$('logoPrevBox')]].forEach(([el])=>{if(el&&!S.cfg.siteLogoImg)el.style.background=c;});}
 function uploadLogo(i){const f=i.files[0];if(!f)return;if(f.size>2*1024*1024){toast('الصورة كبيرة — الحد 2MB','err');return;}const r=new FileReader();r.onload=e=>{S.cfg.siteLogoImg=e.target.result;applySettings();};r.readAsDataURL(f);}
 function removeLogo(){S.cfg.siteLogoImg='';applySettings();}
 async function saveSettings(){
-  ['siteName','siteIcon','siteDesc','sitePhone','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)S.cfg[k]=el.value;});
+  ['siteName','siteIcon','siteDesc','sitePhone','supportWhatsapp','supportTelegram','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)S.cfg[k]=el.value;});
   const cs=getComputedStyle(document.documentElement);
   S.cfg.colors={'--p':cs.getPropertyValue('--p').trim(),'--pd':cs.getPropertyValue('--pd').trim(),'--acc':cs.getPropertyValue('--acc').trim(),'--ok':cs.getPropertyValue('--ok').trim(),'--bg':cs.getPropertyValue('--bg').trim(),'--card':cs.getPropertyValue('--card').trim()};
   applySettings();
@@ -3375,13 +3407,17 @@ async function saveCompSettings(){
     },
     topBuyer:{
       enabled:b('topBuyerEnabled'),name:v('topBuyerName')||'🛒 أكثر مشترٍ',
-      period:v('topBuyerPeriod')||'month',prizeType:v('topBuyerPrizeType')||'balance',
-      prizeVal:n('topBuyerPrizeVal')||2000,cardCat:v('topBuyerCardCat')
+      period:v('topBuyerPeriod')||'month',distrib:v('topBuyerDistrib')||'admin_btn',
+      prize1Type:v('topBuyerPrize1Type')||'balance',prize1Val:n('topBuyerPrize1Val')||3000,prize1Card:v('topBuyerPrize1Card'),
+      prize2Type:v('topBuyerPrize2Type')||'balance',prize2Val:n('topBuyerPrize2Val')||2000,prize2Card:v('topBuyerPrize2Card'),
+      prize3Type:v('topBuyerPrize3Type')||'balance',prize3Val:n('topBuyerPrize3Val')||1000,prize3Card:v('topBuyerPrize3Card')
     },
     topRc:{
       enabled:b('topRcEnabled'),name:v('topRcName')||'💳 أكثر شاحن',
-      period:v('topRcPeriod')||'month',prizeType:v('topRcPrizeType')||'balance',
-      prizeVal:n('topRcPrizeVal')||2000,cardCat:v('topRcCardCat')
+      period:v('topRcPeriod')||'month',distrib:v('topRcDistrib')||'admin_btn',
+      prize1Type:v('topRcPrize1Type')||'balance',prize1Val:n('topRcPrize1Val')||3000,prize1Card:v('topRcPrize1Card'),
+      prize2Type:v('topRcPrize2Type')||'balance',prize2Val:n('topRcPrize2Val')||2000,prize2Card:v('topRcPrize2Card'),
+      prize3Type:v('topRcPrize3Type')||'balance',prize3Val:n('topRcPrize3Val')||1000,prize3Card:v('topRcPrize3Card')
     },
     daily:{
       enabled:b('dailyEnabled'),name:v('dailyName')||'📅 سؤال اليوم',
@@ -3402,9 +3438,19 @@ function loadCompSettingsToForm(){
   set('loyaltyPtsRedeem',l.ptsRedeem||100);set('loyaltyPrizeType',l.prizeType||'balance');
   set('loyaltyPrizeVal',l.prizeVal||500);
   set('topBuyerEnabled',tb.enabled);set('topBuyerName',tb.name||'🛒 أكثر مشترٍ');
-  set('topBuyerPeriod',tb.period||'month');set('topBuyerPrizeType',tb.prizeType||'balance');set('topBuyerPrizeVal',tb.prizeVal||2000);
+  set('topBuyerPeriod',tb.period||'month');set('topBuyerDistrib',tb.distrib||'admin_btn');
+  ['1','2','3'].forEach(r=>{
+    set(`topBuyerPrize${r}Type`,tb[`prize${r}Type`]||'balance');
+    set(`topBuyerPrize${r}Val`,tb[`prize${r}Val`]||(r==='1'?3000:r==='2'?2000:1000));
+    toggleTieredPrize('topBuyer',r);
+  });
   set('topRcEnabled',tr.enabled);set('topRcName',tr.name||'💳 أكثر شاحن');
-  set('topRcPeriod',tr.period||'month');set('topRcPrizeType',tr.prizeType||'balance');set('topRcPrizeVal',tr.prizeVal||2000);
+  set('topRcPeriod',tr.period||'month');set('topRcDistrib',tr.distrib||'admin_btn');
+  ['1','2','3'].forEach(r=>{
+    set(`topRcPrize${r}Type`,tr[`prize${r}Type`]||'balance');
+    set(`topRcPrize${r}Val`,tr[`prize${r}Val`]||(r==='1'?3000:r==='2'?2000:1000));
+    toggleTieredPrize('topRc',r);
+  });
   set('dailyEnabled',d.enabled);set('dailyName',d.name||'📅 سؤال اليوم');set('dailyMaxWinners',d.maxWinners||10);
   // Run toggles to show/hide correct fields
   toggleLoyaltyPrize();toggleTopPrize('topBuyer');toggleTopPrize('topRc');toggleDailyPrize();
@@ -3586,32 +3632,125 @@ async function showTopRc(){
 // ── Give Prize Helper ──
 async function givePrize(uid,prizeType,prizeVal,cardCat,label){
   const u=S.users?.find(x=>x.fbId===uid);if(!u)return false;
-  const entry={amount:0,date:serverDate(),note:label,type:'prize',ts:Date.now()};
   const updates={};
   if(prizeType==='balance'){
+    if(!prizeVal||prizeVal<=0)return false;
     const nb=(u.balance||0)+prizeVal;
-    entry.amount=prizeVal;
-    updates.balance=nb;
-    updates.manualRecharges=[...(u.manualRecharges||[]),entry];
+    const entry={amount:prizeVal,date:serverDate(),note:label,type:'prize',ts:Date.now()};
+    updates.balance=nb;updates.manualRecharges=[...(u.manualRecharges||[]),entry];
     u.balance=nb;u.manualRecharges=updates.manualRecharges;
     if(S.user?.fbId===uid){S.user.balance=nb;updateBal&&updateBal();}
   }else if(prizeType==='points'){
+    if(!prizeVal||prizeVal<=0)return false;
     const pts=(u.loyaltyPoints||0)+prizeVal;
     updates.loyaltyPoints=pts;u.loyaltyPoints=pts;
     if(S.user?.fbId===uid)S.user.loyaltyPoints=pts;
   }else if(prizeType==='card'&&cardCat){
-    // Give a card from the category
-    const available=S.cards?.filter(c=>c.catId===cardCat&&c.status==='available');
-    if(!available?.length)return false;
-    const card=available[0];
-    const userCards=[...(u.cards||[]),{catId:cardCat,catName:S.cats?.find(c=>c.fbId===cardCat)?.name||'كرت',code:card.code,date:serverDate(),isFree:true,prizeLabel:label}];
+    // جلب الكرت من Firebase مباشرة
+    const cardSnap=await col('cards')
+      .where('catId','==',cardCat).where('status','==','available')
+      .limit(1).get().catch(()=>({docs:[]}));
+    if(!cardSnap.docs.length){toast('لا توجد كروت متاحة في هذه الفئة','err');return false;}
+    const cardDoc=cardSnap.docs[0];
+    const catName=S.cats?.find(c=>c.fbId===cardCat)?.name||'كرت';
+    const newCard={catId:cardCat,catName,code:cardDoc.data().code,date:serverDate(),isFree:true,prizeLabel:label,price:0};
+    const userCards=[...(u.cards||[]),newCard];
     updates.cards=userCards;u.cards=userCards;
-    await col('cards').doc(card.fbId).update({status:'sold',soldTo:uid,soldAt:TS()}).catch(()=>{});
-    if(S.user?.fbId===uid){S.user.cards=userCards;}
-  }
+    if(S.user?.fbId===uid)S.user.cards=userCards;
+    await col('cards').doc(cardDoc.id).update({status:'sold',soldTo:uid,soldAt:TS(),prizeLabel:label}).catch(()=>{});
+    const lc=S.cards?.find(c=>c.fbId===cardDoc.id);if(lc)lc.status='sold';
+  }else return false;
   await col('users').doc(uid).update(updates);
-  if(window.pushNotif)await pushNotif(uid,'gift','🎉 '+label,`تهانينا! حصلت على جائزتك`);
+  if(window.pushNotif)await pushNotif(uid,'gift','🎉 '+label,'تهانينا! تم إضافة جائزتك');
   return true;
+}
+
+// ── Tiered Prize Toggle ──
+function toggleTieredPrize(prefix,rank){
+  const t=document.getElementById(`${prefix}Prize${rank}Type`)?.value;
+  const v=document.getElementById(`${prefix}Prize${rank}Val`);
+  const c=document.getElementById(`${prefix}Prize${rank}Card`);
+  if(v)v.style.display=t==='balance'?'block':'none';
+  if(c)c.style.display=t==='card'?'block':'none';
+}
+
+// ── Get Top Winners ──
+async function getTopWinners(type,period,limit3=3){
+  const cutoff=getPeriodCutoff(period||'month');
+  if(type==='buyer'){
+    const snap=await col('sales').get().catch(()=>({docs:[]}));
+    const counts={};
+    snap.docs.forEach(d=>{const s=d.data();if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,limit3).map(([uid,cnt])=>({uid,score:cnt}));
+  }else{
+    const snap=await col('rechargeRequests').where('status','==','approved').get().catch(()=>({docs:[]}));
+    const amounts={};
+    snap.docs.forEach(d=>{const r=d.data();if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff)amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);});
+    return Object.entries(amounts).sort((a,b)=>b[1]-a[1]).slice(0,limit3).map(([uid,amt])=>({uid,score:amt}));
+  }
+}
+
+// ── Distribute Top Prizes (Admin Button) ──
+async function distributeTopPrizes(type){
+  const isBuyer=type==='buyer';
+  const prefix=isBuyer?'topBuyer':'topRc';
+  const cfg=S.comp?.[isBuyer?'topBuyer':'topRc'];
+  if(!cfg?.enabled){toast('المسابقة غير مفعلة','err');return;}
+  if(!confirm(`توزيع جوائز "${cfg.name||''}" الآن على المراكز الثلاثة الأولى؟`))return;
+  const winners=await getTopWinners(type,cfg.period,3);
+  if(!winners.length){toast('لا يوجد مشاركون بعد','err');return;}
+  const medals=['🥇','🥈','🥉'];
+  let done=0;
+  for(let i=0;i<Math.min(winners.length,3);i++){
+    const {uid}=winners[i];
+    const rank=String(i+1);
+    const pType=document.getElementById(`${prefix}Prize${rank}Type`)?.value||'none';
+    if(pType==='none')continue;
+    const pVal=parseInt(document.getElementById(`${prefix}Prize${rank}Val`)?.value)||0;
+    const pCard=document.getElementById(`${prefix}Prize${rank}Card`)?.value||'';
+    const label=`${medals[i]} جائزة ${cfg.name||''} — المركز ${i===0?'الأول':i===1?'الثاني':'الثالث'}`;
+    const ok=await givePrize(uid,pType,pVal,pCard,label);
+    if(ok)done++;
+  }
+  // Save record
+  const today=serverNow().toISOString().split('T')[0];
+  await col('compDistributions').doc(`${type}_${today}`).set({
+    type,distributedAt:serverDate(),
+    winners:winners.map((w,i)=>({uid:w.uid,rank:i+1,score:w.score}))
+  }).catch(()=>{});
+  toast(`✅ تم توزيع ${done} جائزة`,'ok');
+  renderUsersTable&&renderUsersTable();
+  if(isBuyer)showTopBuyers();else showTopRc();
+}
+
+// ── User Claim Prize ──
+async function claimTopPrize(type){
+  const isBuyer=type==='buyer';
+  const cfg=S.comp?.[isBuyer?'topBuyer':'topRc'];
+  if(!cfg?.enabled){return;}
+  const uid=S.user?.fbId;
+  const winners=await getTopWinners(type,cfg.period,3);
+  const myRank=winners.findIndex(w=>w.uid===uid);
+  if(myRank===-1){toast('لست ضمن المراكز الثلاثة الأولى بعد','err');return;}
+  const period=serverNow().toISOString().split('T')[0].slice(0,7);
+  const claimKey=`${type}_${period}_${uid}`;
+  const claimed=await col('compClaims').doc(claimKey).get().catch(()=>null);
+  if(claimed?.exists){toast('سبق وطالبت بجائزتك هذه الفترة','err');return;}
+  const prefix=isBuyer?'topBuyer':'topRc';
+  const rank=String(myRank+1);
+  const medals=['🥇','🥈','🥉'];
+  // Get prize config from saved settings
+  const pType=cfg[`prize${rank}Type`]||'none';
+  const pVal=cfg[`prize${rank}Val`]||0;
+  const pCard=cfg[`prize${rank}Card`]||'';
+  if(pType==='none'){toast('لا توجد جائزة لمركزك','err');return;}
+  const label=`${medals[myRank]} جائزة ${cfg.name||''} — المركز ${myRank===0?'الأول':myRank===1?'الثاني':'الثالث'}`;
+  const ok=await givePrize(uid,pType,pVal,pCard,label);
+  if(ok){
+    await col('compClaims').doc(claimKey).set({uid,type,rank:myRank+1,date:serverDate(),claimedAt:TS()});
+    toast(`🎉 تم استلام جائزتك!`,'ok');
+    loadUserComp();
+  }else toast('فشل استلام الجائزة — تواصل مع الدعم','err');
 }
 
 // ── Manual Award ──
@@ -3653,22 +3792,29 @@ async function loadUserComp(){
   }
   if(cfg.topBuyer?.enabled){
     const rank=await getUserRank(uid,'buyer',cfg.topBuyer.period);
+    const canClaim=cfg.topBuyer.distrib==='user_claim'&&rank.rank<=3;
+    const medals=['🥇','🥈','🥉'];
+    const prizeLabel=rank.rank<=3?(cfg.topBuyer[`prize${rank.rank}Type`]==='card'?'كرت مجاني':`${(cfg.topBuyer[`prize${rank.rank}Val`]||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}`):cfg.topBuyer.prize1Val?.toLocaleString()+' '+( S.cfg?.currency||'ر.ي');
     active.push({
       icon:'🛒',title:cfg.topBuyer.name||'أكثر مشترٍ',
-      val:`المركز #${rank.rank}`,
-      sub:`${rank.count} عملية | الجائزة: ${cfg.topBuyer.prizeType==='card'?'كرت مجاني':cfg.topBuyer.prizeVal?.toLocaleString()+' '+( S.cfg?.currency||'ر.ي')}`,
+      val:`${rank.rank<=3?medals[rank.rank-1]:''} المركز #${rank.rank}`,
+      sub:`${rank.count} عملية | جائزة #1: ${(cfg.topBuyer.prize1Val||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
       color:'rgba(0,114,255,.1)',border:'rgba(0,114,255,.2)',
-      btn:'👑 المتصدرون',onclick:`showLeaderboard('buyer')`
+      btn:canClaim?'🏆 طالب بجائزتك':'👑 المتصدرون',
+      onclick:canClaim?`claimTopPrize('buyer')`:`showLeaderboard('buyer')`
     });
   }
   if(cfg.topRc?.enabled){
     const rank=await getUserRank(uid,'recharge',cfg.topRc.period);
+    const canClaim=cfg.topRc.distrib==='user_claim'&&rank.rank<=3;
+    const medals=['🥇','🥈','🥉'];
     active.push({
       icon:'💳',title:cfg.topRc.name||'أكثر شاحن',
-      val:`المركز #${rank.rank}`,
-      sub:`${rank.amount?.toLocaleString()} ${S.cfg?.currency||'ر.ي'} | الجائزة: ${cfg.topRc.prizeType==='card'?'كرت مجاني':cfg.topRc.prizeVal?.toLocaleString()+' '+(S.cfg?.currency||'ر.ي')}`,
+      val:`${rank.rank<=3?medals[rank.rank-1]:''} المركز #${rank.rank}`,
+      sub:`${rank.amount?.toLocaleString()} ${S.cfg?.currency||'ر.ي'} | جائزة #1: ${(cfg.topRc.prize1Val||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
       color:'rgba(0,214,143,.1)',border:'rgba(0,214,143,.2)',
-      btn:'👑 المتصدرون',onclick:`showLeaderboard('recharge')`
+      btn:canClaim?'🏆 طالب بجائزتك':'👑 المتصدرون',
+      onclick:canClaim?`claimTopPrize('recharge')`:`showLeaderboard('recharge')`
     });
   }
   if(cfg.daily?.enabled){
