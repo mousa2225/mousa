@@ -1731,8 +1731,15 @@ function initAdmin(){
 }
 
 function nav(s){
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));event.currentTarget.classList.add('on');
-  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));$('sec-'+s)?.classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  if(event&&event.currentTarget)event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
+  $('sec-'+s)?.classList.add('on');
+  // scroll to top — works on mobile and desktop
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  const m=document.querySelector('.adm-main');if(m)m.scrollTop=0;
 }
 
 function refreshStats(){
