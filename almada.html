@@ -717,7 +717,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <label class="fl">نوع الجائزة عند الاستبدال</label>
           <select class="sel" id="loyaltyPrizeType" onchange="toggleLoyaltyPrize()">
             <option value="balance">رصيد نقدي محدد</option>
-            <option value="card">كرت مجاني محدد</option>
+            <option value="card">كرت من الفئات</option>
+            <option value="giftCard">كرت من مخزون الهدايا</option>
             <option value="user_choice">المستخدم يختار النوع</option>
           </select>
         </div>
@@ -761,15 +762,30 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <!-- جوائز تدرجية -->
         <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px">
           <div style="font-size:13px;font-weight:600;margin-bottom:10px">🏆 الجوائز التدرجية</div>
-          ${['1','2','3'].map(r=>`
           <div class="fr" style="margin-bottom:8px;align-items:center">
-            <span style="font-size:18px;width:28px">${r==='1'?'🥇':r==='2'?'🥈':'🥉'}</span>
-            <select class="sel" id="topBuyerPrize${r}Type" onchange="toggleTieredPrize('topBuyer','${r}')">
+            <span style="font-size:18px;width:28px">🥇</span>
+            <select class="sel" id="topBuyerPrize1Type" onchange="toggleTieredPrize('topBuyer','1')">
               <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
             </select>
-            <input class="inp" type="number" id="topBuyerPrize${r}Val" placeholder="المبلغ" value="${r==='1'?3000:r==='2'?2000:1000}" style="width:100px">
-            <select class="sel" id="topBuyerPrize${r}Card" style="display:none"></select>
-          </div>`).join('')}
+            <input class="inp" type="number" id="topBuyerPrize1Val" placeholder="المبلغ" value="3000" style="width:100px">
+            <select class="sel" id="topBuyerPrize1Card" style="display:none"></select>
+          </div>
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">🥈</span>
+            <select class="sel" id="topBuyerPrize2Type" onchange="toggleTieredPrize('topBuyer','2')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
+            </select>
+            <input class="inp" type="number" id="topBuyerPrize2Val" placeholder="المبلغ" value="2000" style="width:100px">
+            <select class="sel" id="topBuyerPrize2Card" style="display:none"></select>
+          </div>
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">🥉</span>
+            <select class="sel" id="topBuyerPrize3Type" onchange="toggleTieredPrize('topBuyer','3')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
+            </select>
+            <input class="inp" type="number" id="topBuyerPrize3Val" placeholder="المبلغ" value="1000" style="width:100px">
+            <select class="sel" id="topBuyerPrize3Card" style="display:none"></select>
+          </div>
         </div>
         <button class="b2" onclick="showTopBuyers()">👁 الترتيب الحالي</button>
         <button class="b1" onclick="distributeTopPrizes('buyer')" style="background:var(--ok);border-color:var(--ok)">🎁 توزيع الجوائز الآن</button>
@@ -800,15 +816,30 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
         <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px">
           <div style="font-size:13px;font-weight:600;margin-bottom:10px">🏆 الجوائز التدرجية</div>
-          ${['1','2','3'].map(r=>`
           <div class="fr" style="margin-bottom:8px;align-items:center">
-            <span style="font-size:18px;width:28px">${r==='1'?'🥇':r==='2'?'🥈':'🥉'}</span>
-            <select class="sel" id="topRcPrize${r}Type" onchange="toggleTieredPrize('topRc','${r}')">
+            <span style="font-size:18px;width:28px">🥇</span>
+            <select class="sel" id="topRcPrize1Type" onchange="toggleTieredPrize('topRc','1')">
               <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
             </select>
-            <input class="inp" type="number" id="topRcPrize${r}Val" placeholder="المبلغ" value="${r==='1'?3000:r==='2'?2000:1000}" style="width:100px">
-            <select class="sel" id="topRcPrize${r}Card" style="display:none"></select>
-          </div>`).join('')}
+            <input class="inp" type="number" id="topRcPrize1Val" placeholder="المبلغ" value="3000" style="width:100px">
+            <select class="sel" id="topRcPrize1Card" style="display:none"></select>
+          </div>
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">🥈</span>
+            <select class="sel" id="topRcPrize2Type" onchange="toggleTieredPrize('topRc','2')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
+            </select>
+            <input class="inp" type="number" id="topRcPrize2Val" placeholder="المبلغ" value="2000" style="width:100px">
+            <select class="sel" id="topRcPrize2Card" style="display:none"></select>
+          </div>
+          <div class="fr" style="margin-bottom:8px;align-items:center">
+            <span style="font-size:18px;width:28px">🥉</span>
+            <select class="sel" id="topRcPrize3Type" onchange="toggleTieredPrize('topRc','3')">
+              <option value="balance">رصيد</option><option value="card">كرت</option><option value="none">لا جائزة</option>
+            </select>
+            <input class="inp" type="number" id="topRcPrize3Val" placeholder="المبلغ" value="1000" style="width:100px">
+            <select class="sel" id="topRcPrize3Card" style="display:none"></select>
+          </div>
         </div>
         <button class="b2" onclick="showTopRc()">👁 الترتيب الحالي</button>
         <button class="b1" onclick="distributeTopPrizes('recharge')" style="background:var(--ok);border-color:var(--ok)">🎁 توزيع الجوائز الآن</button>
@@ -890,15 +921,30 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div><label class="fl">نوع الجائزة</label>
             <select class="sel" id="compAwardType" onchange="toggleAwardType()">
               <option value="balance">رصيد نقدي</option>
-              <option value="card">كرت مجاني</option>
+              <option value="giftCard">كرت من مخزون الهدايا</option>
               <option value="points">نقاط ولاء</option>
             </select>
           </div>
         </div>
         <div id="awardBalDiv" style="margin-bottom:12px"><label class="fl">المبلغ</label><input class="inp" type="number" id="compAwardVal" placeholder="500"></div>
-        <div id="awardCardDiv" style="display:none;margin-bottom:12px"><label class="fl">فئة الكرت</label><select class="sel" id="awardCardCat"></select></div>
+        <div id="awardCardDiv" style="display:none;margin-bottom:12px"><label class="fl">اختر من مخزون الهدايا</label><select class="sel" id="awardGiftCard"></select></div>
         <div id="awardPtsDiv" style="display:none;margin-bottom:12px"><label class="fl">عدد النقاط</label><input class="inp" type="number" id="compAwardPts" placeholder="100"></div>
         <button class="b2" onclick="giveManualAward()">🎁 منح الجائزة</button>
+      </div></div>
+
+      <!-- 📦 مخزون الهدايا -->
+      <div class="panel"><div class="ph"><h3>📦 مخزون الهدايا</h3><p style="font-size:12px;color:var(--t2)">كروت مخفية عن المستخدمين — للجوائز فقط</p></div><div class="pb">
+        <div style="margin-bottom:12px">
+          <label class="fl">إضافة كرت هدية</label>
+          <div class="fr">
+            <input class="inp" id="giftCardCode" placeholder="رمز الكرت..." style="flex:2">
+            <input class="inp" id="giftCardNote" placeholder="وصف (مثال: باقة 10GB)" style="flex:2">
+            <button class="b2" onclick="addGiftCard()">+ إضافة</button>
+          </div>
+        </div>
+        <div class="tw"><table><thead><tr><th>#</th><th>الرمز</th><th>الوصف</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody id="giftInventoryTable"></tbody></table></div>
+        <button class="b5" style="margin-top:10px" onclick="loadGiftInventory()">🔄 تحديث</button>
       </div></div>
 
       <!-- 📱 إدارة الأجهزة -->
@@ -3665,7 +3711,134 @@ async function givePrize(uid,prizeType,prizeVal,cardCat,label){
   return true;
 }
 
-// ── Tiered Prize Toggle ──
+// ── Gift Inventory (مخزون الهدايا) ──
+async function loadGiftInventory(){
+  const tb=document.getElementById('giftInventoryTable');
+  if(!tb)return;
+  tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t2)">⏳</td></tr>';
+  try{
+    const snap=await col('giftInventory').get().catch(()=>({docs:[]}));
+    if(!snap.docs.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا توجد كروت</td></tr>';return;}
+    tb.innerHTML=snap.docs.map((d,i)=>{
+      const g=d.data();
+      return`<tr>
+        <td>${i+1}</td>
+        <td style="font-family:monospace;font-size:12px">${g.code}</td>
+        <td style="font-size:12px">${g.note||'—'}</td>
+        <td><span style="color:${g.status==='available'?'var(--ok)':'var(--t3)'}">${g.status==='available'?'✅ متاح':'❌ مستخدم'}</span></td>
+        <td><button class="b3" onclick="deleteGiftCard('${d.id}')" style="font-size:11px;padding:3px 8px">حذف</button></td>
+      </tr>`;}).join('');
+    // Populate award select
+    const sel=document.getElementById('awardGiftCard');
+    if(sel){
+      const avail=snap.docs.filter(d=>d.data().status==='available');
+      sel.innerHTML=avail.length
+        ?avail.map(d=>`<option value="${d.id}">${d.data().code} — ${d.data().note||''}</option>`).join('')
+        :'<option value="">لا توجد كروت متاحة</option>';
+    }
+  }catch(e){tb.innerHTML=`<tr><td colspan="5" style="color:var(--err)">خطأ: ${e.message}</td></tr>`;}
+}
+
+async function addGiftCard(){
+  const code=document.getElementById('giftCardCode')?.value.trim();
+  const note=document.getElementById('giftCardNote')?.value.trim();
+  if(!code){toast('أدخل رمز الكرت','err');return;}
+  try{
+    await col('giftInventory').add({code,note:note||'',status:'available',createdAt:TS()});
+    document.getElementById('giftCardCode').value='';
+    document.getElementById('giftCardNote').value='';
+    toast('✅ تم إضافة الكرت للمخزون','ok');
+    loadGiftInventory();
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+
+async function deleteGiftCard(id){
+  if(!confirm('حذف هذا الكرت؟'))return;
+  try{await col('giftInventory').doc(id).delete();toast('✅ حذف','ok');loadGiftInventory();}
+  catch(e){toast('خطأ','err');}
+}
+
+function toggleAwardType(){
+  const t=document.getElementById('compAwardType')?.value;
+  document.getElementById('awardBalDiv').style.display=t==='balance'?'block':'none';
+  document.getElementById('awardCardDiv').style.display=t==='giftCard'?'block':'none';
+  document.getElementById('awardPtsDiv').style.display=t==='points'?'block':'none';
+  if(t==='giftCard')loadGiftInventory();
+}
+
+async function giveManualAward(){
+  const uid=document.getElementById('compAwardUser')?.value;
+  const type=document.getElementById('compAwardType')?.value;
+  if(!uid){toast('اختر المستخدم','err');return;}
+  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
+  const label='🎁 جائزة من الإدارة';
+  if(type==='balance'){
+    const val=parseInt(document.getElementById('compAwardVal')?.value)||0;
+    if(!val){toast('أدخل المبلغ','err');return;}
+    const ok=await givePrize(uid,'balance',val,'',label);
+    if(ok){toast(`✅ تم إضافة ${val.toLocaleString()} لـ ${u.name||u.username}`,'ok');renderUsersTable&&renderUsersTable();}
+  }else if(type==='giftCard'){
+    const giftId=document.getElementById('awardGiftCard')?.value;
+    if(!giftId){toast('لا توجد كروت متاحة في المخزون','err');return;}
+    const gSnap=await col('giftInventory').doc(giftId).get().catch(()=>null);
+    if(!gSnap?.exists||gSnap.data().status!=='available'){toast('الكرت غير متاح','err');return;}
+    const gData=gSnap.data();
+    // Give card to user
+    const newCard={code:gData.code,catName:gData.note||'هدية',date:serverDate(),isFree:true,prizeLabel:label,price:0};
+    const userCards=[...(u.cards||[]),newCard];
+    await col('users').doc(uid).update({cards:userCards});
+    await col('giftInventory').doc(giftId).update({status:'used',givenTo:uid,givenAt:TS()});
+    u.cards=userCards;
+    if(window.pushNotif)await pushNotif(uid,'gift','🎁 '+label,'تهانينا! حصلت على كرت هدية');
+    toast(`✅ تم إرسال الكرت لـ ${u.name||u.username}`,'ok');
+    loadGiftInventory();
+  }else if(type==='points'){
+    const pts=parseInt(document.getElementById('compAwardPts')?.value)||0;
+    if(!pts){toast('أدخل عدد النقاط','err');return;}
+    const ok=await givePrize(uid,'points',pts,'',label);
+    if(ok)toast(`✅ تم إضافة ${pts} نقطة لـ ${u.name||u.username}`,'ok');
+  }
+}
+
+// ── Redeem loyalty with gift card option ──
+async function redeemLoyaltyPoints(){
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const pts=S.user?.loyaltyPoints||0;
+  const needed=cfg.ptsRedeem||100;
+  if(pts<needed){toast(`تحتاج ${needed} نقطة (عندك ${pts})`,'err');return;}
+  if(cfg.prizeType==='user_choice'){openRedeemChoiceModal();return;}
+  if(!confirm(`استبدال ${needed} نقطة مقابل جائزتك؟`))return;
+  const label=`⭐ استبدال ${needed} نقطة ولاء`;
+  let ok=false;
+  if(cfg.prizeType==='giftCard'){
+    // Pick from gift inventory
+    const snap=await col('giftInventory').where('status','==','available').limit(1).get().catch(()=>({docs:[]}));
+    if(!snap.docs.length){toast('لا توجد كروت هدايا متاحة الآن — تواصل مع الدعم','err');return;}
+    const gDoc=snap.docs[0];
+    const newCard={code:gDoc.data().code,catName:gDoc.data().note||'هدية',date:serverDate(),isFree:true,prizeLabel:label,price:0};
+    const userCards=[...(S.user.cards||[]),newCard];
+    await col('users').doc(S.user.fbId).update({cards:userCards,loyaltyPoints:pts-needed});
+    await col('giftInventory').doc(gDoc.id).update({status:'used',givenTo:S.user.fbId,givenAt:TS()});
+    S.user.cards=userCards;S.user.loyaltyPoints=pts-needed;
+    if(window.pushNotif)await pushNotif(S.user.fbId,'gift','🎁 '+label,'تهانينا! تم إضافة كرت هدية');
+    ok=true;
+  }else{
+    ok=await givePrize(S.user.fbId,cfg.prizeType,cfg.prizeVal,cfg.cardCat,label);
+    if(ok){
+      await col('users').doc(S.user.fbId).update({loyaltyPoints:pts-needed});
+      S.user.loyaltyPoints=pts-needed;
+    }
+  }
+  if(ok){toast('✅ تم الاستبدال!','ok');loadUserComp();}
+  else toast('فشل الاستبدال','err');
+}
+
+// Load gift inventory when opening comp section
+const _origNavComp=window.nav;
+window.nav=function(s){
+  if(_origNavComp)_origNavComp.call(this,s);
+  if(s==='comp')loadGiftInventory();
+};
 function toggleTieredPrize(prefix,rank){
   const t=document.getElementById(`${prefix}Prize${rank}Type`)?.value;
   const v=document.getElementById(`${prefix}Prize${rank}Val`);
@@ -4202,6 +4375,36 @@ async function setFpStatus(fpId, action){
   <div id="authSupportLinks" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="mbtn-cancel" style="width:100%;margin-top:14px" onclick="closeOv('authSupportModal')">إغلاق</button>
 </div></div>
+
+<!-- ── مخزون الهدايا + إصلاح زر الدعم في Login ── -->
+<div class="ov" id="authSupportModal">
+<div class="modal" style="max-width:380px">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:40px">💬</div>
+    <h3>تواصل مع الدعم</h3>
+    <p style="font-size:13px;color:var(--t2)">هل تواجه مشكلة؟ تواصل معنا</p>
+  </div>
+  <div id="authSupportLinks" style="display:flex;flex-direction:column;gap:10px"></div>
+  <button class="mbtn-cancel" style="width:100%;margin-top:14px" onclick="closeOv('authSupportModal')">إغلاق</button>
+</div></div>
+
+<script>
+// ── زر الدعم في صفحة تسجيل الدخول ──
+function openAuthSupport(){
+  const cfg=S.cfg||{};
+  const links=document.getElementById('authSupportLinks');
+  if(!links)return;
+  const items=[];
+  if(cfg.sitePhone||cfg.supportPhone)
+    items.push(`<a href="tel:${cfg.sitePhone||cfg.supportPhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.sitePhone||cfg.supportPhone}</div></div></a>`);
+  if(cfg.supportWhatsapp)
+    items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
+  if(cfg.supportTelegram)
+    items.push(`<a href="https://t.me/${cfg.supportTelegram}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">✈️</span><div><div style="font-weight:600">تيليجرام</div><div style="font-size:12px;color:var(--t2)">@${cfg.supportTelegram}</div></div></a>`);
+  links.innerHTML=items.length?items.join(''):'<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
+  openOv('authSupportModal');
+}
+</script>
 
 <!-- PWA -->
 <script>
