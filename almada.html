@@ -556,13 +556,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <input class="inp" type="number" id="sliderInterval" value="4" style="max-width:100px" onchange="updateSliderInterval(this.value)">
         </div>
         <div id="sliderAdminList" style="margin-bottom:14px"></div>
-        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
-          <input type="file" id="sliderFile" accept="image/*,video/mp4,video/webm,video/ogg" style="display:none" onchange="addSliderItem()">
-          <button class="b2" onclick="$('sliderFile').click()">🖼️ إضافة صورة</button>
-          <button class="b2" onclick="addSliderVideo()">🎬 إضافة فيديو</button>
-          <span style="font-size:11px;color:var(--t3)">صور: 900KB | فيديو: 900KB</span>
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px">إضافة إعلان جديد</div>
+          <div class="fr" style="margin-bottom:8px">
+            <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="sliderStartDate"></div>
+            <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="sliderEndDate"></div>
+          </div>
+          <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+            <input type="file" id="sliderFile" accept="image/*,video/mp4,video/webm,video/ogg" style="display:none" onchange="addSliderItem()">
+            <button class="b2" onclick="$('sliderFile').click()">🖼️ إضافة صورة/فيديو</button>
+            <span style="font-size:11px;color:var(--t3)">الحد 900KB</span>
+          </div>
+          <input type="file" id="sliderVideoFile" accept="video/*" style="display:none" onchange="addSliderItemVideo(this)">
         </div>
-        <input type="file" id="sliderVideoFile" accept="video/*" style="display:none" onchange="addSliderItemVideo(this)">
       </div></div>
       <div class="panel"><div class="ph"><h3>📌 إعلانات منبثقة</h3></div><div class="pb">
         <div id="popAdsList" style="margin-bottom:14px"></div>
@@ -572,6 +578,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
             <div><label class="fl">أيقونة</label><input class="inp" id="popIcon" value="🎉" style="max-width:70px"></div>
           </div>
           <div style="margin-bottom:10px"><label class="fl">النص</label><input class="inp" id="popText" placeholder="نص الإعلان"></div>
+          <div class="fr" style="margin-bottom:10px">
+            <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="popStartDate"></div>
+            <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="popEndDate"></div>
+          </div>
           <button class="b1" onclick="addPopAd()">➕ إضافة</button>
         </div>
       </div></div>
@@ -1887,7 +1897,12 @@ async function downloadStatementPDF(uid){
 }
 
 function checkPopAds(){
-  (S.cfg.popAds||[]).filter(a=>a.active!==false).forEach((a,i)=>{
+  const today=serverNow().toISOString().split('T')[0];
+  (S.cfg.popAds||[])
+    .filter(a=>a.active!==false
+      &&(!a.startDate||today>=a.startDate)
+      &&(!a.endDate||today<=a.endDate))
+    .forEach((a,i)=>{
     setTimeout(()=>{
       const b=document.createElement('div');
       b.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:14px 18px;z-index:8888;box-shadow:0 8px 30px rgba(0,0,0,.5);text-align:center;max-width:300px;animation:fadeUp .4s ease;cursor:pointer;font-family:var(--ff)';
@@ -2355,9 +2370,27 @@ async function delConv(){
 }
 
 // POPUP ADS
-async function addPopAd(){const t=$('popTitle').value.trim(),x=$('popText').value.trim(),ic=$('popIcon').value||'🎉';if(!t||!x){toast('أدخل العنوان والنص','err');return;}S.cfg.popAds=S.cfg.popAds||[];S.cfg.popAds.push({title:t,text:x,icon:ic,active:true});try{await doc('settings','main').set(S.cfg);}catch(e){}$('popTitle').value='';$('popText').value='';toast('✅ تمت إضافة الإعلان','ok');renderPopAds();}
+// addPopAd defined below with date support
 async function delPopAd(i){S.cfg.popAds?.splice(i,1);try{await doc('settings','main').set(S.cfg);}catch(e){}renderPopAds();}
-function renderPopAds(){const el=$('popAdsList');if(!el)return;if(!(S.cfg.popAds||[]).length){el.innerHTML='';return;}el.innerHTML=(S.cfg.popAds||[]).map((a,i)=>`<div style="background:var(--bg2);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div style="font-size:13px;font-weight:600">${a.icon} ${a.title}</div><div style="font-size:11px;color:var(--t2)">${a.text}</div></div><button class="b3" onclick="delPopAd(${i})">حذف</button></div>`).join('');}
+function renderPopAds(){
+  const el=$('popAdsList');if(!el)return;
+  if(!(S.cfg.popAds||[]).length){el.innerHTML='';return;}
+  const today=serverNow().toISOString().split('T')[0];
+  el.innerHTML=(S.cfg.popAds||[]).map((a,i)=>{
+    const active=(!a.startDate||today>=a.startDate)&&(!a.endDate||today<=a.endDate);
+    return`<div style="background:var(--bg2);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;${!active?'opacity:0.5':''}">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${a.icon} ${a.title}</div>
+        <div style="font-size:11px;color:var(--t2)">${a.text}</div>
+        <div style="font-size:11px;color:${active?'var(--ok)':'var(--err)'}">
+          ${active?'✅ نشط':'⏸ موقوف'}
+          ${a.startDate?` | من: ${a.startDate}`:''}
+          ${a.endDate?` | إلى: ${a.endDate}`:''}
+        </div>
+      </div>
+      <button class="b3" onclick="delPopAd(${i})">حذف</button>
+    </div>`;}).join('');
+}
 
 // ADMIN PASS
 async function changeAdminPass(){const cur=$('apCur').value,np=$('apNew').value,conf=$('apConf').value;if(!np||np.length<6){toast('كلمة المرور 6 أحرف+','err');return;}if(np!==conf){toast('كلمة المرور غير متطابقة','err');return;}try{const cred=firebase.auth.EmailAuthProvider.credential(au.currentUser.email,cur);await au.currentUser.reauthenticateWithCredential(cred);await au.currentUser.updatePassword(np);['apCur','apNew','apConf'].forEach(id=>{const e=$(id);if(e)e.value='';});toast('✅ تم تغيير كلمة المرور','ok');}catch(e){if(e.code==='auth/wrong-password')toast('كلمة المرور الحالية خاطئة','err');else toast('خطأ: '+e.message,'err');}}
@@ -2677,7 +2710,11 @@ function renderHist(){
 }
 
 function initSlider(){
-  const items=S.cfg.sliderItems||[];
+  // فلتر الإعلانات حسب التاريخ
+  const today=serverNow().toISOString().split('T')[0];
+  const items=(S.cfg.sliderItems||[]).filter(it=>
+    (!it.startDate||today>=it.startDate)&&(!it.endDate||today<=it.endDate)
+  );
   const box=$('mediaSlider');if(!box)return;
   if(!items.length){box.style.display='none';return;}
   box.style.display='block';
@@ -2706,8 +2743,14 @@ async function addSliderItem(){
   const fileInput=$('sliderFile');const f=fileInput.files[0];if(!f)return;
   if(f.size>900*1024){toast('الملف كبير — الحد 900KB','err');return;}
   const b64=f.type.startsWith('image/')?await compressImage(f,1200,0.8):await fileToBase64(f);
+  const startDate=$('sliderStartDate')?.value||'';
+  const endDate=$('sliderEndDate')?.value||'';
   S.cfg.sliderItems=S.cfg.sliderItems||[];
-  S.cfg.sliderItems.push({type:f.type.startsWith('video/')?'video':'image',src:b64,name:f.name});
+  S.cfg.sliderItems.push({
+    type:f.type.startsWith('video/')?'video':'image',
+    src:b64,name:f.name,
+    startDate,endDate
+  });
   fileInput.value='';
   try{await doc('settings','main').set(S.cfg);toast('✅ تمت الإضافة للسلايدر','ok');}catch(e){toast('خطأ: '+e.message,'err');}
   renderSliderAdmin();
@@ -2721,12 +2764,37 @@ function renderSliderAdmin(){
   const el=$('sliderAdminList');if(!el)return;
   const items=S.cfg.sliderItems||[];
   if(!items.length){el.innerHTML='<p style="color:var(--t3);font-size:13px">لا توجد إعلانات بعد</p>';return;}
-  el.innerHTML=items.map((it,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">
-      ${it.type==='image'?`<img src="${it.src}" style="width:60px;height:45px;object-fit:cover;border-radius:8px">`:`<div style="width:60px;height:45px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px">🎬</div>`}
-      <div style="flex:1;font-size:12px;color:var(--t2)">${it.name||'ملف'}</div>
+  el.innerHTML=items.map((it,i)=>{
+    const now=serverNow().toISOString().split('T')[0];
+    const active=(!it.startDate||now>=it.startDate)&&(!it.endDate||now<=it.endDate);
+    return`<div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px;${!active?'opacity:0.5':''}">
+      ${it.type==='image'
+        ?`<img src="${it.src}" style="width:60px;height:45px;object-fit:cover;border-radius:8px">`
+        :`<div style="width:60px;height:45px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px">🎬</div>`}
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--t2)">${it.name||'ملف'}</div>
+        <div style="font-size:11px;color:${active?'var(--ok)':'var(--err)'}">
+          ${active?'✅ نشط':'⏸ موقوف'}
+          ${it.startDate?` | من: ${it.startDate}`:''}
+          ${it.endDate?` | إلى: ${it.endDate}`:''}
+        </div>
+      </div>
       <button class="b3" onclick="delSliderItem(${i})">حذف</button>
-    </div>`).join('');
+    </div>`;}).join('');
+}
+
+async function addPopAd(){
+  const t=$('popTitle').value.trim(),x=$('popText').value.trim(),ic=$('popIcon').value||'🎉';
+  const startDate=$('popStartDate')?.value||'';
+  const endDate=$('popEndDate')?.value||'';
+  if(!t||!x){toast('أدخل العنوان والنص','err');return;}
+  S.cfg.popAds=S.cfg.popAds||[];
+  S.cfg.popAds.push({title:t,text:x,icon:ic,active:true,startDate,endDate});
+  try{await doc('settings','main').set(S.cfg);}catch(e){}
+  $('popTitle').value='';$('popText').value='';
+  $('popStartDate').value='';$('popEndDate').value='';
+  toast('✅ تمت إضافة الإعلان','ok');
+  renderPopAds();
 }
 
 function updateSliderInterval(val){
