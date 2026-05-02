@@ -600,7 +600,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
         <div class="fr" style="margin-bottom:14px">
           <div><label class="fl">وصف الموقع</label><input class="inp" id="cf_siteDesc" value="بوابة كروت الإنترنت"></div>
-          <div><label class="fl">رقم الجوال / التواصل</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr"></div>
+          <div><label class="fl">رقم الجوال / التواصل</label><input class="inp" id="cf_sitePhone" placeholder="770XXXXXXX" style="direction:ltr">
+            <label style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;cursor:pointer">
+              <input type="checkbox" id="cf_showPhoneInSupport"> إظهار رقم الاتصال في دعم صفحة التسجيل
+            </label>
+          </div>
         </div>
         <div class="fr" style="margin-bottom:14px">
           <div><label class="fl">💚 واتساب الدعم</label><input class="inp" id="cf_supportWhatsapp" placeholder="9677XXXXXXXX" style="direction:ltr"><span class="hint">الرقم مع رمز الدولة بدون +</span></div>
@@ -745,9 +749,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div><label class="fl">اسم المسابقة</label><input class="inp" id="topBuyerName" value="🛒 أكثر مشترٍ"></div>
           <div><label class="fl">الفترة</label>
             <select class="sel" id="topBuyerPeriod">
-              <option value="month">شهري</option><option value="week">أسبوعي</option>
+              <option value="month">شهري</option><option value="week">أسبوعي</option><option value="custom">مخصص</option>
             </select>
           </div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="topBuyerStartDate"></div>
+          <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="topBuyerEndDate"></div>
         </div>
         <!-- طريقة التوزيع -->
         <div style="margin-bottom:12px">
@@ -801,9 +809,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div><label class="fl">اسم المسابقة</label><input class="inp" id="topRcName" value="💳 أكثر شاحن"></div>
           <div><label class="fl">الفترة</label>
             <select class="sel" id="topRcPeriod">
-              <option value="month">شهري</option><option value="week">أسبوعي</option>
+              <option value="month">شهري</option><option value="week">أسبوعي</option><option value="custom">مخصص</option>
             </select>
           </div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="topRcStartDate"></div>
+          <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="topRcEndDate"></div>
         </div>
         <div style="margin-bottom:12px">
           <label class="fl">طريقة توزيع الجوائز</label>
@@ -1476,12 +1488,14 @@ function applySettings(){
   if(c.colors)Object.entries(c.colors).forEach(([k,v])=>{if(v)applyColor(k,v);});
   const lb=$('logoBgClr');if(lb)lb.value=c.logoBgColor||'#0072ff';
   ['siteName','siteIcon','siteDesc','sitePhone','supportWhatsapp','supportTelegram','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)el.value=c[k]||'';});
+  const spEl=$('cf_showPhoneInSupport');if(spEl)spEl.checked=!!c.showPhoneInSupport;
 }
 function applyLogoBg(c){S.cfg.logoBgColor=c;[[$('aLogoBox')],[$('uHIcon')],[$('sbIcon')],[$('logoPrevBox')]].forEach(([el])=>{if(el&&!S.cfg.siteLogoImg)el.style.background=c;});}
 function uploadLogo(i){const f=i.files[0];if(!f)return;if(f.size>2*1024*1024){toast('الصورة كبيرة — الحد 2MB','err');return;}const r=new FileReader();r.onload=e=>{S.cfg.siteLogoImg=e.target.result;applySettings();};r.readAsDataURL(f);}
 function removeLogo(){S.cfg.siteLogoImg='';applySettings();}
 async function saveSettings(){
   ['siteName','siteIcon','siteDesc','sitePhone','supportWhatsapp','supportTelegram','bankName','bankNum','bankOwner','bankInstr','bankLbl1','bankLbl2','bankLbl3','currency','btnRC','btnHist','lblCards','lblHist','lblBal'].forEach(k=>{const el=$('cf_'+k);if(el)S.cfg[k]=el.value;});
+  const spEl=$('cf_showPhoneInSupport');if(spEl)S.cfg.showPhoneInSupport=spEl.checked;
   const cs=getComputedStyle(document.documentElement);
   S.cfg.colors={'--p':cs.getPropertyValue('--p').trim(),'--pd':cs.getPropertyValue('--pd').trim(),'--acc':cs.getPropertyValue('--acc').trim(),'--ok':cs.getPropertyValue('--ok').trim(),'--bg':cs.getPropertyValue('--bg').trim(),'--card':cs.getPropertyValue('--card').trim()};
   applySettings();
@@ -3359,27 +3373,31 @@ window.downloadStatementPDF=async function(uid){
   <button class="mok" style="width:100%;margin-top:14px" onclick="closeOv('leaderModal')">إغلاق</button>
 </div></div>
 
-<!-- ══ REDEEM CHOICE MODAL ══ -->
+<!-- ══ REDEEM LOYALTY MODAL ══ -->
 <div class="ov" id="redeemChoiceModal">
-<div class="modal" style="max-width:380px">
+<div class="modal" style="max-width:400px">
   <div style="text-align:center;margin-bottom:16px">
     <div style="font-size:40px">⭐</div>
-    <h3>اختر جائزتك</h3>
-    <p style="font-size:13px;color:var(--t2)">استبدل نقاطك بالجائزة التي تريدها</p>
+    <h3>استبدال نقاط الولاء</h3>
+    <p style="font-size:13px;color:var(--t2)" id="redeemSubtitle">أدخل عدد النقاط للاستبدال</p>
   </div>
-  <div style="display:flex;gap:12px;margin-bottom:16px">
-    <button onclick="confirmRedeemChoice('balance')" style="flex:1;background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.3);border-radius:12px;padding:16px;cursor:pointer;font-family:var(--ff)">
-      <div style="font-size:28px;margin-bottom:6px">💰</div>
-      <div style="font-size:13px;font-weight:700;color:var(--ok)" id="rcBalVal">500 ر.ي</div>
-      <div style="font-size:11px;color:var(--t2)">رصيد نقدي</div>
-    </button>
-    <button onclick="confirmRedeemChoice('card')" style="flex:1;background:rgba(0,114,255,.1);border:1px solid rgba(0,114,255,.3);border-radius:12px;padding:16px;cursor:pointer;font-family:var(--ff)">
-      <div style="font-size:28px;margin-bottom:6px">🎫</div>
-      <div style="font-size:13px;font-weight:700;color:var(--p)" id="rcCardVal">كرت</div>
-      <div style="font-size:11px;color:var(--t2)">كرت مجاني</div>
-    </button>
+  <!-- معلومات سعر الاستبدال -->
+  <div id="redeemRateInfo" style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px"></div>
+  <!-- حقل الكمية -->
+  <div class="fg">
+    <label>كم نقطة تريد استبدالها؟</label>
+    <input class="inp" type="number" id="redeemAmount" placeholder="100" oninput="calcRedeemPreview()">
   </div>
-  <button class="mbtn-cancel" style="width:100%" onclick="closeOv('redeemChoiceModal')">إلغاء</button>
+  <!-- معاينة الجائزة -->
+  <div id="redeemPreview" style="background:rgba(0,114,255,.08);border-radius:10px;padding:12px;margin-bottom:14px;display:none;font-size:13px">
+    <div style="font-weight:600;margin-bottom:4px">ستحصل على:</div>
+    <div id="redeemPreviewVal" style="font-size:18px;font-weight:700;color:var(--p)"></div>
+  </div>
+  <div id="redeemError" style="color:var(--err);font-size:12px;margin-bottom:10px;display:none"></div>
+  <div class="mrow">
+    <button class="mcancel" onclick="closeOv('redeemChoiceModal')">إلغاء</button>
+    <button class="mok" id="redeemConfirmBtn" onclick="confirmFlexRedeem()">✅ استبدال</button>
+  </div>
 </div></div>
 
 
@@ -3456,6 +3474,7 @@ async function saveCompSettings(){
     topBuyer:{
       enabled:b('topBuyerEnabled'),name:v('topBuyerName')||'🛒 أكثر مشترٍ',
       period:v('topBuyerPeriod')||'month',distrib:v('topBuyerDistrib')||'admin_btn',
+      startDate:v('topBuyerStartDate'),endDate:v('topBuyerEndDate'),
       prize1Type:v('topBuyerPrize1Type')||'balance',prize1Val:n('topBuyerPrize1Val')||3000,prize1Card:v('topBuyerPrize1Card'),
       prize2Type:v('topBuyerPrize2Type')||'balance',prize2Val:n('topBuyerPrize2Val')||2000,prize2Card:v('topBuyerPrize2Card'),
       prize3Type:v('topBuyerPrize3Type')||'balance',prize3Val:n('topBuyerPrize3Val')||1000,prize3Card:v('topBuyerPrize3Card')
@@ -3463,6 +3482,7 @@ async function saveCompSettings(){
     topRc:{
       enabled:b('topRcEnabled'),name:v('topRcName')||'💳 أكثر شاحن',
       period:v('topRcPeriod')||'month',distrib:v('topRcDistrib')||'admin_btn',
+      startDate:v('topRcStartDate'),endDate:v('topRcEndDate'),
       prize1Type:v('topRcPrize1Type')||'balance',prize1Val:n('topRcPrize1Val')||3000,prize1Card:v('topRcPrize1Card'),
       prize2Type:v('topRcPrize2Type')||'balance',prize2Val:n('topRcPrize2Val')||2000,prize2Card:v('topRcPrize2Card'),
       prize3Type:v('topRcPrize3Type')||'balance',prize3Val:n('topRcPrize3Val')||1000,prize3Card:v('topRcPrize3Card')
@@ -3487,6 +3507,7 @@ function loadCompSettingsToForm(){
   set('loyaltyPrizeVal',l.prizeVal||500);
   set('topBuyerEnabled',tb.enabled);set('topBuyerName',tb.name||'🛒 أكثر مشترٍ');
   set('topBuyerPeriod',tb.period||'month');set('topBuyerDistrib',tb.distrib||'admin_btn');
+  set('topBuyerStartDate',tb.startDate||'');set('topBuyerEndDate',tb.endDate||'');
   ['1','2','3'].forEach(r=>{
     set(`topBuyerPrize${r}Type`,tb[`prize${r}Type`]||'balance');
     set(`topBuyerPrize${r}Val`,tb[`prize${r}Val`]||(r==='1'?3000:r==='2'?2000:1000));
@@ -3494,6 +3515,7 @@ function loadCompSettingsToForm(){
   });
   set('topRcEnabled',tr.enabled);set('topRcName',tr.name||'💳 أكثر شاحن');
   set('topRcPeriod',tr.period||'month');set('topRcDistrib',tr.distrib||'admin_btn');
+  set('topRcStartDate',tr.startDate||'');set('topRcEndDate',tr.endDate||'');
   ['1','2','3'].forEach(r=>{
     set(`topRcPrize${r}Type`,tr[`prize${r}Type`]||'balance');
     set(`topRcPrize${r}Val`,tr[`prize${r}Val`]||(r==='1'?3000:r==='2'?2000:1000));
@@ -3638,14 +3660,35 @@ async function deleteFromBank(id){
 }
 
 // ── Top Buyers / Recharge ──
-function getPeriodCutoff(period){
+function getPeriodCutoff(period,startDate){
   const now=serverNow();
+  // لو في تاريخ بداية مخصص
+  if(startDate) return new Date(startDate);
   const cutoff=new Date(now);
-  if(period==='month')cutoff.setDate(1);
-  else cutoff.setDate(now.getDate()-7);
+  if(period==='month') cutoff.setDate(1);
+  else if(period==='week') cutoff.setDate(now.getDate()-7);
   cutoff.setHours(0,0,0,0);
   return cutoff;
 }
+
+// تحقق من انتهاء الفترة وتوزيع تلقائي
+async function checkAutoDistribute(){
+  const cfg=S.comp||{};
+  const today=serverNow().toISOString().split('T')[0];
+  for(const type of ['buyer','recharge']){
+    const key=type==='buyer'?'topBuyer':'topRc';
+    const comp=cfg[key];
+    if(!comp?.enabled||comp.distrib!=='auto_end')continue;
+    if(!comp.endDate)continue;
+    // لو اليوم = تاريخ النهاية أو بعده ولم يوزع بعد
+    const lastDist=comp.lastDistributed?.split(' ')?.[0]||'';
+    if(today>=comp.endDate&&lastDist!==today){
+      console.log(`Auto distributing ${type} prizes...`);
+      await distributeTopPrizes(type);
+    }
+  }
+}
+
 async function showTopBuyers(){
   const el=document.getElementById('topBuyersTable');if(!el)return;
   const cutoff=getPeriodCutoff(document.getElementById('topBuyerPeriod')?.value||'month');
@@ -3853,15 +3896,12 @@ function toggleTieredPrize(prefix,rank){
 async function getTopWinners(type,period,limit3=3){
   const isBuyer=type==='buyer';
   const cfg=S.comp?.[isBuyer?'topBuyer':'topRc']||{};
-  const periodCutoff=getPeriodCutoff(period||'month');
-
-  // لو في تاريخ توزيع سابق — ابدأ من الأحدث بين الاثنين
-  let cutoff=periodCutoff;
+  // الأولوية: lastDistributedTs > startDate > period cutoff
+  let cutoff=getPeriodCutoff(period||'month', cfg.startDate);
   if(cfg.lastDistributedTs){
     const lastDist=new Date(cfg.lastDistributedTs);
     if(lastDist>cutoff) cutoff=lastDist;
   }
-
   if(isBuyer){
     const snap=await col('sales').get().catch(()=>({docs:[]}));
     const counts={};
@@ -4196,6 +4236,136 @@ async function submitDailyAnswer(){
 }
 
 // ── Redeem Loyalty Points ──
+// ── Loyalty Redemption — Flexible ──
+function openRedeemChoiceModal(){
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const pts=S.user?.loyaltyPoints||0;
+  const needed=cfg.ptsRedeem||100;
+  const prizeVal=cfg.prizeVal||0;
+  const prizeType=cfg.prizeType||'balance';
+  const currency=S.cfg?.currency||'ر.ي';
+
+  // Rate info
+  let rateText='';
+  if(prizeType==='balance') rateText=`${needed} نقطة = ${prizeVal.toLocaleString()} ${currency}`;
+  else if(prizeType==='card') rateText=`${needed} نقطة = كرت مجاني`;
+  else if(prizeType==='giftCard') rateText=`${needed} نقطة = كرت هدية`;
+  else if(prizeType==='user_choice') rateText=`${needed} نقطة = جائزة من اختيارك`;
+
+  const rateEl=document.getElementById('redeemRateInfo');
+  if(rateEl) rateEl.innerHTML=`<div>رصيدك: <strong style="color:var(--p)">${pts.toLocaleString()} نقطة</strong></div>
+    <div style="margin-top:4px">سعر الاستبدال: <strong>${rateText}</strong></div>`;
+
+  const subtitle=document.getElementById('redeemSubtitle');
+  if(subtitle) subtitle.textContent=`أدخل عدد النقاط (بمضاعفات ${needed})`;
+
+  const inp=document.getElementById('redeemAmount');
+  if(inp){inp.value=needed;inp.min=needed;inp.step=needed;}
+
+  document.getElementById('redeemPreview').style.display='none';
+  document.getElementById('redeemError').style.display='none';
+
+  calcRedeemPreview();
+  openOv('redeemChoiceModal');
+}
+
+function calcRedeemPreview(){
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const needed=cfg.ptsRedeem||100;
+  const prizeVal=cfg.prizeVal||0;
+  const prizeType=cfg.prizeType||'balance';
+  const currency=S.cfg?.currency||'ر.ي';
+  const pts=S.user?.loyaltyPoints||0;
+
+  const amount=parseInt(document.getElementById('redeemAmount')?.value)||0;
+  const errEl=document.getElementById('redeemError');
+  const prevEl=document.getElementById('redeemPreview');
+  const prevVal=document.getElementById('redeemPreviewVal');
+  const btn=document.getElementById('redeemConfirmBtn');
+
+  // Validation
+  if(amount<=0){prevEl.style.display='none';if(errEl)errEl.style.display='none';return;}
+  if(amount%needed!==0){
+    if(errEl){errEl.textContent=`يجب أن يكون مضاعفاً لـ ${needed} (مثال: ${needed}, ${needed*2}, ${needed*3}...)`;errEl.style.display='block';}
+    prevEl.style.display='none';if(btn)btn.disabled=true;return;
+  }
+  if(amount>pts){
+    if(errEl){errEl.textContent=`نقاطك غير كافية — عندك ${pts} نقطة`;errEl.style.display='block';}
+    prevEl.style.display='none';if(btn)btn.disabled=true;return;
+  }
+  if(errEl)errEl.style.display='none';
+  if(btn)btn.disabled=false;
+
+  // Calculate prize
+  const multiplier=amount/needed;
+  let prizeText='';
+  if(prizeType==='balance') prizeText=`💰 ${(prizeVal*multiplier).toLocaleString()} ${currency}`;
+  else if(prizeType==='card') prizeText=`🎫 ${multiplier} كرت مجاني`;
+  else if(prizeType==='giftCard') prizeText=`🎁 ${multiplier} كرت هدية`;
+  else prizeText=`🎁 جائزة × ${multiplier}`;
+
+  if(prevVal)prevVal.textContent=prizeText;
+  if(prevEl)prevEl.style.display='block';
+}
+
+async function confirmFlexRedeem(){
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const needed=cfg.ptsRedeem||100;
+  const prizeVal=cfg.prizeVal||0;
+  const prizeType=cfg.prizeType||'balance';
+  const pts=S.user?.loyaltyPoints||0;
+  const amount=parseInt(document.getElementById('redeemAmount')?.value)||0;
+  const currency=S.cfg?.currency||'ر.ي';
+
+  if(!amount||amount%needed!==0){toast(`يجب أن يكون مضاعفاً لـ ${needed}`,'err');return;}
+  if(amount>pts){toast('نقاطك غير كافية','err');return;}
+
+  const multiplier=amount/needed;
+  let prizeText='';
+  if(prizeType==='balance') prizeText=`${(prizeVal*multiplier).toLocaleString()} ${currency}`;
+  else if(prizeType==='card'||prizeType==='giftCard') prizeText=`${multiplier} كرت`;
+  else prizeText=`جائزة × ${multiplier}`;
+
+  if(!confirm(`تأكيد الاستبدال:\n\n${amount} نقطة → ${prizeText}\n\nهل تريد المتابعة؟`))return;
+
+  const label=`⭐ استبدال ${amount} نقطة ولاء`;
+  closeOv('redeemChoiceModal');
+
+  // Give prizes multiplier times
+  let success=true;
+  for(let i=0;i<multiplier;i++){
+    if(prizeType==='balance'){
+      const ok=await givePrize(S.user.fbId,'balance',prizeVal,'',label);
+      if(!ok){success=false;break;}
+    }else if(prizeType==='giftCard'){
+      const snap=await col('giftInventory').where('status','==','available').limit(1).get().catch(()=>({docs:[]}));
+      if(!snap.docs.length){toast('نفدت كروت الهدايا — تواصل مع الدعم','err');success=false;break;}
+      const gDoc=snap.docs[0];
+      const newCard={code:gDoc.data().code,catName:gDoc.data().note||'هدية',date:serverDate(),isFree:true,prizeLabel:label,price:0};
+      const userCards=[...(S.user.cards||[]),newCard];
+      await col('users').doc(S.user.fbId).update({cards:userCards}).catch(()=>{});
+      await col('giftInventory').doc(gDoc.id).update({status:'used',givenTo:S.user.fbId,givenAt:TS()}).catch(()=>{});
+      S.user.cards=userCards;
+    }else if(prizeType==='card'){
+      const ok=await givePrize(S.user.fbId,'card',0,cfg.cardCat,label);
+      if(!ok){success=false;break;}
+    }
+  }
+
+  if(!success){toast('فشل جزئي — تواصل مع الدعم','err');return;}
+
+  // Deduct points
+  const newPts=pts-amount;
+  await col('users').doc(S.user.fbId).update({loyaltyPoints:newPts});
+  S.user.loyaltyPoints=newPts;
+
+  if(window.pushNotif)await pushNotif(S.user.fbId,'gift','⭐ استبدال نقاط',`تم استبدال ${amount} نقطة مقابل ${prizeText}`);
+  toast(`✅ تم الاستبدال! حصلت على ${prizeText}`,'ok');
+  loadUserComp();
+}
+
+// redeemLoyaltyPoints = openRedeemChoiceModal (defined above)
+
 // redeemLoyaltyPoints defined above with full support
 
 function openRedeemChoiceModal(){
@@ -4259,7 +4429,13 @@ if(_origApproveRc3){
 const _origInitUserComp=window.initUser;
 window.initUser=function(){_origInitUserComp&&_origInitUserComp();loadCompSettings().then(()=>loadUserComp());};
 const _origInitAdminComp=window.initAdmin;
-window.initAdmin=function(){_origInitAdminComp&&_origInitAdminComp();loadCompSettings().then(()=>loadCompSettingsToForm());};
+window.initAdmin=function(){
+  _origInitAdminComp&&_origInitAdminComp();
+  loadCompSettings().then(()=>{
+    loadCompSettingsToForm();
+    checkAutoDistribute(); // تحقق من التوزيع التلقائي
+  });
+};
 </script>
 
 <script>
@@ -4407,7 +4583,7 @@ function openAuthSupport(){
   const links=document.getElementById('authSupportLinks');
   if(!links)return;
   const items=[];
-  if(cfg.sitePhone||cfg.supportPhone)
+  if((cfg.sitePhone||cfg.supportPhone)&&cfg.showPhoneInSupport)
     items.push(`<a href="tel:${cfg.sitePhone||cfg.supportPhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.sitePhone||cfg.supportPhone}</div></div></a>`);
   if(cfg.supportWhatsapp)
     items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'').replace(/^0/,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
