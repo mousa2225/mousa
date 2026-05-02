@@ -319,11 +319,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
     <div class="sec-ttl" id="lblCards">اختر فئة الكرت</div>
-    <!-- ══ قسم المسابقات ══ -->
-    <div id="compSection" style="display:none;margin-bottom:20px">
-      <div class="sec-ttl">🏆 المسابقات والمكافآت</div>
-      <div id="compCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px"></div>
-    </div>
     <div class="cards-grid" id="cardsGrid"></div>
     <button class="btn-buy" id="buyBtn" disabled onclick="openBuyMod()">اختر فئة الكرت أولاً</button>
     <div id="histSec">
@@ -341,6 +336,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="hist-list" id="rcHistList"><div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div></div>
       </div>
     </div>
+  </div>
+  <!-- ══ قسم المسابقات — يظهر بعد السجل ══ -->
+  <div id="compSection" style="display:none;padding:16px;padding-top:0">
+    <div class="sec-ttl" style="margin-bottom:12px">🏆 المسابقات والمكافآت</div>
+    <div id="compCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
   </div>
 </div>
 
@@ -829,8 +829,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div></div>
       <!-- إدارة الأجهزة -->
       <div class="panel"><div class="ph"><h3>📱 إدارة الأجهزة</h3><button class="b5" onclick="loadDeviceFingerprints()">🔄 تحديث</button></div><div class="pb">
-        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">كل جهاز يسمح بـ 2 حساب فقط. يمكنك حظر أي جهاز مشبوه.</p>
-        <div class="tw"><table><thead><tr><th>بصمة الجهاز</th><th>الحسابات</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">كل جهاز يسمح بحساب واحد فقط. الجدول يعرض بصمة الجهاز والحسابات المرتبطة به.</p>
+        <div class="tw"><table><thead><tr><th>بصمة الجهاز</th><th>الحسابات</th><th>آخر نشاط</th><th>الحالة</th><th>إجراء</th></tr></thead>
         <tbody id="deviceFpTable"></tbody></table></div>
       </div></div>
     </div><!-- end sec-comp -->
@@ -3619,36 +3619,45 @@ async function submitDailyAnswer(){
     const d=snap.data();
     const winners=d.winners||[];
 
-    // تحقق من بصمة الجهاز — يمنع التحايل بأكثر من حساب
+    // تحقق من بصمة الجهاز — يمنع الإجابة مرتين بأي حساب
     const fp = await getDeviceFingerprint();
     const fpSnap = await col('deviceFingerprints').doc(fp).get().catch(()=>null);
     const fpData = fpSnap?.exists ? fpSnap.data() : {};
-    const dailyAnsweredDevices = fpData.dailyAnswered || {};
-    if(dailyAnsweredDevices[today]){
+    const dailyAnswered = fpData.dailyAnswered || {};
+
+    // منع الإجابة مرتين من نفس الجهاز
+    if(dailyAnswered[today]){
       toast('أجاب جهازك على سؤال اليوم بالفعل 😊','err');
       closeOv('dailyModal');
       return;
     }
+    // منع الإجابة مرتين من نفس المستخدم
+    if(winners.find(w=>w.uid===uid)){
+      toast('أجبت على هذا السؤال بالفعل','err');
+      closeOv('dailyModal');
+      return;
+    }
 
-    if(winners.length>=(d.maxWinners||10)){toast('اكتمل الفائزون!','err');closeOv('dailyModal');return;}
+    if(winners.length>=(d.maxWinners||10)){toast('اكتمل الفائزون! حظ أوفر غداً 🍀','err');closeOv('dailyModal');return;}
     if(ans!==d.answer){toast('إجابة خاطئة! حاول مجدداً 🤔','err');return;}
 
     // إجابة صحيحة!
     const winEntry={uid,name:S.user?.name||S.user?.username,date:serverDate(),fp};
     await doc('dailyQuestions',today).update({winners:[...winners,winEntry]});
 
-    // تسجيل الجهاز كأجاب اليوم
-    dailyAnsweredDevices[today] = true;
-    await col('deviceFingerprints').doc(fp).set({
-      dailyAnswered: dailyAnsweredDevices,
-      lastSeen: serverDate()
-    },{merge:true});
+    // تسجيل الجهاز كأجاب اليوم (منع التكرار)
+    dailyAnswered[today]=true;
+    await col('deviceFingerprints').doc(fp).set({dailyAnswered,lastSeen:serverDate()},{merge:true});
 
-    // Give prize
+    // منح الجائزة + تسجيلها في manualRecharges لتظهر في PDF
+    const prizeLabel = d.prizeType==='points'?`🏆 جائزة سؤال اليوم (${d.prizeVal} نقطة)`:`🏆 جائزة سؤال اليوم`;
     if(d.prizeType==='balance'){
       const nb=(S.user?.balance||0)+d.prizeVal;
-      await col('users').doc(uid).update({balance:nb});
-      S.user.balance=nb;updateBal&&updateBal();
+      const entry={amount:d.prizeVal,date:serverDate(),note:prizeLabel,type:'prize',ts:Date.now()};
+      const prev=S.user?.manualRecharges||[];
+      await col('users').doc(uid).update({balance:nb,manualRecharges:[...prev,entry]});
+      S.user.balance=nb;S.user.manualRecharges=[...prev,entry];
+      updateBal&&updateBal();
     }else if(d.prizeType==='points'){
       const pts=(S.user?.loyaltyPoints||0)+d.prizeVal;
       await col('users').doc(uid).update({loyaltyPoints:pts});
@@ -3672,11 +3681,16 @@ async function redeemLoyaltyPoints(){
     const newPts=pts-cfg.ptsRedeem;
     const updates={loyaltyPoints:newPts};
     if(cfg.prizeType==='balance'){
-      updates.balance=(S.user?.balance||0)+cfg.prizeVal;
+      const newBal=(S.user?.balance||0)+cfg.prizeVal;
+      const entry={amount:cfg.prizeVal,date:serverDate(),note:`⭐ استبدال نقاط الولاء (${cfg.ptsRedeem} نقطة)`,type:'prize',ts:Date.now()};
+      const prev=S.user?.manualRecharges||[];
+      updates.balance=newBal;
+      updates.manualRecharges=[...prev,entry];
+      S.user.balance=newBal;S.user.manualRecharges=[...prev,entry];
+      updateBal&&updateBal();
     }
     await col('users').doc(S.user.fbId).update(updates);
     S.user.loyaltyPoints=newPts;
-    if(cfg.prizeType==='balance'){S.user.balance=updates.balance;updateBal&&updateBal();}
     toast(`✅ تم استبدال النقاط! حصلت على ${cfg.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,'ok');
     loadUserComp();
   }catch(e){toast('خطأ: '+e.message,'err');}
@@ -3829,15 +3843,17 @@ async function loadDeviceFingerprints(){
     const all = snap.docs.map(d=>({id:d.id,...d.data()}));
     if(!all.length){el.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا توجد بيانات</td></tr>';return;}
     el.innerHTML = all.map(fp=>`<tr>
-      <td style="font-size:11px;direction:ltr">${fp.id}</td>
-      <td style="font-size:11px">${(fp.accounts||[]).map(a=>a.username).join(', ')}</td>
-      <td><span style="color:${fp.blocked?'var(--err)':fp.allowMultiple?'var(--warn)':'var(--ok)'}">${fp.blocked?'محظور':fp.allowMultiple?'متعدد':'مسموح'}</span></td>
+      <td style="font-size:10px;direction:ltr;color:var(--t2)">${fp.id}</td>
+      <td style="font-size:12px">${(fp.accounts||[]).map(a=>`<div>${a.username} <span style="font-size:10px;color:var(--t3)">${a.date||''}</span></div>`).join('')||'—'}</td>
+      <td style="font-size:11px;color:var(--t2)">${fp.lastSeen||'—'}</td>
+      <td><span style="color:${fp.blocked?'var(--err)':fp.allowMultiple?'var(--warn)':'var(--ok)'}">
+        ${fp.blocked?'🚫 محظور':fp.allowMultiple?'⚠️ متعدد':'✅ مسموح'}</span></td>
       <td style="display:flex;gap:5px;flex-wrap:wrap">
         ${fp.blocked
           ?`<button class="b2" onclick="setFpStatus('${fp.id}','unblock')">فك الحظر</button>`
           :`<button class="b3" onclick="setFpStatus('${fp.id}','block')">حظر</button>`
         }
-        ${!fp.blocked && !fp.allowMultiple
+        ${!fp.blocked&&!fp.allowMultiple
           ?`<button class="b4" onclick="setFpStatus('${fp.id}','allow')">إتاحة متعدد</button>`
           :''
         }
