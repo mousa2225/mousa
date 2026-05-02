@@ -3433,8 +3433,10 @@ function populateCompCats(){
 async function loadCompSettings(){
   try{
     const snap=await doc('settings','competitions').get().catch(()=>null);
-    if(snap&&snap.exists)S.comp=snap.data();
-    else S.comp={};
+    if(snap&&snap.exists){
+      S.comp=snap.data();
+      // Ensure nested timestamps are loaded
+    } else S.comp={};
   }catch(e){S.comp={};}
 }
 
@@ -3851,27 +3853,32 @@ function toggleTieredPrize(prefix,rank){
 async function getTopWinners(type,period,limit3=3){
   const isBuyer=type==='buyer';
   const cfg=S.comp?.[isBuyer?'topBuyer':'topRc']||{};
-  // ابدأ العد من تاريخ آخر توزيع أو من بداية الفترة — أيهما أحدث
   const periodCutoff=getPeriodCutoff(period||'month');
+
+  // لو في تاريخ توزيع سابق — ابدأ من الأحدث بين الاثنين
   let cutoff=periodCutoff;
-  if(cfg.lastDistributed){
-    // Parse the Arabic date stored — use timestamp approach
-    const distSnap=await col('compDistributions').orderBy&&null; // skip
-    // We store lastDistributedTs for accurate comparison
-  }
   if(cfg.lastDistributedTs){
-    const distDate=new Date(cfg.lastDistributedTs);
-    if(distDate>cutoff)cutoff=distDate;
+    const lastDist=new Date(cfg.lastDistributedTs);
+    if(lastDist>cutoff) cutoff=lastDist;
   }
+
   if(isBuyer){
     const snap=await col('sales').get().catch(()=>({docs:[]}));
     const counts={};
-    snap.docs.forEach(d=>{const s=d.data();if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
+    snap.docs.forEach(d=>{
+      const s=d.data();
+      if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)
+        counts[s.userId]=(counts[s.userId]||0)+1;
+    });
     return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,limit3).map(([uid,cnt])=>({uid,score:cnt}));
   }else{
     const snap=await col('rechargeRequests').where('status','==','approved').get().catch(()=>({docs:[]}));
     const amounts={};
-    snap.docs.forEach(d=>{const r=d.data();if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff)amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);});
+    snap.docs.forEach(d=>{
+      const r=d.data();
+      if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff)
+        amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);
+    });
     return Object.entries(amounts).sort((a,b)=>b[1]-a[1]).slice(0,limit3).map(([uid,amt])=>({uid,score:amt}));
   }
 }
@@ -3900,15 +3907,15 @@ async function distributeTopPrizes(type){
   }
   // Save record
   const today=serverNow().toISOString().split('T')[0];
-  // Save last distribution timestamp to restart counting from this point
-  const distUpdate={};
-  distUpdate[`${isBuyer?'topBuyer':'topRc'}.lastDistributed`]=serverDate();
-  distUpdate[`${isBuyer?'topBuyer':'topRc'}.lastDistributedTs`]=serverNow().getTime();
-  await doc('settings','competitions').update(distUpdate).catch(()=>{});
-  // Update local cfg
-  if(S.comp?.[isBuyer?'topBuyer':'topRc']){
-    S.comp[isBuyer?'topBuyer':'topRc'].lastDistributedTs=serverNow().getTime();
-  }
+  // حفظ timestamp التوزيع — يُعيد العد من الصفر
+  const distTs=serverNow().getTime();
+  const compKey=isBuyer?'topBuyer':'topRc';
+  const updatedComp={...S.comp};
+  if(!updatedComp[compKey])updatedComp[compKey]={};
+  updatedComp[compKey].lastDistributedTs=distTs;
+  updatedComp[compKey].lastDistributed=serverDate();
+  S.comp=updatedComp;
+  await doc('settings','competitions').set(updatedComp).catch(()=>{});
   await col('compDistributions').doc(`${type}_${today}`).set({
     type,distributedAt:serverDate(),
     winners:winners.map((w,i)=>({uid:w.uid,rank:i+1,score:w.score}))
