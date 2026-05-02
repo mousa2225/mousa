@@ -216,6 +216,28 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .toast.on{opacity:1}.toast.ok{border-color:rgba(0,214,143,.4);color:var(--ok)}.toast.err{border-color:rgba(255,61,113,.4);color:var(--err)}
 
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+
+/* ── Mobile Responsive ── */
+.sb-menu-btn{display:none;position:fixed;top:8px;left:8px;z-index:300;background:var(--pd);border:none;border-radius:10px;color:#fff;width:40px;height:40px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.sb-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+@media(max-width:768px){
+  /* Admin */
+  .sb{display:none!important}.sb.mob-open{display:flex!important}
+  .sb-dim.on{display:block}
+  .sb-menu-btn{display:flex!important}
+  .adm-main{margin-right:0!important;padding:12px!important;padding-top:56px!important}
+  .stats-row{grid-template-columns:repeat(2,1fr)!important}
+  .panel .fr{flex-direction:column}
+  #sec-sup>div[style*="grid-template"]{display:flex!important;flex-direction:column!important;height:auto!important}
+  /* User */
+  .u-header{padding:8px 12px!important}
+  .bal-pill{font-size:11px!important;padding:4px 9px!important}
+  .hbtn{padding:6px 10px!important;font-size:12px!important}
+  .grid{grid-template-columns:repeat(2,1fr)!important}
+  .card{padding:12px!important}
+  .histSec{padding:12px!important}
+  .modal{margin:10px!important;max-height:90vh;overflow-y:auto}
+}
 </style>
 </head>
 <body>
@@ -312,7 +334,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ══ ADMIN ══ -->
 <div id="adminPg" class="pg">
-  <div class="sb">
+<button class="sb-menu-btn" onclick="toggleAdminSB()">☰</button>
+<div class="sb-dim" id="sbDim" onclick="closeAdminSB()"></div>
+  <div class="sb" id="sbEl">
     <div class="sb-logo">
       <div class="sb-icon" id="sbIcon"><span id="sbEmoji">📡</span><img id="sbImg" src="" style="display:none"></div>
       <div><div style="font-size:14px;font-weight:700" id="sbName">المدى نت</div><div style="font-size:11px;color:var(--t2)">لوحة الإدارة</div></div>
@@ -1270,21 +1294,22 @@ async function renderRcHist(){
   list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px;font-size:13px">⏳ جاري التحميل...</div>';
   try{
     // Load directly from Firebase — user-specific
-    const snap=await col('rechargeRequests')
-      .where('userId','==',uid)
-      .orderBy('createdAt','desc')
-      .get();
+    const snap=await col('rechargeRequests').where('userId','==',uid).get();
     const rcs=snap.docs.map(d=>({fbId:d.id,...d.data()}));
     // Also get admin manual recharges from user doc
     const userSnap=await col('users').doc(uid).get();
     const manualRcs=(userSnap.data()?.manualRecharges||[]);
     // Combine
     const all=[
-      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,amount:r.amount,note:'💳 شحن رصيد',type:'approved'})),
-      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,amount:r.amount,note:'⏳ قيد المراجعة',type:'pending'})),
-      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,amount:r.amount,note:'❌ مرفوض',type:'rejected'})),
-      ...manualRcs.map(r=>({date:r.date,amount:r.amount,note:'🎁 شحن من الإدارة',type:'admin'}))
-    ].sort((a,b)=>(b.ts||0)-(a.ts||0));
+      ...rcs.filter(r=>r.status==='approved').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'💳 شحن رصيد',type:'approved'})),
+      ...rcs.filter(r=>r.status==='pending').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'⏳ قيد المراجعة',type:'pending'})),
+      ...rcs.filter(r=>r.status==='rejected').map(r=>({date:r.date,ts:r.createdAt?.seconds||0,amount:+(r.amount||0),note:'❌ مرفوض',type:'rejected'})),
+      ...manualRcs.map(r=>({
+        date:r.date,ts:(r.ts||0)/1000,amount:r.amount||0,
+        note:r.type==='deduct'?'➖ '+(r.note||'خصم من الإدارة'):'🎁 '+(r.note||'شحن من الإدارة'),
+        type:r.type==='deduct'?'deduct':'admin'
+      }))
+    ].sort((a,b)=>b.ts-a.ts);
     if(!all.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
     const page=all.slice(0,(_rcPage+1)*PAGE_SIZE);
     const hasMore=all.length>(_rcPage+1)*PAGE_SIZE;
@@ -1292,16 +1317,16 @@ async function renderRcHist(){
     list.innerHTML=page.map(r=>`
       <div class="hi">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <div style="width:36px;height:36px;background:${r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
-            ${r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
+          <div style="width:36px;height:36px;background:${r.type==='deduct'?'rgba(255,61,113,.1)':r.type==='approved'||r.type==='admin'?'rgba(0,214,143,.1)':r.type==='pending'?'rgba(255,170,0,.1)':'rgba(255,61,113,.1)'};border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">
+            ${r.type==='deduct'?'➖':r.type==='approved'||r.type==='admin'?'💳':r.type==='pending'?'⏳':'❌'}
           </div>
           <div>
             <div style="font-size:13px;font-weight:600">${r.note}</div>
             <div style="font-size:11px;color:var(--t2)">${r.date||''}</div>
           </div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:${r.type==='approved'||r.type==='admin'?'var(--ok)':r.type==='pending'?'var(--warn)':'var(--err)'}">
-          ${r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
+        <div style="font-size:14px;font-weight:700;color:${r.type==='deduct'||r.type==='rejected'?'var(--err)':r.type==='pending'?'var(--warn)':'var(--ok)'}">
+          ${r.type==='deduct'?'':r.type==='approved'||r.type==='admin'?'+':''}${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span>
         </div>
       </div>`).join('');
     const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:10px';
@@ -1810,19 +1835,15 @@ async function manRc(){
   if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
   const u=S.users.find(x=>x.fbId===uid);if(!u)return;
   const newBal=(u.balance||0)+amt;
-  const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'شحن من الإدارة',ts:Date.now()};
-  // Save balance + log entry
+  const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'شحن من الإدارة',type:'add',ts:Date.now()};
   const prev=(u.manualRecharges||[]);
-  await col('users').doc(uid).update({
-    balance:newBal,
-    manualRecharges:[...prev,entry]
-  });
-  u.balance=newBal;
-  u.manualRecharges=[...prev,entry];
+  await col('users').doc(uid).update({balance:newBal,manualRecharges:[...prev,entry]});
+  u.balance=newBal;u.manualRecharges=[...prev,entry];
   if(S.user?.fbId===uid){S.user.balance=newBal;updateBal();}
   $('manAmt').value='';
   toast(`✅ تم شحن ${amt.toLocaleString()} ريال 🎁 هدية من الإدارة`,'ok');
   renderUsersTable();refreshStats();
+  if(window.pushNotif) await window.pushNotif(uid,'gift','🎁 شحن من الإدارة',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك`);
 }
 
 // USERS
@@ -1843,7 +1864,21 @@ function renderUsersTable(){
   </tr>`).join('');
   popSelects();
 }
-async function addBal(){const uid=$('addBalUser').value,amt=parseInt($('addBalAmt').value);if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}const u=S.users.find(x=>x.fbId===uid);if(!u)return;const nb=(u.balance||0)+amt;await col('users').doc(uid).update({balance:nb});u.balance=nb;if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}$('addBalAmt').value='';toast(`✅ تمت إضافة ${amt.toLocaleString()} ريال`,'ok');renderUsersTable();refreshStats();}
+async function addBal(){
+  const uid=$('addBalUser').value,amt=parseInt($('addBalAmt').value);
+  if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
+  const u=S.users.find(x=>x.fbId===uid);if(!u)return;
+  const nb=(u.balance||0)+amt;
+  const entry={amount:amt,date:new Date().toLocaleString('ar-YE'),note:'إضافة يدوية من الإدارة',type:'add',ts:Date.now()};
+  const prev=u.manualRecharges||[];
+  await col('users').doc(uid).update({balance:nb,manualRecharges:[...prev,entry]});
+  u.balance=nb;u.manualRecharges=[...prev,entry];
+  if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}
+  $('addBalAmt').value='';
+  toast(`✅ تمت إضافة ${amt.toLocaleString()} ريال`,'ok');
+  renderUsersTable();refreshStats();
+  if(window.pushNotif) await window.pushNotif(uid,'gift','💳 إضافة رصيد',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك من الإدارة`);
+}
 async function qAddBal(uid){const amt=parseInt(prompt('أدخل المبلغ:'));if(!amt||isNaN(amt))return;const u=S.users.find(x=>x.fbId===uid);if(!u)return;const nb=(u.balance||0)+amt;await col('users').doc(uid).update({balance:nb});u.balance=nb;if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}toast('✅ تمت الإضافة','ok');renderUsersTable();refreshStats();}
 async function zeroBal(uid){await col('users').doc(uid).update({balance:0});const u=S.users.find(x=>x.fbId===uid);if(u){u.balance=0;if(S.user?.fbId===uid){S.user.balance=0;updateBal();}}renderUsersTable();}
 
@@ -1977,24 +2012,7 @@ function switchHistTab(tab){
   $('rcHistDiv').style.display=tab==='rc'?'block':'none';
 }
 
-function renderRcHist(){
-  const list=$('rcHistList');if(!list)return;
-  const uid=S.user?.fbId;if(!uid)return;
-  // Get approved recharge requests for this user from state
-  const myRc=(S.reqs||[]).filter(r=>r.userId===uid&&r.status==='approved');
-  if(!myRc.length){list.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div>';return;}
-  list.innerHTML=myRc.slice().reverse().map(r=>`
-    <div class="hi">
-      <div style="display:flex;align-items:center;gap:10px;flex:1">
-        <div style="width:36px;height:36px;background:rgba(0,214,143,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">💳</div>
-        <div>
-          <div style="font-size:13px;font-weight:600">شحن رصيد</div>
-          <div style="font-size:11px;color:var(--t2)">${r.date}</div>
-        </div>
-      </div>
-      <div style="font-size:14px;font-weight:700;color:var(--ok)">+${(r.amount||0).toLocaleString()} <span class="cur">ر.ي</span></div>
-    </div>`).join('');
-}
+// renderRcHist defined above
 
 // ── EDIT OFFER ──
 function editOffer(id){
@@ -2192,23 +2210,29 @@ async function deductBal(){
   const uid=$('addBalUser').value;
   if(!uid){toast('اختر مستخدماً','err');return;}
   const u=S.users.find(x=>x.fbId===uid);if(!u)return;
-  const mode=prompt(`رصيد ${u.name||u.username} الحالي: ${(u.balance||0).toLocaleString()}\n\nاختر:\n1 - خصم مبلغ (اكتب مثلاً: خصم 500)\n2 - تعيين رصيد محدد (اكتب مثلاً: تعيين 1000)`);
+  const mode=prompt(`رصيد ${u.name||u.username}: ${(u.balance||0).toLocaleString()}\n\n• خصم مبلغ → اكتب: خصم 500\n• تعيين رصيد → اكتب: تعيين 1000`);
   if(!mode)return;
-  let newBal;
+  let newBal,amt,note;
   if(mode.includes('خصم')){
-    const amt=parseInt(mode.replace(/[^\d]/g,''));
+    amt=parseInt(mode.replace(/[^\d]/g,''));
     if(!amt){toast('مبلغ غير صحيح','err');return;}
     newBal=Math.max(0,(u.balance||0)-amt);
-    toast(`تم خصم ${amt.toLocaleString()} — الرصيد الجديد: ${newBal.toLocaleString()}`,'ok');
+    note='خصم من الإدارة';
+    toast(`✅ تم خصم ${amt.toLocaleString()} — الرصيد: ${newBal.toLocaleString()}`,'ok');
   }else if(mode.includes('تعيين')){
     newBal=parseInt(mode.replace(/[^\d]/g,''));
     if(isNaN(newBal)){toast('مبلغ غير صحيح','err');return;}
-    toast(`تم تعيين الرصيد: ${newBal.toLocaleString()}`,'ok');
+    amt=Math.abs((u.balance||0)-newBal);
+    note='تعيين رصيد من الإدارة';
+    toast(`✅ تم تعيين الرصيد: ${newBal.toLocaleString()}`,'ok');
   }else{toast('اكتب خصم أو تعيين','err');return;}
-  await col('users').doc(uid).update({balance:newBal});
-  u.balance=newBal;
+  const entry={amount:-Math.abs(amt),date:new Date().toLocaleString('ar-YE'),note,type:'deduct',ts:Date.now()};
+  const prev=u.manualRecharges||[];
+  await col('users').doc(uid).update({balance:newBal,manualRecharges:[...prev,entry]});
+  u.balance=newBal;u.manualRecharges=[...prev,entry];
   if(S.user?.fbId===uid){S.user.balance=newBal;updateBal();}
   renderUsersTable();refreshStats();
+  if(window.pushNotif) await window.pushNotif(uid,'gift','⚠️ تعديل رصيد',`${note}: ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} — رصيدك: ${newBal.toLocaleString()}`);
 }
 
 // ── HISTORY PAGINATION ──
@@ -2333,6 +2357,26 @@ async function addSliderItemVideo(input){
 
 <!-- ── إضافات آمنة: فلتر البحث + صور البروفايل ── -->
 <script>
+
+// ── Mobile Sidebar Toggle ──
+function toggleAdminSB(){
+  const sb=document.getElementById('sbEl'),dim=document.getElementById('sbDim');
+  if(!sb)return;
+  sb.classList.toggle('mob-open');
+  if(dim)dim.classList.toggle('on');
+}
+function closeAdminSB(){
+  document.getElementById('sbEl')?.classList.remove('mob-open');
+  document.getElementById('sbDim')?.classList.remove('on');
+}
+// Fix nav to scroll to top + close mobile sidebar
+const _origNav=window.nav;
+window.nav=function(s){
+  if(_origNav)_origNav.call(this,s);
+  const m=document.querySelector('.adm-main');
+  if(m)m.scrollTop=0;
+  closeAdminSB();
+};
 
 // ── فلتر البحث في قائمة المستخدمين ──
 document.addEventListener('DOMContentLoaded', function(){
