@@ -697,143 +697,186 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="adm-sec" id="sec-comp">
       <div class="adm-hdr"><h2>🏆 المسابقات</h2><p>إدارة المسابقات والمكافآت</p></div>
 
-      <!-- نقاط الولاء -->
+      <!-- ⭐ نقاط الولاء -->
       <div class="panel"><div class="ph"><h3>⭐ نقاط الولاء</h3>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="loyaltyEnabled" onchange="saveCompSettings()"> تفعيل
-        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="loyaltyEnabled"> تفعيل</label>
       </div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم المسابقة</label><input class="inp" id="loyaltyName" value="⭐ نقاط الولاء" onchange="saveCompSettings()"></div>
-          <div><label class="fl">نقاط لكل عملية شراء</label><input class="inp" type="number" id="loyaltyPtsPerBuy" value="10" onchange="saveCompSettings()"></div>
+          <div><label class="fl">اسم القسم</label><input class="inp" id="loyaltyName" value="⭐ نقاط الولاء"></div>
+          <div><label class="fl">نقاط لكل شراء</label><input class="inp" type="number" id="loyaltyPtsPerBuy" value="10"></div>
         </div>
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">نقاط لكل شحن</label><input class="inp" type="number" id="loyaltyPtsPerRc" value="5" onchange="saveCompSettings()"></div>
-          <div><label class="fl">النقاط المطلوبة للاستبدال</label><input class="inp" type="number" id="loyaltyPtsRedeem" value="100" onchange="saveCompSettings()"></div>
+          <div><label class="fl">نقاط لكل شحن</label><input class="inp" type="number" id="loyaltyPtsPerRc" value="5"></div>
+          <div><label class="fl">نقاط للاستبدال</label><input class="inp" type="number" id="loyaltyPtsRedeem" value="100"></div>
         </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="loyaltyPrizeType" onchange="saveCompSettings()">
-              <option value="balance">رصيد نقدي</option>
-              <option value="card">كرت مجاني</option>
-            </select>
+        <div style="margin-bottom:12px">
+          <label class="fl">نوع الجائزة عند الاستبدال</label>
+          <select class="sel" id="loyaltyPrizeType" onchange="toggleLoyaltyPrize()">
+            <option value="balance">رصيد نقدي محدد</option>
+            <option value="card">كرت مجاني محدد</option>
+            <option value="user_choice">المستخدم يختار النوع</option>
+          </select>
+        </div>
+        <div id="loyaltyBalDiv" class="fr" style="margin-bottom:12px">
+          <div><label class="fl">قيمة الرصيد (ر.ي)</label><input class="inp" type="number" id="loyaltyPrizeVal" value="500"></div>
+        </div>
+        <div id="loyaltyCardDiv" style="display:none;margin-bottom:12px">
+          <label class="fl">فئة الكرت</label><select class="sel" id="loyaltyCardCat"></select>
+        </div>
+        <div id="loyaltyChoiceDiv" style="display:none;margin-bottom:12px">
+          <div class="fr">
+            <div><label class="fl">قيمة الرصيد إذا اختار نقدي</label><input class="inp" type="number" id="loyaltyChoiceBal" value="500"></div>
+            <div><label class="fl">فئة الكرت إذا اختار كرت</label><select class="sel" id="loyaltyChoiceCard"></select></div>
           </div>
-          <div><label class="fl">قيمة الجائزة</label><input class="inp" type="number" id="loyaltyPrizeVal" value="500" onchange="saveCompSettings()"></div>
         </div>
-        <button class="b1" onclick="saveCompSettings()">💾 حفظ</button>
+        <button class="b1" onclick="saveCompSettings()">💾 حفظ إعدادات الولاء</button>
       </div></div>
 
-      <!-- أكثر مشترٍ -->
+      <!-- 🛒 أكثر مشترٍ -->
       <div class="panel"><div class="ph"><h3>🛒 أكثر مشترٍ</h3>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="topBuyerEnabled" onchange="saveCompSettings()"> تفعيل
-        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="topBuyerEnabled"> تفعيل</label>
       </div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم المسابقة</label><input class="inp" id="topBuyerName" value="🛒 أكثر مشترٍ" onchange="saveCompSettings()"></div>
+          <div><label class="fl">اسم المسابقة</label><input class="inp" id="topBuyerName" value="🛒 أكثر مشترٍ"></div>
           <div><label class="fl">الفترة</label>
-            <select class="sel" id="topBuyerPeriod" onchange="saveCompSettings()">
-              <option value="month">شهري</option>
-              <option value="week">أسبوعي</option>
+            <select class="sel" id="topBuyerPeriod">
+              <option value="month">شهري</option><option value="week">أسبوعي</option>
             </select>
           </div>
         </div>
         <div class="fr" style="margin-bottom:12px">
           <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="topBuyerPrizeType" onchange="saveCompSettings()">
-              <option value="balance">رصيد نقدي</option>
-              <option value="card">كرت مجاني</option>
+            <select class="sel" id="topBuyerPrizeType" onchange="toggleTopPrize('topBuyer')">
+              <option value="balance">رصيد نقدي</option><option value="card">كرت مجاني</option>
             </select>
           </div>
-          <div><label class="fl">قيمة الجائزة</label><input class="inp" type="number" id="topBuyerPrizeVal" value="2000" onchange="saveCompSettings()"></div>
+          <div id="topBuyerBalDiv"><label class="fl">قيمة الرصيد</label><input class="inp" type="number" id="topBuyerPrizeVal" value="2000"></div>
+          <div id="topBuyerCardDiv" style="display:none"><label class="fl">فئة الكرت</label><select class="sel" id="topBuyerCardCat"></select></div>
         </div>
-        <button class="b2" onclick="showTopBuyers()">👁 عرض الترتيب الحالي</button>
-        <div id="topBuyersTable" style="margin-top:12px"></div>
-        <button class="b1" onclick="saveCompSettings()">💾 حفظ</button>
+        <button class="b2" onclick="showTopBuyers()">👁 الترتيب الحالي</button>
+        <div id="topBuyersTable" style="margin-top:10px"></div>
+        <button class="b1" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
       </div></div>
 
-      <!-- أكثر شاحن -->
+      <!-- 💳 أكثر شاحن -->
       <div class="panel"><div class="ph"><h3>💳 أكثر شاحن</h3>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="topRcEnabled" onchange="saveCompSettings()"> تفعيل
-        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="topRcEnabled"> تفعيل</label>
       </div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم المسابقة</label><input class="inp" id="topRcName" value="💳 أكثر شاحن" onchange="saveCompSettings()"></div>
+          <div><label class="fl">اسم المسابقة</label><input class="inp" id="topRcName" value="💳 أكثر شاحن"></div>
           <div><label class="fl">الفترة</label>
-            <select class="sel" id="topRcPeriod" onchange="saveCompSettings()">
-              <option value="month">شهري</option>
-              <option value="week">أسبوعي</option>
+            <select class="sel" id="topRcPeriod">
+              <option value="month">شهري</option><option value="week">أسبوعي</option>
             </select>
           </div>
         </div>
         <div class="fr" style="margin-bottom:12px">
           <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="topRcPrizeType" onchange="saveCompSettings()">
-              <option value="balance">رصيد نقدي</option>
-              <option value="card">كرت مجاني</option>
+            <select class="sel" id="topRcPrizeType" onchange="toggleTopPrize('topRc')">
+              <option value="balance">رصيد نقدي</option><option value="card">كرت مجاني</option>
             </select>
           </div>
-          <div><label class="fl">قيمة الجائزة</label><input class="inp" type="number" id="topRcPrizeVal" value="2000" onchange="saveCompSettings()"></div>
+          <div id="topRcBalDiv"><label class="fl">قيمة الرصيد</label><input class="inp" type="number" id="topRcPrizeVal" value="2000"></div>
+          <div id="topRcCardDiv" style="display:none"><label class="fl">فئة الكرت</label><select class="sel" id="topRcCardCat"></select></div>
         </div>
-        <button class="b2" onclick="showTopRc()">👁 عرض الترتيب الحالي</button>
-        <div id="topRcTable" style="margin-top:12px"></div>
-        <button class="b1" onclick="saveCompSettings()">💾 حفظ</button>
+        <button class="b2" onclick="showTopRc()">👁 الترتيب الحالي</button>
+        <div id="topRcTable" style="margin-top:10px"></div>
+        <button class="b1" style="margin-top:10px" onclick="saveCompSettings()">💾 حفظ</button>
       </div></div>
 
-      <!-- مسابقة يومية -->
-      <div class="panel"><div class="ph"><h3>📅 المسابقة اليومية</h3>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-          <input type="checkbox" id="dailyEnabled" onchange="saveCompSettings()"> تفعيل
-        </label>
+      <!-- 📅 سؤال اليوم -->
+      <div class="panel"><div class="ph"><h3>📅 سؤال اليوم</h3>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="dailyEnabled"> تفعيل</label>
       </div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">اسم المسابقة</label><input class="inp" id="dailyName" value="📅 سؤال اليوم" onchange="saveCompSettings()"></div>
-          <div><label class="fl">عدد الأسئلة الفائزة يومياً</label><input class="inp" type="number" id="dailyMaxWinners" value="10" onchange="saveCompSettings()"></div>
+          <div><label class="fl">اسم المسابقة</label><input class="inp" id="dailyName" value="📅 سؤال اليوم"></div>
+          <div><label class="fl">أقصى عدد فائزين يومياً</label><input class="inp" type="number" id="dailyMaxWinners" value="10"></div>
         </div>
-        <div style="margin-bottom:14px">
+        <div style="margin-bottom:10px">
+          <label class="fl">نوع السؤال</label>
+          <select class="sel" id="dailyQType" onchange="toggleDailyQType()">
+            <option value="text">إجابة مكتوبة</option>
+            <option value="choice">اختيارات أ/ب/ج/د</option>
+            <option value="bank">من بنك الأسئلة (تلقائي يومياً)</option>
+          </select>
+        </div>
+        <!-- سؤال مكتوب -->
+        <div id="dailyTextDiv" style="margin-bottom:12px">
           <label class="fl">السؤال</label>
           <input class="inp" id="dailyQuestion" placeholder="اكتب السؤال هنا...">
+          <label class="fl" style="margin-top:8px">الإجابة الصحيحة</label>
+          <input class="inp" id="dailyAnswer" placeholder="الإجابة (غير حساسة للحالة)">
         </div>
-        <div class="fr" style="margin-bottom:12px">
-          <div><label class="fl">الإجابة الصحيحة</label><input class="inp" id="dailyAnswer" placeholder="الإجابة"></div>
-          <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="dailyPrizeType" onchange="toggleDailyPrize()">
-              <option value="balance">رصيد نقدي</option>
-              <option value="card">كرت مجاني</option>
-              <option value="points">نقاط ولاء</option>
-            </select>
+        <!-- اختيارات -->
+        <div id="dailyChoiceDiv" style="display:none;margin-bottom:12px">
+          <label class="fl">السؤال</label>
+          <input class="inp" id="dailyChoiceQ" placeholder="اكتب السؤال...">
+          <div class="fr" style="margin-top:8px">
+            <div><label class="fl">أ</label><input class="inp" id="choiceA" placeholder="الخيار أ"></div>
+            <div><label class="fl">ب</label><input class="inp" id="choiceB" placeholder="الخيار ب"></div>
           </div>
+          <div class="fr">
+            <div><label class="fl">ج</label><input class="inp" id="choiceC" placeholder="الخيار ج (اختياري)"></div>
+            <div><label class="fl">د</label><input class="inp" id="choiceD" placeholder="الخيار د (اختياري)"></div>
+          </div>
+          <label class="fl" style="margin-top:8px">الإجابة الصحيحة</label>
+          <select class="sel" id="choiceCorrect">
+            <option value="a">أ</option><option value="b">ب</option>
+            <option value="c">ج</option><option value="d">د</option>
+          </select>
         </div>
-        <div class="fr" style="margin-bottom:14px">
-          <div><label class="fl">قيمة الجائزة</label><input class="inp" type="number" id="dailyPrizeVal" value="200"></div>
-          <div id="dailyCardCatDiv"><label class="fl">فئة الكرت</label><select class="sel" id="dailyCardCat"></select></div>
+        <!-- بنك الأسئلة -->
+        <div id="dailyBankDiv" style="display:none;margin-bottom:12px">
+          <p style="font-size:12px;color:var(--t2);margin-bottom:8px">أضف أسئلة للبنك — سيختار النظام سؤالاً جديداً كل يوم تلقائياً</p>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input class="inp" id="bankQ" placeholder="السؤال..." style="flex:2">
+            <input class="inp" id="bankA" placeholder="الإجابة..." style="flex:1">
+            <button class="b2" onclick="addToBank()">+ إضافة</button>
+          </div>
+          <div id="bankList" style="max-height:180px;overflow-y:auto"></div>
         </div>
-        <button class="b1" onclick="saveDailyQuestion()">💾 حفظ السؤال</button>
+        <!-- الجائزة -->
+        <div style="border-top:1px solid var(--brd);padding-top:12px;margin-top:4px">
+          <label class="fl">نوع الجائزة</label>
+          <select class="sel" id="dailyPrizeType" onchange="toggleDailyPrize()">
+            <option value="balance">رصيد نقدي</option>
+            <option value="card">كرت مجاني</option>
+            <option value="points">نقاط ولاء</option>
+          </select>
+          <div id="dailyPrizeBalDiv" style="margin-top:8px"><label class="fl">قيمة الرصيد</label><input class="inp" type="number" id="dailyPrizeVal" value="200"></div>
+          <div id="dailyPrizeCardDiv" style="display:none;margin-top:8px"><label class="fl">فئة الكرت</label><select class="sel" id="dailyCardCat"></select></div>
+          <div id="dailyPrizePtsDiv" style="display:none;margin-top:8px"><label class="fl">عدد النقاط</label><input class="inp" type="number" id="dailyPrizePoints" value="50"></div>
+        </div>
+        <button class="b1" style="margin-top:12px" onclick="saveDailyQuestion()">💾 حفظ وتفعيل السؤال اليوم</button>
         <div id="dailyWinnersToday" style="margin-top:14px"></div>
       </div></div>
 
-      <!-- منح جائزة يدوية -->
+      <!-- 🎁 جائزة يدوية -->
       <div class="panel"><div class="ph"><h3>🎁 منح جائزة يدوية</h3></div><div class="pb">
         <div class="fr" style="margin-bottom:12px">
           <div><label class="fl">المستخدم</label><select class="sel" id="compAwardUser"></select></div>
           <div><label class="fl">نوع الجائزة</label>
-            <select class="sel" id="compAwardType">
+            <select class="sel" id="compAwardType" onchange="toggleAwardType()">
               <option value="balance">رصيد نقدي</option>
+              <option value="card">كرت مجاني</option>
               <option value="points">نقاط ولاء</option>
             </select>
           </div>
         </div>
-        <div style="margin-bottom:12px"><label class="fl">القيمة</label><input class="inp" type="number" id="compAwardVal" placeholder="500"></div>
+        <div id="awardBalDiv" style="margin-bottom:12px"><label class="fl">المبلغ</label><input class="inp" type="number" id="compAwardVal" placeholder="500"></div>
+        <div id="awardCardDiv" style="display:none;margin-bottom:12px"><label class="fl">فئة الكرت</label><select class="sel" id="awardCardCat"></select></div>
+        <div id="awardPtsDiv" style="display:none;margin-bottom:12px"><label class="fl">عدد النقاط</label><input class="inp" type="number" id="compAwardPts" placeholder="100"></div>
         <button class="b2" onclick="giveManualAward()">🎁 منح الجائزة</button>
       </div></div>
-      <!-- إدارة الأجهزة -->
+
+      <!-- 📱 إدارة الأجهزة -->
       <div class="panel"><div class="ph"><h3>📱 إدارة الأجهزة</h3><button class="b5" onclick="loadDeviceFingerprints()">🔄 تحديث</button></div><div class="pb">
-        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">كل جهاز يسمح بحساب واحد فقط. الجدول يعرض بصمة الجهاز والحسابات المرتبطة به.</p>
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">حساب واحد لكل جهاز. يمكنك حظر أو إتاحة متعدد لأي جهاز.</p>
         <div class="tw"><table><thead><tr><th>بصمة الجهاز</th><th>الحسابات</th><th>آخر نشاط</th><th>الحالة</th><th>إجراء</th></tr></thead>
         <tbody id="deviceFpTable"></tbody></table></div>
       </div></div>
     </div><!-- end sec-comp -->
+
 
 </div><!-- admin-main -->
 </div><!-- adminPg -->
@@ -3217,9 +3260,10 @@ window.downloadStatementPDF=async function(uid){
     <h3 id="dailyModalName" style="margin:8px 0">سؤال اليوم</h3>
     <p style="font-size:12px;color:var(--t2)" id="dailyModalSubtitle"></p>
   </div>
-  <div style="background:var(--bg2);border-radius:12px;padding:16px;margin-bottom:16px">
+  <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px">
     <p id="dailyModalQ" style="font-size:14px;font-weight:600;text-align:center;margin:0"></p>
   </div>
+  <div id="dailyModalChoices" style="margin-bottom:10px"></div>
   <div class="fg">
     <input class="inp" id="dailyModalAns" placeholder="إجابتك..." onkeydown="if(event.key==='Enter')submitDailyAnswer()">
   </div>
@@ -3237,113 +3281,193 @@ window.downloadStatementPDF=async function(uid){
   <button class="mok" style="width:100%;margin-top:14px" onclick="closeOv('leaderModal')">إغلاق</button>
 </div></div>
 
+<!-- ══ REDEEM CHOICE MODAL ══ -->
+<div class="ov" id="redeemChoiceModal">
+<div class="modal" style="max-width:380px">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:40px">⭐</div>
+    <h3>اختر جائزتك</h3>
+    <p style="font-size:13px;color:var(--t2)">استبدل نقاطك بالجائزة التي تريدها</p>
+  </div>
+  <div style="display:flex;gap:12px;margin-bottom:16px">
+    <button onclick="confirmRedeemChoice('balance')" style="flex:1;background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.3);border-radius:12px;padding:16px;cursor:pointer;font-family:var(--ff)">
+      <div style="font-size:28px;margin-bottom:6px">💰</div>
+      <div style="font-size:13px;font-weight:700;color:var(--ok)" id="rcBalVal">500 ر.ي</div>
+      <div style="font-size:11px;color:var(--t2)">رصيد نقدي</div>
+    </button>
+    <button onclick="confirmRedeemChoice('card')" style="flex:1;background:rgba(0,114,255,.1);border:1px solid rgba(0,114,255,.3);border-radius:12px;padding:16px;cursor:pointer;font-family:var(--ff)">
+      <div style="font-size:28px;margin-bottom:6px">🎫</div>
+      <div style="font-size:13px;font-weight:700;color:var(--p)" id="rcCardVal">كرت</div>
+      <div style="font-size:11px;color:var(--t2)">كرت مجاني</div>
+    </button>
+  </div>
+  <button class="mbtn-cancel" style="width:100%" onclick="closeOv('redeemChoiceModal')">إلغاء</button>
+</div></div>
+
+
 <script>
 // ══════════════════════════════════════════
-// COMPETITIONS SYSTEM
+// COMPETITIONS SYSTEM — COMPLETE REWRITE
 // ══════════════════════════════════════════
 
-// ── Load competitions settings ──
+// ── UI Toggle Helpers ──
+function toggleLoyaltyPrize(){
+  const t=document.getElementById('loyaltyPrizeType')?.value;
+  const show=(id,v)=>{const e=document.getElementById(id);if(e)e.style.display=v?'block':'none';};
+  show('loyaltyBalDiv',t==='balance');
+  show('loyaltyCardDiv',t==='card');
+  show('loyaltyChoiceDiv',t==='user_choice');
+}
+function toggleTopPrize(prefix){
+  const t=document.getElementById(prefix+'PrizeType')?.value;
+  const show=(id,v)=>{const e=document.getElementById(id);if(e)e.style.display=v?'block':'none';};
+  show(prefix+'BalDiv',t==='balance');
+  show(prefix+'CardDiv',t==='card');
+}
+function toggleDailyQType(){
+  const t=document.getElementById('dailyQType')?.value;
+  document.getElementById('dailyTextDiv').style.display=t==='text'?'block':'none';
+  document.getElementById('dailyChoiceDiv').style.display=t==='choice'?'block':'none';
+  document.getElementById('dailyBankDiv').style.display=t==='bank'?'block':'none';
+}
+function toggleDailyPrize(){
+  const t=document.getElementById('dailyPrizeType')?.value;
+  document.getElementById('dailyPrizeBalDiv').style.display=t==='balance'?'block':'none';
+  document.getElementById('dailyPrizeCardDiv').style.display=t==='card'?'block':'none';
+  document.getElementById('dailyPrizePtsDiv').style.display=t==='points'?'block':'none';
+}
+function toggleAwardType(){
+  const t=document.getElementById('compAwardType')?.value;
+  document.getElementById('awardBalDiv').style.display=t==='balance'?'block':'none';
+  document.getElementById('awardCardDiv').style.display=t==='card'?'block':'none';
+  document.getElementById('awardPtsDiv').style.display=t==='points'?'block':'none';
+}
+
+// ── Populate all cat selects in competitions ──
+function populateCompCats(){
+  const cats=S.cats||[];
+  const opts=cats.map(c=>`<option value="${c.fbId}">${c.name}</option>`).join('');
+  ['loyaltyCardCat','loyaltyChoiceCard','topBuyerCardCat','topRcCardCat','dailyCardCat','awardCardCat']
+    .forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts||'<option>لا توجد فئات</option>';});
+}
+
+// ── Load & Save Settings ──
 async function loadCompSettings(){
   try{
     const snap=await doc('settings','competitions').get().catch(()=>null);
-    if(snap&&snap.exists) S.comp=snap.data();
+    if(snap&&snap.exists)S.comp=snap.data();
     else S.comp={};
-  }catch(e){ S.comp={}; }
+  }catch(e){S.comp={};}
 }
 
 async function saveCompSettings(){
+  const g=(id)=>document.getElementById(id);
+  const v=(id)=>g(id)?.value||'';
+  const n=(id)=>parseInt(g(id)?.value)||0;
+  const b=(id)=>g(id)?.checked||false;
   const cfg={
     loyalty:{
-      enabled:document.getElementById('loyaltyEnabled')?.checked||false,
-      name:document.getElementById('loyaltyName')?.value||'⭐ نقاط الولاء',
-      ptsPerBuy:parseInt(document.getElementById('loyaltyPtsPerBuy')?.value)||10,
-      ptsPerRc:parseInt(document.getElementById('loyaltyPtsPerRc')?.value)||5,
-      ptsRedeem:parseInt(document.getElementById('loyaltyPtsRedeem')?.value)||100,
-      prizeType:document.getElementById('loyaltyPrizeType')?.value||'balance',
-      prizeVal:parseInt(document.getElementById('loyaltyPrizeVal')?.value)||500
+      enabled:b('loyaltyEnabled'),name:v('loyaltyName')||'⭐ نقاط الولاء',
+      ptsPerBuy:n('loyaltyPtsPerBuy')||10,ptsPerRc:n('loyaltyPtsPerRc')||5,
+      ptsRedeem:n('loyaltyPtsRedeem')||100,prizeType:v('loyaltyPrizeType')||'balance',
+      prizeVal:n('loyaltyPrizeVal')||500,cardCat:v('loyaltyCardCat'),
+      choiceBal:n('loyaltyChoiceBal')||500,choiceCard:v('loyaltyChoiceCard')
     },
     topBuyer:{
-      enabled:document.getElementById('topBuyerEnabled')?.checked||false,
-      name:document.getElementById('topBuyerName')?.value||'🛒 أكثر مشترٍ',
-      period:document.getElementById('topBuyerPeriod')?.value||'month',
-      prizeType:document.getElementById('topBuyerPrizeType')?.value||'balance',
-      prizeVal:parseInt(document.getElementById('topBuyerPrizeVal')?.value)||2000
+      enabled:b('topBuyerEnabled'),name:v('topBuyerName')||'🛒 أكثر مشترٍ',
+      period:v('topBuyerPeriod')||'month',prizeType:v('topBuyerPrizeType')||'balance',
+      prizeVal:n('topBuyerPrizeVal')||2000,cardCat:v('topBuyerCardCat')
     },
     topRc:{
-      enabled:document.getElementById('topRcEnabled')?.checked||false,
-      name:document.getElementById('topRcName')?.value||'💳 أكثر شاحن',
-      period:document.getElementById('topRcPeriod')?.value||'month',
-      prizeType:document.getElementById('topRcPrizeType')?.value||'balance',
-      prizeVal:parseInt(document.getElementById('topRcPrizeVal')?.value)||2000
+      enabled:b('topRcEnabled'),name:v('topRcName')||'💳 أكثر شاحن',
+      period:v('topRcPeriod')||'month',prizeType:v('topRcPrizeType')||'balance',
+      prizeVal:n('topRcPrizeVal')||2000,cardCat:v('topRcCardCat')
     },
     daily:{
-      enabled:document.getElementById('dailyEnabled')?.checked||false,
-      name:document.getElementById('dailyName')?.value||'📅 سؤال اليوم',
-      maxWinners:parseInt(document.getElementById('dailyMaxWinners')?.value)||10,
-      prizeType:document.getElementById('dailyPrizeType')?.value||'balance',
-      prizeVal:parseInt(document.getElementById('dailyPrizeVal')?.value)||200
+      enabled:b('dailyEnabled'),name:v('dailyName')||'📅 سؤال اليوم',
+      maxWinners:n('dailyMaxWinners')||10
     }
   };
   S.comp=cfg;
-  try{
-    await doc('settings','competitions').set(cfg);
-    toast('✅ تم حفظ إعدادات المسابقات','ok');
-  }catch(e){toast('خطأ: '+e.message,'err');}
-}
-
-async function saveDailyQuestion(){
-  const q=document.getElementById('dailyQuestion')?.value.trim();
-  const a=document.getElementById('dailyAnswer')?.value.trim();
-  if(!q||!a){toast('أدخل السؤال والإجابة','err');return;}
-  const today=serverNow().toISOString().split('T')[0];
-  try{
-    await doc('dailyQuestions',today).set({
-      question:q,answer:a.toLowerCase().trim(),
-      prizeType:document.getElementById('dailyPrizeType')?.value||'balance',
-      prizeVal:parseInt(document.getElementById('dailyPrizeVal')?.value)||200,
-      cardCat:document.getElementById('dailyCardCat')?.value||'',
-      maxWinners:parseInt(document.getElementById('dailyMaxWinners')?.value)||10,
-      date:today,winners:[],createdAt:TS()
-    });
-    toast('✅ تم حفظ سؤال اليوم','ok');
-    showDailyWinnersAdmin();
-  }catch(e){toast('خطأ: '+e.message,'err');}
+  try{await doc('settings','competitions').set(cfg);toast('✅ تم حفظ الإعدادات','ok');}
+  catch(e){toast('خطأ: '+e.message,'err');}
 }
 
 function loadCompSettingsToForm(){
   const cfg=S.comp||{};
-  const set=(id,val)=>{const e=document.getElementById(id);if(e){if(e.type==='checkbox')e.checked=val||false;else e.value=val||'';}};
-  set('loyaltyEnabled',cfg.loyalty?.enabled);
-  set('loyaltyName',cfg.loyalty?.name||'⭐ نقاط الولاء');
-  set('loyaltyPtsPerBuy',cfg.loyalty?.ptsPerBuy||10);
-  set('loyaltyPtsPerRc',cfg.loyalty?.ptsPerRc||5);
-  set('loyaltyPtsRedeem',cfg.loyalty?.ptsRedeem||100);
-  set('loyaltyPrizeType',cfg.loyalty?.prizeType||'balance');
-  set('loyaltyPrizeVal',cfg.loyalty?.prizeVal||500);
-  set('topBuyerEnabled',cfg.topBuyer?.enabled);
-  set('topBuyerName',cfg.topBuyer?.name||'🛒 أكثر مشترٍ');
-  set('topBuyerPeriod',cfg.topBuyer?.period||'month');
-  set('topBuyerPrizeType',cfg.topBuyer?.prizeType||'balance');
-  set('topBuyerPrizeVal',cfg.topBuyer?.prizeVal||2000);
-  set('topRcEnabled',cfg.topRc?.enabled);
-  set('topRcName',cfg.topRc?.name||'💳 أكثر شاحن');
-  set('topRcPeriod',cfg.topRc?.period||'month');
-  set('topRcPrizeType',cfg.topRc?.prizeType||'balance');
-  set('topRcPrizeVal',cfg.topRc?.prizeVal||2000);
-  set('dailyEnabled',cfg.daily?.enabled);
-  set('dailyName',cfg.daily?.name||'📅 سؤال اليوم');
-  set('dailyMaxWinners',cfg.daily?.maxWinners||10);
-  set('dailyPrizeType',cfg.daily?.prizeType||'balance');
-  set('dailyPrizeVal',cfg.daily?.prizeVal||200);
-  // populate card cats
-  const sel=document.getElementById('dailyCardCat');
-  if(sel&&S.cats){sel.innerHTML=S.cats.map(c=>`<option value="${c.fbId}">${c.name}</option>`).join('');}
-  // populate award user select
+  const set=(id,v)=>{const e=document.getElementById(id);if(!e)return;if(e.type==='checkbox')e.checked=!!v;else e.value=v||'';};
+  const l=cfg.loyalty||{};const tb=cfg.topBuyer||{};const tr=cfg.topRc||{};const d=cfg.daily||{};
+  set('loyaltyEnabled',l.enabled);set('loyaltyName',l.name||'⭐ نقاط الولاء');
+  set('loyaltyPtsPerBuy',l.ptsPerBuy||10);set('loyaltyPtsPerRc',l.ptsPerRc||5);
+  set('loyaltyPtsRedeem',l.ptsRedeem||100);set('loyaltyPrizeType',l.prizeType||'balance');
+  set('loyaltyPrizeVal',l.prizeVal||500);
+  set('topBuyerEnabled',tb.enabled);set('topBuyerName',tb.name||'🛒 أكثر مشترٍ');
+  set('topBuyerPeriod',tb.period||'month');set('topBuyerPrizeType',tb.prizeType||'balance');set('topBuyerPrizeVal',tb.prizeVal||2000);
+  set('topRcEnabled',tr.enabled);set('topRcName',tr.name||'💳 أكثر شاحن');
+  set('topRcPeriod',tr.period||'month');set('topRcPrizeType',tr.prizeType||'balance');set('topRcPrizeVal',tr.prizeVal||2000);
+  set('dailyEnabled',d.enabled);set('dailyName',d.name||'📅 سؤال اليوم');set('dailyMaxWinners',d.maxWinners||10);
+  // Run toggles to show/hide correct fields
+  toggleLoyaltyPrize();toggleTopPrize('topBuyer');toggleTopPrize('topRc');toggleDailyPrize();
+  populateCompCats();
   const aus=document.getElementById('compAwardUser');
-  if(aus&&S.users){aus.innerHTML='<option value="">— اختر —</option>'+S.users.map(u=>`<option value="${u.fbId}">${u.name||u.username}</option>`).join('');}
-  // load today's question
-  loadTodayQuestion();
-  showDailyWinnersAdmin();
+  if(aus)aus.innerHTML='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username}</option>`).join('');
+  loadTodayQuestion();showDailyWinnersAdmin();loadQuestionBank();
+}
+
+// ── Daily Question ──
+async function saveDailyQuestion(){
+  const qtype=document.getElementById('dailyQType')?.value||'text';
+  const today=serverNow().toISOString().split('T')[0];
+  const maxW=parseInt(document.getElementById('dailyMaxWinners')?.value)||10;
+  const pType=document.getElementById('dailyPrizeType')?.value||'balance';
+  const pVal=parseInt(document.getElementById('dailyPrizeVal')?.value)||200;
+  const pPts=parseInt(document.getElementById('dailyPrizePoints')?.value)||50;
+  const cardCat=document.getElementById('dailyCardCat')?.value||'';
+  let qData={type:qtype,maxWinners:maxW,prizeType:pType,date:today,winners:[],createdAt:TS()};
+  if(pType==='balance')qData.prizeVal=pVal;
+  else if(pType==='points')qData.prizeVal=pPts;
+  else if(pType==='card')qData.cardCat=cardCat;
+
+  if(qtype==='text'){
+    const q=document.getElementById('dailyQuestion')?.value.trim();
+    const a=document.getElementById('dailyAnswer')?.value.trim().toLowerCase();
+    if(!q||!a){toast('أدخل السؤال والإجابة','err');return;}
+    qData={...qData,question:q,answer:a};
+  }else if(qtype==='choice'){
+    const q=document.getElementById('dailyChoiceQ')?.value.trim();
+    const a=document.getElementById('choiceA')?.value.trim();
+    const b2=document.getElementById('choiceB')?.value.trim();
+    const c2=document.getElementById('choiceC')?.value.trim();
+    const d2=document.getElementById('choiceD')?.value.trim();
+    const correct=document.getElementById('choiceCorrect')?.value;
+    if(!q||!a||!b2){toast('أدخل السؤال والخيارين على الأقل','err');return;}
+    const choices={a,b:b2};
+    if(c2)choices.c=c2;if(d2)choices.d=d2;
+    qData={...qData,question:q,choices,answer:correct};
+  }else if(qtype==='bank'){
+    // Pick random from bank
+    const bankSnap=await col('questionBank').get().catch(()=>({docs:[]}));
+    const bank=bankSnap.docs.map(d3=>({id:d3.id,...d3.data()}));
+    // Exclude already used today
+    const unused=bank.filter(q2=>q2.lastUsed!==today);
+    if(!unused.length){toast('لا توجد أسئلة في البنك أو كلها استخدمت اليوم','err');return;}
+    const picked=unused[Math.floor(Math.random()*unused.length)];
+    // Mark as used
+    await col('questionBank').doc(picked.id).update({lastUsed:today}).catch(()=>{});
+    qData={...qData,question:picked.question,answer:picked.answer,type:'text'};
+    if(picked.choices)qData={...qData,choices:picked.choices,type:'choice'};
+  }
+
+  // New question = reset device daily answered for today
+  // (devices can answer the new question)
+  // We store questionId per day so devices know if it changed
+  qData.questionId = Date.now().toString(36);
+
+  try{
+    await doc('dailyQuestions',today).set(qData);
+    toast('✅ تم حفظ سؤال اليوم','ok');
+    showDailyWinnersAdmin();
+  }catch(e){toast('خطأ: '+e.message,'err');}
 }
 
 async function loadTodayQuestion(){
@@ -3352,10 +3476,24 @@ async function loadTodayQuestion(){
     const snap=await doc('dailyQuestions',today).get().catch(()=>null);
     if(snap&&snap.exists){
       const d=snap.data();
-      const qEl=document.getElementById('dailyQuestion');
-      const aEl=document.getElementById('dailyAnswer');
-      if(qEl)qEl.value=d.question||'';
-      if(aEl)aEl.value=d.answer||'';
+      const qtype=d.type||'text';
+      const sel=document.getElementById('dailyQType');if(sel)sel.value=qtype;
+      toggleDailyQType();
+      if(qtype==='text'||qtype==='bank'){
+        const qEl=document.getElementById('dailyQuestion');const aEl=document.getElementById('dailyAnswer');
+        if(qEl)qEl.value=d.question||'';if(aEl)aEl.value=d.answer||'';
+      }else if(qtype==='choice'){
+        const qEl=document.getElementById('dailyChoiceQ');if(qEl)qEl.value=d.question||'';
+        if(d.choices){
+          ['a','b','c','d'].forEach(k=>{const e=document.getElementById('choice'+k.toUpperCase());if(e)e.value=d.choices[k]||'';});
+          const cs=document.getElementById('choiceCorrect');if(cs)cs.value=d.answer||'a';
+        }
+      }
+      const pt=document.getElementById('dailyPrizeType');if(pt){pt.value=d.prizeType||'balance';toggleDailyPrize();}
+      const pv=document.getElementById('dailyPrizeVal');if(pv)pv.value=d.prizeVal||200;
+      const pp=document.getElementById('dailyPrizePoints');if(pp)pp.value=d.prizeVal||50;
+      const dc=document.getElementById('dailyCardCat');if(dc&&d.cardCat)dc.value=d.cardCat;
+      const mw=document.getElementById('dailyMaxWinners');if(mw)mw.value=d.maxWinners||10;
     }
   }catch(e){}
 }
@@ -3368,86 +3506,131 @@ async function showDailyWinnersAdmin(){
     if(!snap||!snap.exists){el.innerHTML='<p style="color:var(--t3);font-size:13px">لا يوجد سؤال لليوم بعد</p>';return;}
     const winners=snap.data().winners||[];
     if(!winners.length){el.innerHTML='<p style="color:var(--t3);font-size:13px">لا يوجد فائزون اليوم بعد</p>';return;}
-    el.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">الفائزون اليوم (${winners.length}):</div>`+
-      winners.map((w,i)=>`<div style="padding:6px 0;border-bottom:1px solid var(--brd);font-size:12px">
-        <span style="color:var(--ok)">${i+1}.</span> ${w.name} — ${w.date}
+    el.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:8px">🏆 الفائزون اليوم (${winners.length}/${snap.data().maxWinners||10}):</div>`+
+      winners.map((w,i)=>`<div style="padding:5px 0;border-bottom:1px solid var(--brd);font-size:12px;display:flex;gap:8px">
+        <span style="color:var(--ok);font-weight:600">${i+1}.</span>
+        <span style="flex:1">${w.name}</span>
+        <span style="color:var(--t3)">${w.date}</span>
       </div>`).join('');
   }catch(e){}
 }
 
-async function showTopBuyers(){
-  const el=document.getElementById('topBuyersTable');if(!el)return;
-  const period=document.getElementById('topBuyerPeriod')?.value||'month';
+// ── Question Bank ──
+async function loadQuestionBank(){
+  const el=document.getElementById('bankList');if(!el)return;
+  try{
+    const snap=await col('questionBank').get().catch(()=>({docs:[]}));
+    if(!snap.docs.length){el.innerHTML='<p style="color:var(--t3);font-size:12px;padding:8px">البنك فارغ — أضف أسئلة</p>';return;}
+    el.innerHTML=snap.docs.map(d=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--brd)">
+        <div style="flex:1;font-size:12px"><span style="font-weight:600">${d.data().question}</span> <span style="color:var(--ok)">← ${d.data().answer}</span></div>
+        <button class="b3" onclick="deleteFromBank('${d.id}')" style="padding:3px 8px;font-size:11px">حذف</button>
+      </div>`).join('');
+  }catch(e){}
+}
+async function addToBank(){
+  const q=document.getElementById('bankQ')?.value.trim();
+  const a=document.getElementById('bankA')?.value.trim().toLowerCase();
+  if(!q||!a){toast('أدخل السؤال والإجابة','err');return;}
+  try{
+    await col('questionBank').add({question:q,answer:a,createdAt:TS()});
+    document.getElementById('bankQ').value='';document.getElementById('bankA').value='';
+    toast('✅ أضيف للبنك','ok');loadQuestionBank();
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+async function deleteFromBank(id){
+  try{await col('questionBank').doc(id).delete();toast('✅ حذف','ok');loadQuestionBank();}
+  catch(e){toast('خطأ: '+e.message,'err');}
+}
+
+// ── Top Buyers / Recharge ──
+function getPeriodCutoff(period){
   const now=serverNow();
   const cutoff=new Date(now);
   if(period==='month')cutoff.setDate(1);
   else cutoff.setDate(now.getDate()-7);
   cutoff.setHours(0,0,0,0);
-  // Count purchases per user
+  return cutoff;
+}
+async function showTopBuyers(){
+  const el=document.getElementById('topBuyersTable');if(!el)return;
+  const cutoff=getPeriodCutoff(document.getElementById('topBuyerPeriod')?.value||'month');
   const counts={};
-  S.sales?.forEach(s=>{
-    if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff){
-      counts[s.userId]=(counts[s.userId]||0)+1;
-    }
-  });
+  S.sales?.forEach(s=>{if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
   const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
   if(!sorted.length){el.innerHTML='<p style="color:var(--t3);font-size:13px">لا توجد بيانات</p>';return;}
   el.innerHTML=sorted.map(([uid,cnt],i)=>{
     const u=S.users?.find(x=>x.fbId===uid);
-    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)">
+    return`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--brd)">
       <span style="font-size:16px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
       <span style="flex:1;font-size:13px">${u?.name||u?.username||uid}</span>
       <span style="font-weight:700;color:var(--p)">${cnt} عملية</span>
     </div>`;}).join('');
 }
-
 async function showTopRc(){
   const el=document.getElementById('topRcTable');if(!el)return;
-  const period=document.getElementById('topRcPeriod')?.value||'month';
-  const now=serverNow();
-  const cutoff=new Date(now);
-  if(period==='month')cutoff.setDate(1);
-  else cutoff.setDate(now.getDate()-7);
-  cutoff.setHours(0,0,0,0);
+  const cutoff=getPeriodCutoff(document.getElementById('topRcPeriod')?.value||'month');
   const amounts={};
-  S.reqs?.filter(r=>r.status==='approved').forEach(r=>{
-    if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff){
-      amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);
-    }
-  });
+  S.reqs?.filter(r=>r.status==='approved').forEach(r=>{if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff)amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);});
   const sorted=Object.entries(amounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
   if(!sorted.length){el.innerHTML='<p style="color:var(--t3);font-size:13px">لا توجد بيانات</p>';return;}
   el.innerHTML=sorted.map(([uid,amt],i)=>{
     const u=S.users?.find(x=>x.fbId===uid);
-    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)">
+    return`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--brd)">
       <span style="font-size:16px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
       <span style="flex:1;font-size:13px">${u?.name||u?.username||uid}</span>
-      <span style="font-weight:700;color:var(--ok)">${amt.toLocaleString()} <span class="cur">ر.ي</span></span>
+      <span style="font-weight:700;color:var(--ok)">${amt.toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span></span>
     </div>`;}).join('');
 }
 
+// ── Give Prize Helper ──
+async function givePrize(uid,prizeType,prizeVal,cardCat,label){
+  const u=S.users?.find(x=>x.fbId===uid);if(!u)return false;
+  const entry={amount:0,date:serverDate(),note:label,type:'prize',ts:Date.now()};
+  const updates={};
+  if(prizeType==='balance'){
+    const nb=(u.balance||0)+prizeVal;
+    entry.amount=prizeVal;
+    updates.balance=nb;
+    updates.manualRecharges=[...(u.manualRecharges||[]),entry];
+    u.balance=nb;u.manualRecharges=updates.manualRecharges;
+    if(S.user?.fbId===uid){S.user.balance=nb;updateBal&&updateBal();}
+  }else if(prizeType==='points'){
+    const pts=(u.loyaltyPoints||0)+prizeVal;
+    updates.loyaltyPoints=pts;u.loyaltyPoints=pts;
+    if(S.user?.fbId===uid)S.user.loyaltyPoints=pts;
+  }else if(prizeType==='card'&&cardCat){
+    // Give a card from the category
+    const available=S.cards?.filter(c=>c.catId===cardCat&&c.status==='available');
+    if(!available?.length)return false;
+    const card=available[0];
+    const userCards=[...(u.cards||[]),{catId:cardCat,catName:S.cats?.find(c=>c.fbId===cardCat)?.name||'كرت',code:card.code,date:serverDate(),isFree:true,prizeLabel:label}];
+    updates.cards=userCards;u.cards=userCards;
+    await col('cards').doc(card.fbId).update({status:'sold',soldTo:uid,soldAt:TS()}).catch(()=>{});
+    if(S.user?.fbId===uid){S.user.cards=userCards;}
+  }
+  await col('users').doc(uid).update(updates);
+  if(window.pushNotif)await pushNotif(uid,'gift','🎉 '+label,`تهانينا! حصلت على جائزتك`);
+  return true;
+}
+
+// ── Manual Award ──
 async function giveManualAward(){
   const uid=document.getElementById('compAwardUser')?.value;
   const type=document.getElementById('compAwardType')?.value;
-  const val=parseInt(document.getElementById('compAwardVal')?.value);
-  if(!uid||!val){toast('اختر المستخدم والقيمة','err');return;}
-  const u=S.users?.find(x=>x.fbId===uid);if(!u)return;
-  if(type==='balance'){
-    const nb=(u.balance||0)+val;
-    await col('users').doc(uid).update({balance:nb});
-    u.balance=nb;
-    await window.pushNotif&&pushNotif(uid,'gift','🎁 جائزة!',`تهانينا! حصلت على ${val.toLocaleString()} ${S.cfg?.currency||'ر.ي'} كجائزة`);
-  }else{
-    const pts=(u.loyaltyPoints||0)+val;
-    await col('users').doc(uid).update({loyaltyPoints:pts});
-    u.loyaltyPoints=pts;
-    await window.pushNotif&&pushNotif(uid,'gift','⭐ نقاط جائزة!',`تهانينا! حصلت على ${val} نقطة إضافية`);
-  }
-  toast(`✅ تم منح الجائزة لـ ${u.name||u.username}`,'ok');
-  renderUsersTable&&renderUsersTable();
+  if(!uid){toast('اختر المستخدم','err');return;}
+  let val=0,cardCat='',label='🎁 جائزة من الإدارة';
+  if(type==='balance'){val=parseInt(document.getElementById('compAwardVal')?.value)||0;}
+  else if(type==='points'){val=parseInt(document.getElementById('compAwardPts')?.value)||0;}
+  else if(type==='card'){cardCat=document.getElementById('awardCardCat')?.value;}
+  if(type!=='card'&&!val){toast('أدخل القيمة','err');return;}
+  if(type==='card'&&!cardCat){toast('اختر فئة الكرت','err');return;}
+  const ok=await givePrize(uid,type,val,cardCat,label);
+  if(ok){toast('✅ تم منح الجائزة','ok');renderUsersTable&&renderUsersTable();refreshStats&&refreshStats();}
+  else toast('فشل المنح — تحقق من توفر الكروت','err');
 }
 
-// ── USER SIDE ──
+// ── User Side ──
 async function loadUserComp(){
   const section=document.getElementById('compSection');
   const cards=document.getElementById('compCards');
@@ -3456,76 +3639,70 @@ async function loadUserComp(){
   const uid=S.user?.fbId;
   const active=[];
 
-  // Loyalty points
   if(cfg.loyalty?.enabled){
+    const pts=S.user?.loyaltyPoints||0;
+    const needed=cfg.loyalty.ptsRedeem||100;
+    const pct=Math.min(100,Math.round(pts/needed*100));
     active.push({
-      icon:'⭐',
-      title:cfg.loyalty.name||'نقاط الولاء',
-      val:`${(S.user?.loyaltyPoints||0).toLocaleString()} نقطة`,
-      sub:`${cfg.loyalty.ptsRedeem} نقطة = ${cfg.loyalty.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
-      color:'rgba(255,200,0,.15)',
-      border:'rgba(255,200,0,.3)',
-      btn: (S.user?.loyaltyPoints||0)>=(cfg.loyalty.ptsRedeem||100)?'استبدل النقاط':'',
-      onclick:`redeemLoyaltyPoints()`
+      icon:'⭐',title:cfg.loyalty.name||'نقاط الولاء',
+      val:`${pts.toLocaleString()} نقطة`,
+      sub:`${needed} نقطة = جائزة | ${pct}% مكتمل`,
+      color:'rgba(255,200,0,.12)',border:'rgba(255,200,0,.3)',
+      btn:pts>=needed?'🎁 استبدل الآن':'',onclick:`redeemLoyaltyPoints()`
     });
   }
-
-  // Top buyer
   if(cfg.topBuyer?.enabled){
     const rank=await getUserRank(uid,'buyer',cfg.topBuyer.period);
     active.push({
       icon:'🛒',title:cfg.topBuyer.name||'أكثر مشترٍ',
       val:`المركز #${rank.rank}`,
-      sub:`${rank.count} عملية — الجائزة: ${cfg.topBuyer.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
+      sub:`${rank.count} عملية | الجائزة: ${cfg.topBuyer.prizeType==='card'?'كرت مجاني':cfg.topBuyer.prizeVal?.toLocaleString()+' '+( S.cfg?.currency||'ر.ي')}`,
       color:'rgba(0,114,255,.1)',border:'rgba(0,114,255,.2)',
-      btn:'عرض المتصدرين',onclick:`showLeaderboard('buyer')`
+      btn:'👑 المتصدرون',onclick:`showLeaderboard('buyer')`
     });
   }
-
-  // Top recharge
   if(cfg.topRc?.enabled){
     const rank=await getUserRank(uid,'recharge',cfg.topRc.period);
     active.push({
       icon:'💳',title:cfg.topRc.name||'أكثر شاحن',
       val:`المركز #${rank.rank}`,
-      sub:`${rank.amount?.toLocaleString()} ${S.cfg?.currency||'ر.ي'} — الجائزة: ${cfg.topRc.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
+      sub:`${rank.amount?.toLocaleString()} ${S.cfg?.currency||'ر.ي'} | الجائزة: ${cfg.topRc.prizeType==='card'?'كرت مجاني':cfg.topRc.prizeVal?.toLocaleString()+' '+(S.cfg?.currency||'ر.ي')}`,
       color:'rgba(0,214,143,.1)',border:'rgba(0,214,143,.2)',
-      btn:'عرض المتصدرين',onclick:`showLeaderboard('recharge')`
+      btn:'👑 المتصدرون',onclick:`showLeaderboard('recharge')`
     });
   }
-
-  // Daily question
   if(cfg.daily?.enabled){
     const today=serverNow().toISOString().split('T')[0];
-    const answered=S.user?.dailyAnswered===today;
+    const fp=await getDeviceFingerprint().catch(()=>'');
+    const fpSnap=await col('deviceFingerprints').doc(fp).get().catch(()=>null);
+    const dailyAnswered=fpSnap?.data()?.dailyAnswered||{};
+    // Check if question changed (new questionId)
+    const qSnap=await doc('dailyQuestions',today).get().catch(()=>null);
+    const qId=qSnap?.data()?.questionId||today;
+    const answered=dailyAnswered[today]===qId;
     active.push({
       icon:'📅',title:cfg.daily.name||'سؤال اليوم',
       val:answered?'✅ أجبت اليوم':'🔔 سؤال جديد!',
-      sub:answered?'شارك غداً مجدداً':`الجائزة: ${cfg.daily.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,
+      sub:answered?'شارك غداً':qSnap?.exists?'اضغط للإجابة والفوز':'لا يوجد سؤال اليوم بعد',
       color:answered?'rgba(100,100,100,.1)':'rgba(255,107,53,.1)',
       border:answered?'rgba(100,100,100,.2)':'rgba(255,107,53,.3)',
-      btn:answered?'':'أجب الآن',onclick:`openDailyQuestion()`
+      btn:answered||!qSnap?.exists?'':'🎯 أجب الآن',onclick:`openDailyQuestion()`
     });
   }
-
   if(!active.length){section.style.display='none';return;}
   section.style.display='block';
   cards.innerHTML=active.map(item=>`
-    <div style="background:${item.color};border:1px solid ${item.border};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px">
-      <div style="font-size:24px">${item.icon}</div>
-      <div style="font-size:12px;font-weight:700;color:var(--txt)">${item.title}</div>
-      <div style="font-size:16px;font-weight:700;color:var(--p)">${item.val}</div>
+    <div style="background:${item.color};border:1px solid ${item.border};border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:5px">
+      <div style="font-size:26px">${item.icon}</div>
+      <div style="font-size:12px;font-weight:700">${item.title}</div>
+      <div style="font-size:15px;font-weight:700;color:var(--p)">${item.val}</div>
       <div style="font-size:11px;color:var(--t2)">${item.sub}</div>
-      ${item.btn?`<button onclick="${item.onclick}" style="margin-top:4px;background:var(--p);border:none;border-radius:8px;color:#fff;padding:6px;font-size:12px;cursor:pointer;font-family:var(--ff)">${item.btn}</button>`:''}
+      ${item.btn?`<button onclick="${item.onclick}" style="margin-top:6px;background:var(--pd);border:none;border-radius:8px;color:#fff;padding:7px;font-size:12px;cursor:pointer;font-family:var(--ff);font-weight:600">${item.btn}</button>`:''}
     </div>`).join('');
 }
 
 async function getUserRank(uid,type,period){
-  const now=serverNow();
-  const cutoff=new Date(now);
-  if(period==='month')cutoff.setDate(1);
-  else cutoff.setDate(now.getDate()-7);
-  cutoff.setHours(0,0,0,0);
+  const cutoff=getPeriodCutoff(period||'month');
   if(type==='buyer'){
     const counts={};
     S.sales?.forEach(s=>{if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
@@ -3544,13 +3721,9 @@ async function getUserRank(uid,type,period){
 async function showLeaderboard(type){
   const cfg=S.comp||{};
   const isB=type==='buyer';
-  const period=isB?cfg.topBuyer?.period:cfg.topRc?.period;
-  const now=serverNow();
-  const cutoff=new Date(now);
-  if(period==='month')cutoff.setDate(1);
-  else cutoff.setDate(now.getDate()-7);
-  cutoff.setHours(0,0,0,0);
-  document.getElementById('leaderTitle').textContent=isB?(cfg.topBuyer?.name||'🛒 أكثر مشترٍ'):(cfg.topRc?.name||'💳 أكثر شاحن');
+  const comp=isB?cfg.topBuyer:cfg.topRc;
+  document.getElementById('leaderTitle').textContent=comp?.name||(isB?'🛒 أكثر مشترٍ':'💳 أكثر شاحن');
+  const cutoff=getPeriodCutoff(comp?.period||'month');
   const list=document.getElementById('leaderList');
   if(isB){
     const snap=await col('sales').get().catch(()=>({docs:[]}));
@@ -3558,213 +3731,204 @@ async function showLeaderboard(type){
     snap.docs.forEach(d=>{const s=d.data();if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
     const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
     list.innerHTML=sorted.map(([uid,cnt],i)=>{
-      const u=S.users?.find(x=>x.fbId===uid);
-      const isMe=uid===S.user?.fbId;
-      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd);${isMe?'background:rgba(0,114,255,.05);border-radius:8px;padding:10px;':''}">
+      const u=S.users?.find(x=>x.fbId===uid);const isMe=uid===S.user?.fbId;
+      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd);${isMe?'background:rgba(0,114,255,.07);border-radius:8px;padding:10px':''}">
         <span style="font-size:18px;width:28px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
         <span style="flex:1;font-size:13px;font-weight:${isMe?700:400}">${u?.name||u?.username||'مستخدم'}${isMe?' (أنت)':''}</span>
         <span style="font-weight:700;color:var(--p)">${cnt} عملية</span>
-      </div>`;}).join('')||'<p style="text-align:center;color:var(--t3);padding:20px">لا توجد بيانات بعد</p>';
+      </div>`;}).join('')||'<p style="text-align:center;color:var(--t3);padding:20px">لا توجد بيانات</p>';
   }else{
     const snap=await col('rechargeRequests').where('status','==','approved').get().catch(()=>({docs:[]}));
     const amounts={};
     snap.docs.forEach(d=>{const r=d.data();if(r.createdAt?.seconds&&new Date(r.createdAt.seconds*1000)>=cutoff)amounts[r.userId]=(amounts[r.userId]||0)+(r.amount||0);});
     const sorted=Object.entries(amounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
     list.innerHTML=sorted.map(([uid,amt],i)=>{
-      const u=S.users?.find(x=>x.fbId===uid);
-      const isMe=uid===S.user?.fbId;
-      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd);${isMe?'background:rgba(0,114,255,.05);border-radius:8px;padding:10px;':''}">
+      const u=S.users?.find(x=>x.fbId===uid);const isMe=uid===S.user?.fbId;
+      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd);${isMe?'background:rgba(0,114,255,.07);border-radius:8px;padding:10px':''}">
         <span style="font-size:18px;width:28px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
         <span style="flex:1;font-size:13px;font-weight:${isMe?700:400}">${u?.name||u?.username||'مستخدم'}${isMe?' (أنت)':''}</span>
         <span style="font-weight:700;color:var(--ok)">${amt.toLocaleString()} <span class="cur">${S.cfg?.currency||'ر.ي'}</span></span>
-      </div>`;}).join('')||'<p style="text-align:center;color:var(--t3);padding:20px">لا توجد بيانات بعد</p>';
+      </div>`;}).join('')||'<p style="text-align:center;color:var(--t3);padding:20px">لا توجد بيانات</p>';
   }
   openOv('leaderModal');
 }
 
+// ── Daily Question User ──
 async function openDailyQuestion(){
   const today=serverNow().toISOString().split('T')[0];
-  // تحقق من بصمة الجهاز
-  const fp = await getDeviceFingerprint();
-  const fpSnap = await col('deviceFingerprints').doc(fp).get().catch(()=>null);
-  if(fpSnap?.exists){
-    const dailyAnswered = fpSnap.data().dailyAnswered||{};
-    if(dailyAnswered[today]){
-      toast('أجاب جهازك على سؤال اليوم بالفعل 😊','ok');
-      return;
-    }
-  }
+  const fp=await getDeviceFingerprint().catch(()=>'');
+  const fpSnap=await col('deviceFingerprints').doc(fp).get().catch(()=>null);
+  const dailyAnswered=fpSnap?.data()?.dailyAnswered||{};
   try{
     const snap=await doc('dailyQuestions',today).get().catch(()=>null);
     if(!snap||!snap.exists){toast('لا يوجد سؤال اليوم بعد','err');return;}
     const d=snap.data();
-    const winners=d.winners||[];
-    if(winners.length>=(d.maxWinners||10)){toast('اكتمل عدد الفائزين اليوم! حظ أوفر غداً 🍀','err');return;}
+    const qId=d.questionId||today;
+    if(dailyAnswered[today]===qId){toast('أجاب جهازك على هذا السؤال بالفعل 😊','ok');return;}
+    if((d.winners||[]).length>=(d.maxWinners||10)){toast('اكتمل الفائزون اليوم! حظ أوفر غداً 🍀','err');return;}
     document.getElementById('dailyModalName').textContent=S.comp?.daily?.name||'سؤال اليوم';
-    document.getElementById('dailyModalSubtitle').textContent=`الجائزة: ${d.prizeVal?.toLocaleString()||''} ${S.cfg?.currency||'ر.ي'} | الفائزون: ${winners.length}/${d.maxWinners||10}`;
+    const pLabel=d.prizeType==='card'?'كرت مجاني':d.prizeType==='points'?`${d.prizeVal} نقطة`:`${(d.prizeVal||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}`;
+    document.getElementById('dailyModalSubtitle').textContent=`الجائزة: ${pLabel} | الفائزون: ${d.winners?.length||0}/${d.maxWinners||10}`;
     document.getElementById('dailyModalQ').textContent=d.question;
+    // Show choices if type=choice
+    const choicesDiv=document.getElementById('dailyModalChoices');
+    if(choicesDiv){
+      if(d.type==='choice'&&d.choices){
+        const labels={a:'أ',b:'ب',c:'ج',d:'د'};
+        choicesDiv.style.display='block';
+        choicesDiv.innerHTML=Object.entries(d.choices).map(([k,v])=>`
+          <button onclick="selectDailyChoice('${k}',this)" style="width:100%;text-align:right;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:13px;font-family:var(--ff);color:var(--txt)">
+            <span style="font-weight:700;color:var(--p);margin-left:6px">${labels[k]}</span>${v}
+          </button>`).join('');
+        document.getElementById('dailyModalAns').style.display='none';
+      }else{
+        choicesDiv.style.display='none';
+        document.getElementById('dailyModalAns').style.display='block';
+      }
+    }
     document.getElementById('dailyModalAns').value='';
     openOv('dailyModal');
   }catch(e){toast('خطأ: '+e.message,'err');}
 }
+let _selectedChoice='';
+function selectDailyChoice(k,btn){
+  _selectedChoice=k;
+  document.querySelectorAll('#dailyModalChoices button').forEach(b=>{
+    b.style.background='var(--bg2)';b.style.borderColor='var(--brd)';
+  });
+  btn.style.background='rgba(0,114,255,.15)';btn.style.borderColor='var(--p)';
+}
 
 async function submitDailyAnswer(){
-  const ans=document.getElementById('dailyModalAns')?.value.trim().toLowerCase();
-  if(!ans){toast('أدخل إجابتك','err');return;}
   const today=serverNow().toISOString().split('T')[0];
   const uid=S.user?.fbId;
+  const fp=await getDeviceFingerprint().catch(()=>'');
   try{
     const snap=await doc('dailyQuestions',today).get();
     if(!snap.exists){closeOv('dailyModal');return;}
     const d=snap.data();
-    const winners=d.winners||[];
-
-    // تحقق من بصمة الجهاز — يمنع الإجابة مرتين بأي حساب
-    const fp = await getDeviceFingerprint();
-    const fpSnap = await col('deviceFingerprints').doc(fp).get().catch(()=>null);
-    const fpData = fpSnap?.exists ? fpSnap.data() : {};
-    const dailyAnswered = fpData.dailyAnswered || {};
-
-    // منع الإجابة مرتين من نفس الجهاز
-    if(dailyAnswered[today]){
-      toast('أجاب جهازك على سؤال اليوم بالفعل 😊','err');
-      closeOv('dailyModal');
+    const qId=d.questionId||today;
+    const fpSnap=await col('deviceFingerprints').doc(fp).get().catch(()=>null);
+    const dailyAnswered=fpSnap?.data()?.dailyAnswered||{};
+    // Double check device didn't answer
+    if(dailyAnswered[today]===qId){toast('أجاب جهازك بالفعل','err');closeOv('dailyModal');return;}
+    // Double check user didn't answer
+    if((d.winners||[]).find(w=>w.uid===uid)){toast('أجبت بالفعل','err');closeOv('dailyModal');return;}
+    if((d.winners||[]).length>=(d.maxWinners||10)){toast('اكتمل الفائزون!','err');closeOv('dailyModal');return;}
+    // Get answer
+    let userAns='';
+    if(d.type==='choice'){
+      userAns=_selectedChoice;
+      if(!userAns){toast('اختر إجابة','err');return;}
+    }else{
+      userAns=document.getElementById('dailyModalAns')?.value.trim().toLowerCase();
+      if(!userAns){toast('أدخل إجابتك','err');return;}
+    }
+    if(userAns!==d.answer){
+      // Shake wrong
+      const ans=document.getElementById('dailyModalAns');
+      if(ans){ans.style.borderColor='var(--err)';setTimeout(()=>ans.style.borderColor='',1000);}
+      toast('إجابة خاطئة! حاول مجدداً 🤔','err');
       return;
     }
-    // منع الإجابة مرتين من نفس المستخدم
-    if(winners.find(w=>w.uid===uid)){
-      toast('أجبت على هذا السؤال بالفعل','err');
-      closeOv('dailyModal');
-      return;
-    }
-
-    if(winners.length>=(d.maxWinners||10)){toast('اكتمل الفائزون! حظ أوفر غداً 🍀','err');closeOv('dailyModal');return;}
-    if(ans!==d.answer){toast('إجابة خاطئة! حاول مجدداً 🤔','err');return;}
-
-    // إجابة صحيحة!
+    // Correct!
     const winEntry={uid,name:S.user?.name||S.user?.username,date:serverDate(),fp};
-    await doc('dailyQuestions',today).update({winners:[...winners,winEntry]});
-
-    // تسجيل الجهاز كأجاب اليوم (منع التكرار)
-    dailyAnswered[today]=true;
+    await doc('dailyQuestions',today).update({winners:[...(d.winners||[]),winEntry]});
+    // Mark device as answered THIS specific question
+    dailyAnswered[today]=qId;
     await col('deviceFingerprints').doc(fp).set({dailyAnswered,lastSeen:serverDate()},{merge:true});
-
-    // منح الجائزة + تسجيلها في manualRecharges لتظهر في PDF
-    const prizeLabel = d.prizeType==='points'?`🏆 جائزة سؤال اليوم (${d.prizeVal} نقطة)`:`🏆 جائزة سؤال اليوم`;
-    if(d.prizeType==='balance'){
-      const nb=(S.user?.balance||0)+d.prizeVal;
-      const entry={amount:d.prizeVal,date:serverDate(),note:prizeLabel,type:'prize',ts:Date.now()};
-      const prev=S.user?.manualRecharges||[];
-      await col('users').doc(uid).update({balance:nb,manualRecharges:[...prev,entry]});
-      S.user.balance=nb;S.user.manualRecharges=[...prev,entry];
-      updateBal&&updateBal();
-    }else if(d.prizeType==='points'){
-      const pts=(S.user?.loyaltyPoints||0)+d.prizeVal;
-      await col('users').doc(uid).update({loyaltyPoints:pts});
-      S.user.loyaltyPoints=pts;
-    }
-
-    await window.pushNotif&&pushNotif(uid,'gift','🎉 إجابة صحيحة!',`تهانينا! فزت بـ ${d.prizeVal?.toLocaleString()} ${d.prizeType==='points'?'نقطة':(S.cfg?.currency||'ر.ي')}`);
-    closeOv('dailyModal');
-    toast(`🎉 إجابة صحيحة! فزت بـ ${d.prizeVal?.toLocaleString()} ${d.prizeType==='points'?'نقطة':(S.cfg?.currency||'ر.ي')}`,'ok');
+    // Give prize
+    const prizeLabel=`🏆 جائزة ${S.comp?.daily?.name||'سؤال اليوم'} — ${serverDate().split('،')[0]}`;
+    await givePrize(uid,d.prizeType,d.prizeVal,d.cardCat,prizeLabel);
+    closeOv('dailyModal');_selectedChoice='';
+    const pLabel=d.prizeType==='card'?'كرت مجاني':d.prizeType==='points'?`${d.prizeVal} نقطة`:`${(d.prizeVal||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}`;
+    toast(`🎉 إجابة صحيحة! فزت بـ ${pLabel}`,'ok');
     loadUserComp();
   }catch(e){toast('خطأ: '+e.message,'err');}
 }
 
+// ── Redeem Loyalty Points ──
 async function redeemLoyaltyPoints(){
-  const cfg=S.comp?.loyalty;
-  if(!cfg)return;
+  const cfg=S.comp?.loyalty;if(!cfg)return;
   const pts=S.user?.loyaltyPoints||0;
-  if(pts<cfg.ptsRedeem){toast(`تحتاج ${cfg.ptsRedeem} نقطة للاستبدال (عندك ${pts})`, 'err');return;}
-  if(!confirm(`استبدال ${cfg.ptsRedeem} نقطة مقابل ${cfg.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}؟`))return;
-  try{
-    const newPts=pts-cfg.ptsRedeem;
-    const updates={loyaltyPoints:newPts};
-    if(cfg.prizeType==='balance'){
-      const newBal=(S.user?.balance||0)+cfg.prizeVal;
-      const entry={amount:cfg.prizeVal,date:serverDate(),note:`⭐ استبدال نقاط الولاء (${cfg.ptsRedeem} نقطة)`,type:'prize',ts:Date.now()};
-      const prev=S.user?.manualRecharges||[];
-      updates.balance=newBal;
-      updates.manualRecharges=[...prev,entry];
-      S.user.balance=newBal;S.user.manualRecharges=[...prev,entry];
-      updateBal&&updateBal();
-    }
-    await col('users').doc(S.user.fbId).update(updates);
-    S.user.loyaltyPoints=newPts;
-    toast(`✅ تم استبدال النقاط! حصلت على ${cfg.prizeVal?.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`,'ok');
-    loadUserComp();
-  }catch(e){toast('خطأ: '+e.message,'err');}
+  const needed=cfg.ptsRedeem||100;
+  if(pts<needed){toast(`تحتاج ${needed} نقطة (عندك ${pts})`,'err');return;}
+  // If user_choice, show options
+  if(cfg.prizeType==='user_choice'){
+    openRedeemChoiceModal();return;
+  }
+  if(!confirm(`استبدال ${needed} نقطة مقابل جائزتك؟`))return;
+  const label=`⭐ استبدال ${needed} نقطة ولاء`;
+  const ok=await givePrize(S.user.fbId,cfg.prizeType,cfg.prizeVal,cfg.cardCat,label);
+  if(!ok){toast('فشل الاستبدال','err');return;}
+  const newPts=pts-needed;
+  await col('users').doc(S.user.fbId).update({loyaltyPoints:newPts});
+  S.user.loyaltyPoints=newPts;
+  toast('✅ تم الاستبدال!','ok');loadUserComp();
 }
 
-// Add loyalty points on purchase
+function openRedeemChoiceModal(){
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const modal=document.getElementById('redeemChoiceModal');
+  if(!modal)return;
+  document.getElementById('rcBalVal').textContent=(cfg.choiceBal||0).toLocaleString()+' '+(S.cfg?.currency||'ر.ي');
+  const cat=S.cats?.find(c=>c.fbId===cfg.choiceCard);
+  document.getElementById('rcCardVal').textContent=cat?cat.name:'كرت مجاني';
+  openOv('redeemChoiceModal');
+}
+async function confirmRedeemChoice(type){
+  closeOv('redeemChoiceModal');
+  const cfg=S.comp?.loyalty;if(!cfg)return;
+  const pts=S.user?.loyaltyPoints||0;
+  const needed=cfg.ptsRedeem||100;
+  const label=`⭐ استبدال ${needed} نقطة ولاء`;
+  const val=type==='balance'?cfg.choiceBal:0;
+  const card=type==='card'?cfg.choiceCard:'';
+  const ok=await givePrize(S.user.fbId,type,val,card,label);
+  if(!ok){toast('فشل الاستبدال — تحقق من توفر الكروت','err');return;}
+  const newPts=pts-needed;
+  await col('users').doc(S.user.fbId).update({loyaltyPoints:newPts});
+  S.user.loyaltyPoints=newPts;
+  toast('✅ تم الاستبدال!','ok');loadUserComp();
+}
+
+// ── Add loyalty points hooks ──
 const _origBuyCard=window.confirmBuy;
 if(_origBuyCard){
   window.confirmBuy=async function(){
     await _origBuyCard();
-    // Add loyalty points after purchase
     const cfg=S.comp?.loyalty;
     if(cfg?.enabled&&S.user?.fbId){
-      const pts=(S.user?.loyaltyPoints||0)+cfg.ptsPerBuy;
+      const pts=(S.user?.loyaltyPoints||0)+( cfg.ptsPerBuy||10);
       await col('users').doc(S.user.fbId).update({loyaltyPoints:pts}).catch(()=>{});
-      S.user.loyaltyPoints=pts;
-      loadUserComp();
+      S.user.loyaltyPoints=pts;loadUserComp();
     }
   };
 }
-
-// Add loyalty points on recharge approval
-const _origApproveRc2=window.approveRc;
-if(_origApproveRc2){
+const _origApproveRc3=window.approveRc;
+if(_origApproveRc3){
   window.approveRc=async function(id){
-    await _origApproveRc2(id);
+    await _origApproveRc3(id);
     const cfg=S.comp?.loyalty;
     if(cfg?.enabled){
       const req=S.reqs?.find(r=>r.fbId===id);
       if(req){
         const uSnap=await col('users').doc(req.userId).get().catch(()=>null);
         if(uSnap?.exists){
-          const pts=(uSnap.data().loyaltyPoints||0)+cfg.ptsPerRc;
+          const pts=(uSnap.data().loyaltyPoints||0)+(cfg.ptsPerRc||5);
           await col('users').doc(req.userId).update({loyaltyPoints:pts}).catch(()=>{});
         }
       }
     }
+    if(window.pushNotif){const req=S.reqs?.find(r=>r.fbId===id);if(req)await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك`);}
   };
 }
 
-// Override initUser to load competitions
+// ── Override initUser/initAdmin ──
 const _origInitUserComp=window.initUser;
-window.initUser=function(){
-  _origInitUserComp&&_origInitUserComp();
-  loadCompSettings().then(()=>loadUserComp());
-};
-
-// Override initAdmin to load competitions settings
+window.initUser=function(){_origInitUserComp&&_origInitUserComp();loadCompSettings().then(()=>loadUserComp());};
 const _origInitAdminComp=window.initAdmin;
-window.initAdmin=function(){
-  _origInitAdminComp&&_origInitAdminComp();
-  loadCompSettings().then(()=>loadCompSettingsToForm());
-};
-
-function toggleDailyPrize(){
-  const type=document.getElementById('dailyPrizeType')?.value;
-  const cardDiv=document.getElementById('dailyCardCatDiv');
-  if(cardDiv)cardDiv.style.display=type==='card'?'block':'none';
-}
-
-function openAuthSupport(){
-  const cfg=S.cfg||{};
-  const links=document.getElementById('authSupportLinks');
-  if(!links)return;
-  const items=[];
-  if(cfg.supportPhone||cfg.sitePhone)
-    items.push(`<a href="tel:${cfg.supportPhone||cfg.sitePhone}" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">📞</span><div><div style="font-weight:600">اتصال مباشر</div><div style="font-size:12px;color:var(--t2)">${cfg.supportPhone||cfg.sitePhone}</div></div></a>`);
-  if(cfg.supportWhatsapp)
-    items.push(`<a href="https://wa.me/${cfg.supportWhatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">💚</span><div><div style="font-weight:600">واتساب</div><div style="font-size:12px;color:var(--t2)">${cfg.supportWhatsapp}</div></div></a>`);
-  if(cfg.supportTelegram)
-    items.push(`<a href="https://t.me/${cfg.supportTelegram}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.3);border-radius:10px;padding:12px;color:var(--txt);text-decoration:none"><span style="font-size:22px">✈️</span><div><div style="font-weight:600">تيليجرام</div><div style="font-size:12px;color:var(--t2)">@${cfg.supportTelegram}</div></div></a>`);
-  links.innerHTML=items.length?items.join(''):'<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
-  openOv('authSupportModal');
-}
+window.initAdmin=function(){_origInitAdminComp&&_origInitAdminComp();loadCompSettings().then(()=>loadCompSettingsToForm());};
 </script>
 
 <script>
