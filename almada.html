@@ -932,7 +932,11 @@ async function syncServerTime(){
   try{
     const ref = col('_ping').doc('ts');
     const t1 = Date.now();
-    await ref.set({t: TS()});
+    // timeout 3 ثواني — لو تعلّق نتجاهل
+    await Promise.race([
+      ref.set({t: TS()}),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),3000))
+    ]);
     const snap = await ref.get();
     const t2 = Date.now();
     const serverMs = snap.data()?.t?.toMillis?.();
@@ -2619,12 +2623,11 @@ async function addSliderItemVideo(input){
 // ═══════════════════════════════════════════════
 // STARTUP
 // ═══════════════════════════════════════════════
-// Load settings before auth (faster UI)
 (async()=>{
   try{const s=await doc('settings','main').get();if(s.exists){Object.assign(S.cfg,s.data());applySettings();}}catch(e){}
-  // مزامنة وقت السيرفر قبل البداية
-  await syncServerTime();
   loadRem();
+  // مزامنة وقت السيرفر في الخلفية — بدون انتظار حتى لا تتعلق الصفحة
+  syncServerTime().catch(()=>{});
 })();
 </script>
 
