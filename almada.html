@@ -3385,18 +3385,7 @@ async function renderTrHist(){
   }catch(e){list.innerHTML=`<div style="color:var(--err);padding:20px">⚠️ ${e.message}</div>`;}
 }
 
-// ══ INIT USER — avatar + notifs + competitions ══
-const _origInitUser=window.initUser;
-window.initUser=function(){
-  _origInitUser&&_origInitUser();
-  // apply avatar
-  const img=document.getElementById('uAvatarH'),em=document.getElementById('uAvatarE');
-  if(S.user?.avatarImg){if(img){img.src=S.user.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
-  // load notifications
-  loadNotifs();
-  // load competitions
-  loadCompSettings().then(()=>loadUserComp());
-};
+// initUser override in comp script below
 
 // ══ PATCH approveRc to notify ══
 const _origApproveRc=window.approveRc;
@@ -4003,12 +3992,7 @@ async function redeemLoyaltyPoints(){
   else toast('فشل الاستبدال','err');
 }
 
-// Load gift inventory when opening comp section
-const _origNavComp=window.nav;
-window.nav=function(s){
-  if(_origNavComp)_origNavComp.call(this,s);
-  if(s==='comp')loadGiftInventory();
-};
+// nav comp handled in main nav
 function toggleTieredPrize(prefix,rank){
   const t=document.getElementById(`${prefix}Prize${rank}Type`)?.value;
   const v=document.getElementById(`${prefix}Prize${rank}Val`);
@@ -4580,14 +4564,7 @@ if(_origApproveRc3){
 
 // ── Override initUser/initAdmin ──
 // initUser already handles competitions above
-const _origInitAdminComp=window.initAdmin;
-window.initAdmin=function(){
-  _origInitAdminComp&&_origInitAdminComp();
-  loadCompSettings().then(()=>{
-    loadCompSettingsToForm();
-    checkAutoDistribute(); // تحقق من التوزيع التلقائي
-  });
-};
+// initAdmin override moved to final block
 </script>
 
 <script>
@@ -4744,6 +4721,30 @@ function openAuthSupport(){
   links.innerHTML=items.length?items.join(''):'<p style="text-align:center;color:var(--t3);padding:20px">تواصل مع إدارة الموقع مباشرة</p>';
   openOv('authSupportModal');
 }
+
+
+// ══ INIT USER + ADMIN — FINAL OVERRIDES ══
+const _origInitUserFinal = window.initUser;
+window.initUser = function(){
+  _origInitUserFinal && _origInitUserFinal();
+  // avatar
+  const img=document.getElementById('uAvatarH'),em=document.getElementById('uAvatarE');
+  if(S.user?.avatarImg){if(img){img.src=S.user.avatarImg;img.style.display='block';}if(em)em.style.display='none';}
+  // notifications
+  if(typeof loadNotifs==='function') loadNotifs();
+  // competitions
+  if(typeof loadCompSettings==='function') loadCompSettings().then(()=>{if(typeof loadUserComp==='function')loadUserComp();});
+};
+
+const _origInitAdminFinal = window.initAdmin;
+window.initAdmin = function(){
+  _origInitAdminFinal && _origInitAdminFinal();
+  if(typeof loadCompSettings==='function') loadCompSettings().then(()=>{
+    if(typeof loadCompSettingsToForm==='function') loadCompSettingsToForm();
+    if(typeof checkAutoDistribute==='function') checkAutoDistribute();
+    if(typeof loadGiftInventory==='function') loadGiftInventory();
+  });
+};
 </script>
 
 <!-- PWA -->
