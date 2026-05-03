@@ -383,6 +383,12 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="sc o"><div style="font-size:22px">👥</div><div class="sv" id="stUsers">0</div><div class="sl">المستخدمون</div></div>
         <div class="sc r"><div style="font-size:22px">⏳</div><div class="sv" id="stPend">0</div><div class="sl">طلبات معلقة</div></div>
       </div>
+      <div class="stats-row" style="margin-top:0">
+        <div class="sc b"><div style="font-size:22px">💳</div><div class="sv" id="stRcTotal">0</div><div class="sl">إجمالي الشحن</div></div>
+        <div class="sc g"><div style="font-size:22px">🏆</div><div class="sv" id="stSalesToday">0</div><div class="sl">مبيعات اليوم</div></div>
+        <div class="sc o"><div style="font-size:22px">⭐</div><div class="sv" id="stPoints">0</div><div class="sl">نقاط الولاء الكلية</div></div>
+        <div class="sc r"><div style="font-size:22px">📦</div><div class="sv" id="stGiftInv">0</div><div class="sl">مخزون الهدايا</div></div>
+      </div>
     </div>
 
     <div class="adm-sec" id="sec-cards">
@@ -493,7 +499,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
       </div></div>
       <div class="panel"><div class="ph"><h3>قائمة المستخدمين</h3></div><div class="pb"><div class="tw">
-        <table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>الكروت</th><th>إجراءات</th></tr></thead>
+        <table><thead><tr><th>#</th><th>المستخدم</th><th>الرصيد</th><th>⭐ النقاط</th><th>الكروت</th><th>إجراءات</th></tr></thead>
         <tbody id="usersTable"></tbody></table>
       </div></div></div>
     </div>
@@ -2130,8 +2136,19 @@ function nav(s){
 }
 
 function refreshStats(){
-  const av=S.cards.filter(c=>c.status==='available').length;const tot=S.sales.reduce((s,x)=>s+(x.price||0),0);const pend=S.reqs.filter(r=>r.status==='pending').length;
-  const sv=(id,v)=>{const e=$(id);if(e)e.textContent=v;};sv('stSales',tot.toLocaleString());sv('stCards',av);sv('stUsers',S.users.length);sv('stPend',pend);
+  const av=S.cards.filter(c=>c.status==='available').length;
+  const tot=S.sales.reduce((s,x)=>s+(x.price||0),0);
+  const pend=S.reqs.filter(r=>r.status==='pending').length;
+  const rcTotal=S.reqs.filter(r=>r.status==='approved').reduce((s,x)=>s+(x.amount||0),0);
+  const today=serverNow().toISOString().split('T')[0];
+  const salesToday=S.sales.filter(s=>s.date&&s.date.includes(today.split('-').reverse().join('/'))).length;
+  const totalPoints=S.users.reduce((s,u)=>s+(u.loyaltyPoints||0),0);
+  const sv=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+  sv('stSales',tot.toLocaleString());sv('stCards',av);sv('stUsers',S.users.length);sv('stPend',pend);
+  sv('stRcTotal',rcTotal.toLocaleString());sv('stSalesToday',salesToday);
+  sv('stPoints',totalPoints.toLocaleString());
+  // Gift inventory count
+  col('giftInventory').where('status','==','available').get().then(s=>{sv('stGiftInv',s.docs.length);}).catch(()=>{});
   const nb=$('nbRc');if(nb){nb.textContent=pend;nb.classList.toggle('on',pend>0);}
 }
 
@@ -2262,17 +2279,24 @@ async function manRc(){
 // USERS
 function renderUsersTable(){
   const tb=$('usersTable');if(!tb)return;
-  if(!S.users.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>';popSelects();return;}
+  if(!S.users.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>';popSelects();return;}
   tb.innerHTML=S.users.map((u,i)=>`<tr>
     <td>${i+1}</td>
     <td><div style="font-weight:600">${u.name||u.username||'—'}</div><div style="font-size:11px;color:var(--t2)">${u.email||u.username||''}</div></td>
     <td style="color:var(--ok);font-weight:600">${(u.balance||0).toLocaleString()} <span class="cur">ر.ي</span></td>
+    <td style="color:var(--warn);font-weight:600">
+      ⭐ ${(u.loyaltyPoints||0).toLocaleString()}
+      <div style="display:flex;gap:4px;margin-top:3px">
+        <button class="b2" onclick="editUserPoints('${u.fbId}','add')" style="font-size:10px;padding:2px 6px">+</button>
+        <button class="b3" onclick="editUserPoints('${u.fbId}','sub')" style="font-size:10px;padding:2px 6px">−</button>
+      </div>
+    </td>
     <td>${(u.cards||[]).length}</td>
     <td style="display:flex;gap:5px;flex-wrap:wrap">
       <button class="b2" onclick="qAddBal('${u.fbId}')">+ رصيد</button>
       <button class="b1" onclick="viewUserStatement('${u.fbId}')">📊 كشف</button>
-      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑 كلمة مرور</button>
-      <button class="b3" onclick="delUser('${u.fbId}')">🗑️ حذف</button>
+      <button class="b4" onclick="qChgPass('${u.fbId}')">🔑</button>
+      <button class="b3" onclick="delUser('${u.fbId}')">🗑️</button>
     </td>
   </tr>`).join('');
   popSelects();
@@ -2292,6 +2316,24 @@ async function addBal(){
   renderUsersTable();refreshStats();
   if(window.pushNotif) await window.pushNotif(uid,'gift','💳 إضافة رصيد',`تم إضافة ${amt.toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك من الإدارة`);
 }
+async function editUserPoints(uid, action){
+  const u=S.users.find(x=>x.fbId===uid);if(!u)return;
+  const cur=u.loyaltyPoints||0;
+  const label=action==='add'?'إضافة نقاط':'خصم نقاط';
+  const amt=parseInt(prompt(`${u.name||u.username} — نقاطه الحالية: ${cur}\n\n${label}: كم نقطة؟`));
+  if(!amt||isNaN(amt)||amt<=0){toast('عدد غير صحيح','err');return;}
+  let newPts=action==='add'?cur+amt:Math.max(0,cur-amt);
+  await col('users').doc(uid).update({loyaltyPoints:newPts});
+  u.loyaltyPoints=newPts;
+  if(S.user?.fbId===uid)S.user.loyaltyPoints=newPts;
+  if(window.pushNotif)await pushNotif(uid,'gift',
+    action==='add'?`⭐ إضافة ${amt} نقطة`:`⭐ خصم ${amt} نقطة`,
+    action==='add'?`تم إضافة ${amt} نقطة لحسابك — رصيدك: ${newPts}`:`تم خصم ${amt} نقطة — رصيدك: ${newPts}`
+  );
+  toast(`✅ ${label}: ${amt} — النقاط الجديدة: ${newPts}`,'ok');
+  renderUsersTable();refreshStats();
+}
+
 async function qAddBal(uid){const amt=parseInt(prompt('أدخل المبلغ:'));if(!amt||isNaN(amt))return;const u=S.users.find(x=>x.fbId===uid);if(!u)return;const nb=(u.balance||0)+amt;await col('users').doc(uid).update({balance:nb});u.balance=nb;if(S.user?.fbId===uid){S.user.balance=nb;updateBal();}toast('✅ تمت الإضافة','ok');renderUsersTable();refreshStats();}
 async function zeroBal(uid){await col('users').doc(uid).update({balance:0});const u=S.users.find(x=>x.fbId===uid);if(u){u.balance=0;if(S.user?.fbId===uid){S.user.balance=0;updateBal();}}renderUsersTable();}
 
@@ -4158,8 +4200,15 @@ async function loadUserComp(){
 }
 
 async function getUserRank(uid,type,period){
-  const cutoff=getPeriodCutoff(period||'month');
-  if(type==='buyer'){
+  const isBuyer=type==='buyer';
+  const cfg=S.comp?.[isBuyer?'topBuyer':'topRc']||{};
+  // نفس منطق getTopWinners — يحترم lastDistributedTs و startDate
+  let cutoff=getPeriodCutoff(period||'month', cfg.startDate);
+  if(cfg.lastDistributedTs){
+    const lastDist=new Date(cfg.lastDistributedTs);
+    if(lastDist>cutoff) cutoff=lastDist;
+  }
+  if(isBuyer){
     const counts={};
     S.sales?.forEach(s=>{if(s.createdAt?.seconds&&new Date(s.createdAt.seconds*1000)>=cutoff)counts[s.userId]=(counts[s.userId]||0)+1;});
     const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
@@ -4179,7 +4228,12 @@ async function showLeaderboard(type){
   const isB=type==='buyer';
   const comp=isB?cfg.topBuyer:cfg.topRc;
   document.getElementById('leaderTitle').textContent=comp?.name||(isB?'🛒 أكثر مشترٍ':'💳 أكثر شاحن');
-  const cutoff=getPeriodCutoff(comp?.period||'month');
+  // نفس منطق getTopWinners
+  let cutoff=getPeriodCutoff(comp?.period||'month', comp?.startDate);
+  if(comp?.lastDistributedTs){
+    const lastDist=new Date(comp.lastDistributedTs);
+    if(lastDist>cutoff) cutoff=lastDist;
+  }
   const list=document.getElementById('leaderList');
   if(isB){
     const snap=await col('sales').get().catch(()=>({docs:[]}));
@@ -4368,8 +4422,11 @@ function calcRedeemPreview(){
   const multiplier=amount/needed;
   let prizeText='';
   if(prizeType==='balance') prizeText=`💰 ${(prizeVal*multiplier).toLocaleString()} ${currency}`;
-  else if(prizeType==='card') prizeText=`🎫 ${multiplier} كرت مجاني`;
-  else if(prizeType==='giftCard') prizeText=`🎁 ${multiplier} كرت هدية`;
+  else if(prizeType==='card'){
+    const catName=S.cats?.find(c=>c.fbId===cfg.cardCat)?.name||'كرت مجاني';
+    prizeText=`🎫 ${multiplier} × ${catName}`;
+  }
+  else if(prizeType==='giftCard') prizeText=`🎁 ${multiplier} كرت هدية من المخزون`;
   else prizeText=`🎁 جائزة × ${multiplier}`;
 
   if(prevVal)prevVal.textContent=prizeText;
@@ -4389,12 +4446,25 @@ async function confirmFlexRedeem(){
   if(amount>pts){toast('نقاطك غير كافية','err');return;}
 
   const multiplier=amount/needed;
+  const currency=S.cfg?.currency||'ر.ي';
   let prizeText='';
-  if(prizeType==='balance') prizeText=`${(prizeVal*multiplier).toLocaleString()} ${currency}`;
-  else if(prizeType==='card'||prizeType==='giftCard') prizeText=`${multiplier} كرت`;
-  else prizeText=`جائزة × ${multiplier}`;
+  let prizeDetail='';
+  if(prizeType==='balance'){
+    prizeText=`💰 ${(prizeVal*multiplier).toLocaleString()} ${currency}`;
+    prizeDetail=`رصيد نقدي: ${(prizeVal*multiplier).toLocaleString()} ${currency}`;
+  }else if(prizeType==='card'){
+    const catName=S.cats?.find(c=>c.fbId===cfg.cardCat)?.name||'كرت';
+    prizeText=`🎫 ${multiplier} × ${catName}`;
+    prizeDetail=`كرت مجاني: ${multiplier} × ${catName}`;
+  }else if(prizeType==='giftCard'){
+    prizeText=`🎁 ${multiplier} كرت هدية`;
+    prizeDetail=`كرت هدية من المخزون × ${multiplier}`;
+  }else{
+    prizeText=`🎁 جائزة × ${multiplier}`;
+    prizeDetail=prizeText;
+  }
 
-  if(!confirm(`تأكيد الاستبدال:\n\n${amount} نقطة → ${prizeText}\n\nهل تريد المتابعة؟`))return;
+  if(!confirm(`⭐ تأكيد الاستبدال\n\nالنقاط: ${amount} نقطة\nالجائزة: ${prizeDetail}\n\nالنقاط المتبقية: ${pts-amount}\n\nهل تريد المتابعة؟`))return;
 
   const label=`⭐ استبدال ${amount} نقطة ولاء`;
   closeOv('redeemChoiceModal');
