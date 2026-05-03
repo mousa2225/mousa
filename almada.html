@@ -199,6 +199,32 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .modal h3{font-size:17px;font-weight:700;margin-bottom:18px;text-align:center}
 .mrow{display:flex;gap:9px;margin-top:4px}
 .mcancel,.mbtn-cancel{flex:1;padding:11px;background:var(--bg2);border:1px solid var(--brd);border-radius:9px;color:var(--t2);font-size:13px;font-family:var(--ff);cursor:pointer}
+
+/* ── CONTESTS CSS ── */
+.ot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ot{background:var(--bg2);border:2px solid var(--brd);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.ot:hover{border-color:var(--p)}
+.ot.on{border-color:var(--p);background:rgba(0,114,255,.12)}
+.contest-card{background:var(--card);border:1px solid var(--brd);border-radius:18px;padding:18px;position:relative;overflow:hidden}
+.contest-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cgrad,linear-gradient(90deg,var(--pd),var(--p)))}
+.contest-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.cb-active{background:rgba(0,214,143,.15);color:var(--ok);border:1px solid rgba(0,214,143,.3)}
+.cb-ended{background:rgba(122,139,168,.1);color:var(--t2);border:1px solid var(--brd)}
+.cb-type{background:rgba(0,114,255,.12);color:var(--p);border:1px solid rgba(0,114,255,.2)}
+.spin-wheel-wrap{position:relative;width:240px;height:240px;margin:0 auto 20px}
+.spin-wheel{width:100%;height:100%;border-radius:50%;position:relative;cursor:pointer;transition:transform 4s cubic-bezier(.17,.67,.12,1);border:4px solid rgba(255,255,255,.1);box-shadow:0 0 30px rgba(0,114,255,.3)}
+.spin-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;background:linear-gradient(135deg,var(--pd),var(--p));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;z-index:10;box-shadow:0 4px 14px rgba(0,114,255,.5);cursor:pointer;border:3px solid var(--bg)}
+.spin-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.lboard-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:var(--bg2);margin-bottom:8px}
+.lboard-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000}
+.rank-2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);color:#000}
+.rank-3{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.rank-other{background:var(--bg3);color:var(--t2)}
+.code-input-wrap{display:flex;gap:8px}
+.code-input-wrap input{flex:1;letter-spacing:3px;text-align:center;font-size:18px;font-weight:700;direction:ltr}
+.pts-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
+.pts-bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:3px;transition:width .6s ease}
 .mok{flex:2;padding:11px;background:linear-gradient(135deg,var(--pd),var(--p));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;font-family:var(--ff);cursor:pointer}
 .bank-box{background:var(--bg2);border-radius:11px;padding:14px;margin-bottom:14px}
 .brow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--brd)}.brow:last-child{border:none}
@@ -314,7 +340,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="bal-row">
         <button class="rc-btn" onclick="openRcModal()" id="btnRC">+ شحن رصيد</button>
         <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 سجل العمليات</button>
-        <button class="rc-btn" onclick="openQuizModal()" id="btnQuiz" style="background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(139,92,246,.3));border-color:rgba(168,85,247,.4)">🧠 المسابقة</button>
       </div>
     </div>
     <div class="sec-ttl" id="lblCards">اختر فئة الكرت</div>
@@ -335,11 +360,37 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="hist-list" id="rcHistList"><div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">لا توجد عمليات شحن بعد</div></div>
       </div>
     </div>
-  </div>
-  </div>
-</div>
 
-<!-- ══ ADMIN ══ -->
+  <!-- ══ قسم المسابقات — أسفل الصفحة ══ -->
+  <div class="u-body" id="contestsSection" style="padding-top:0">
+
+    <!-- نقاط الولاء -->
+    <div id="loyaltyCard" style="background:linear-gradient(135deg,#1a0a2e,#2d1060);border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:18px;margin-bottom:16px;display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:11px;color:rgba(168,85,247,.8);margin-bottom:3px">⭐ نقاط الولاء</div>
+          <div style="font-size:28px;font-weight:900;color:#c084fc"><span id="userPointsDisp">0</span> <span style="font-size:14px">نقطة</span></div>
+        </div>
+        <button onclick="openRedeemPoints()" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:12px;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;font-family:var(--ff);cursor:pointer">💱 استبدال</button>
+      </div>
+      <div style="font-size:11px;color:rgba(168,85,247,.6);margin-top:8px">كل 100 نقطة = 1 <span class="cur">ر.ي</span> رصيد</div>
+    </div>
+
+    <!-- عنوان المسابقات -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+      <div style="font-size:13px;font-weight:700;color:var(--p);white-space:nowrap">🏆 المسابقات والجوائز</div>
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+    </div>
+
+    <!-- بطاقات المسابقات -->
+    <div id="contestsGrid" style="display:flex;flex-direction:column;gap:12px;padding-bottom:24px">
+      <div style="text-align:center;color:var(--t3);padding:30px;font-size:13px">⏳ جاري التحميل...</div>
+    </div>
+
+  </div>
+  </div>
+</div><!-- end userPg -->
 <div id="adminPg" class="pg">
 <button class="sb-menu-btn" onclick="toggleAdminSB()">☰</button>
 <div class="sb-dim" id="sbDim" onclick="closeAdminSB()"></div>
@@ -359,7 +410,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="nav-item" onclick="nav('ads')">📢 الإعلانات</button>
       <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>
       <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>
-      <button class="nav-item" onclick="nav('quiz')">🧠 المسابقة</button>    </nav>
+      <button class="nav-item" onclick="nav('quiz')">🧠 المسابقة</button>
+      <button class="nav-item" onclick="nav('contests')">🏆 المسابقات</button>    </nav>
     <div style="padding:12px 10px;border-top:1px solid var(--brd)">
       <div style="display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px">
         <div style="width:30px;height:30px;background:linear-gradient(135deg,var(--acc),#e05500);border-radius:8px;display:flex;align-items:center;justify-content:center">👨‍💼</div>
@@ -758,6 +810,214 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div></div>
       </div>
     </div><!-- end sec-quiz -->
+
+    <!-- ══════════════════ CONTESTS SECTION ══════════════════ -->
+    <div class="adm-sec" id="sec-contests">
+      <div class="adm-hdr">
+        <h2>🏆 المسابقات</h2>
+        <p>إدارة جميع أنواع المسابقات والجوائز — أسئلة، متصدر، عجلة الحظ، الكود الخفي</p>
+      </div>
+
+      <!-- إحصائيات -->
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="sc b"><div style="font-size:22px">🏆</div><div class="sv" id="cstTot">0</div><div class="sl">إجمالي المسابقات</div></div>
+        <div class="sc g"><div style="font-size:22px">👥</div><div class="sv" id="cstPart">0</div><div class="sl">مشاركة</div></div>
+        <div class="sc o"><div style="font-size:22px">🎁</div><div class="sv" id="cstGift">0</div><div class="sl">كروت هدية متاحة</div></div>
+        <div class="sc r" style="cursor:pointer" onclick="nav('contests');setTimeout(()=>document.getElementById('giftCardsPanel')?.scrollIntoView({behavior:'smooth'}),200)"><div style="font-size:22px">⭐</div><div class="sv" id="cstPts">0</div><div class="sl">نقاط ولاء كلية</div></div>
+      </div>
+
+      <!-- تبويبات إدارة المسابقات -->
+      <div style="display:flex;background:var(--bg2);border-radius:12px;padding:4px;gap:4px;margin-bottom:18px;flex-wrap:wrap">
+        <button class="tab on" id="cTab1" onclick="cSwitchTab('create')" style="flex:1;padding:9px;font-size:12px">➕ إنشاء مسابقة</button>
+        <button class="tab" id="cTab2" onclick="cSwitchTab('list')" style="flex:1;padding:9px;font-size:12px">📋 المسابقات</button>
+        <button class="tab" id="cTab3" onclick="cSwitchTab('gifts')" style="flex:1;padding:9px;font-size:12px">🎁 كروت الهدايا</button>
+        <button class="tab" id="cTab4" onclick="cSwitchTab('points')" style="flex:1;padding:9px;font-size:12px">⭐ نقاط الولاء</button>
+        <button class="tab" id="cTab5" onclick="cSwitchTab('results')" style="flex:1;padding:9px;font-size:12px">📊 النتائج</button>
+      </div>
+
+      <!-- ───── تاب: إنشاء مسابقة ───── -->
+      <div id="cTabCreate">
+        <div class="panel"><div class="ph" style="background:rgba(0,114,255,.05)"><h3>🏆 إنشاء مسابقة جديدة</h3></div><div class="pb">
+          <!-- اسم + موسم -->
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">اسم المسابقة</label><input class="inp" id="ctName" placeholder="مسابقة رمضان 🌙"></div>
+            <div><label class="fl">الموسم / الفئة (اختياري)</label><input class="inp" id="ctSeason" placeholder="رمضان 2025"></div>
+          </div>
+          <!-- نوع المسابقة -->
+          <div style="margin-bottom:14px">
+            <label class="fl">نوع المسابقة</label>
+            <div class="ot-grid" id="ctTypeGrid">
+              <div class="ot on" onclick="ctSelType(this,'quiz')" style="grid-column:span 1">
+                <div style="font-size:22px">🧠</div><div style="font-size:12px;font-weight:600;margin-top:4px">أسئلة وأجوبة</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">سؤال واحد — إجابة صحيحة تفوز</div>
+              </div>
+              <div class="ot" onclick="ctSelType(this,'top_buyer')">
+                <div style="font-size:22px">🛒</div><div style="font-size:12px;font-weight:600;margin-top:4px">أكثر مشتري</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">أعلى مشتريات في الفترة</div>
+              </div>
+              <div class="ot" onclick="ctSelType(this,'top_recharger')">
+                <div style="font-size:22px">💳</div><div style="font-size:12px;font-weight:600;margin-top:4px">أكثر شاحن</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">أعلى شحن في الفترة</div>
+              </div>
+              <div class="ot" onclick="ctSelType(this,'spin_wheel')">
+                <div style="font-size:22px">🎡</div><div style="font-size:12px;font-weight:600;margin-top:4px">عجلة الحظ</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">كل عملية = دوران مجاني</div>
+              </div>
+              <div class="ot" onclick="ctSelType(this,'hidden_code')">
+                <div style="font-size:22px">🔑</div><div style="font-size:12px;font-weight:600;margin-top:4px">الكود الخفي</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">أول من يدخل الكود يفوز</div>
+              </div>
+              <div class="ot" onclick="ctSelType(this,'daily_lucky')">
+                <div style="font-size:22px">🍀</div><div style="font-size:12px;font-weight:600;margin-top:4px">الحظ اليومي</div>
+                <div style="font-size:10px;color:var(--t2);margin-top:2px">ضغطة يومية — فرصة جائزة</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- إعدادات خاصة بكل نوع -->
+          <!-- أسئلة -->
+          <div id="ctCfgQuiz">
+            <div style="margin-bottom:12px"><label class="fl">نص السؤال</label><input class="inp" id="ctQ" placeholder="ما هو...؟"></div>
+            <div class="fr" style="margin-bottom:10px">
+              <div><label class="fl">الخيار أ</label><input class="inp" id="ctA"></div>
+              <div><label class="fl">الخيار ب</label><input class="inp" id="ctB"></div>
+            </div>
+            <div class="fr" style="margin-bottom:10px">
+              <div><label class="fl">الخيار ج</label><input class="inp" id="ctC"></div>
+              <div><label class="fl">الخيار د</label><input class="inp" id="ctD"></div>
+            </div>
+            <div><label class="fl">الإجابة الصحيحة</label>
+              <select class="sel" id="ctCorrect" style="max-width:120px">
+                <option value="A">أ</option><option value="B">ب</option>
+                <option value="C">ج</option><option value="D">د</option>
+              </select>
+            </div>
+          </div>
+          <!-- أكثر مشتري / شاحن -->
+          <div id="ctCfgTop" style="display:none">
+            <div style="background:rgba(0,198,255,.07);border-radius:10px;padding:12px;font-size:13px;color:var(--t2)">
+              📊 سيتم احتساب المتصدر تلقائياً بناءً على الفترة الزمنية المحددة أدناه.
+            </div>
+          </div>
+          <!-- عجلة الحظ -->
+          <div id="ctCfgSpin" style="display:none">
+            <div style="background:rgba(0,198,255,.07);border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;color:var(--t2)">
+              🎡 كل عملية شراء أو شحن تمنح المستخدم دوراناً واحداً. الجائزة تحدد أدناه.
+            </div>
+            <div><label class="fl">نسبة الفوز % (من 1 إلى 100)</label>
+              <input class="inp" type="number" id="ctSpinWinPct" placeholder="20" style="max-width:120px" min="1" max="100">
+            </div>
+          </div>
+          <!-- الكود الخفي -->
+          <div id="ctCfgCode" style="display:none">
+            <div class="fr" style="margin-bottom:10px">
+              <div><label class="fl">الكود الخفي (حروف وأرقام)</label><input class="inp" id="ctHiddenCode" placeholder="ALMADA2025" style="direction:ltr;letter-spacing:2px"></div>
+              <div><label class="fl">تلميح للمستخدمين</label><input class="inp" id="ctCodeHint" placeholder="ابحث في إعلاناتنا..."></div>
+            </div>
+          </div>
+          <!-- الحظ اليومي -->
+          <div id="ctCfgDaily" style="display:none">
+            <div style="background:rgba(0,198,255,.07);border-radius:10px;padding:12px;font-size:13px;color:var(--t2)">
+              🍀 كل مستخدم يضغط الزر مرة يومياً. إذا فاز تُضاف الجائزة لرصيده فوراً.
+            </div>
+          </div>
+
+          <!-- نوع الجائزة -->
+          <div style="margin:16px 0 12px">
+            <label class="fl">🎁 نوع الجائزة</label>
+            <div class="ot-grid" id="ctPrizeTypeGrid" style="grid-template-columns:repeat(3,1fr)">
+              <div class="ot on" onclick="ctSelPrizeType(this,'balance')"><div style="font-size:20px">💰</div><div style="font-size:11px;font-weight:600;margin-top:3px">رصيد</div></div>
+              <div class="ot" onclick="ctSelPrizeType(this,'points')"><div style="font-size:20px">⭐</div><div style="font-size:11px;font-weight:600;margin-top:3px">نقاط ولاء</div></div>
+              <div class="ot" onclick="ctSelPrizeType(this,'gift_card')"><div style="font-size:20px">🎫</div><div style="font-size:11px;font-weight:600;margin-top:3px">كرت هدية</div></div>
+            </div>
+          </div>
+          <!-- قيمة الجائزة -->
+          <div id="ctPrizeBalRow" style="margin-bottom:12px">
+            <label class="fl">قيمة الجائزة (<span class="cur">ر.ي</span>)</label>
+            <input class="inp" type="number" id="ctPrizeAmt" placeholder="500" style="max-width:200px">
+          </div>
+          <div id="ctPrizePtsRow" style="display:none;margin-bottom:12px">
+            <label class="fl">عدد النقاط</label>
+            <input class="inp" type="number" id="ctPrizePts" placeholder="100" style="max-width:200px">
+          </div>
+          <div id="ctPrizeGiftRow" style="display:none;margin-bottom:12px">
+            <label class="fl">كرت الهدية</label>
+            <select class="sel" id="ctPrizeGiftCat">
+              <option value="">— اختر فئة كروت الهدايا —</option>
+            </select>
+            <div style="font-size:11px;color:var(--t2);margin-top:4px">يُسحب كرت تلقائياً من مخزون الهدايا عند الفوز</div>
+          </div>
+
+          <!-- التواريخ -->
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="ctStart"></div>
+            <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="ctEnd"></div>
+          </div>
+          <div style="margin-bottom:14px"><label class="fl">رسالة الفائز</label><input class="inp" id="ctWinMsg" placeholder="🎉 تهانينا! لقد فزت بالجائزة"></div>
+
+          <button class="b2" onclick="createContest()" style="padding:12px 28px;font-size:14px">🏆 إنشاء المسابقة</button>
+        </div></div>
+      </div>
+
+      <!-- ───── تاب: قائمة المسابقات ───── -->
+      <div id="cTabList" style="display:none">
+        <div class="panel"><div class="ph"><h3>📋 المسابقات الحالية</h3><button class="b5" onclick="loadContestsAdmin()" style="margin-right:auto">🔄 تحديث</button></div>
+          <div class="pb" id="cAdminList"><p style="color:var(--t3);text-align:center;padding:20px">اضغط تحديث</p></div>
+        </div>
+      </div>
+
+      <!-- ───── تاب: كروت الهدايا ───── -->
+      <div id="cTabGifts" style="display:none" id="giftCardsPanel">
+        <div class="panel"><div class="ph"><h3>🎫 مخزون كروت الهدايا</h3></div><div class="pb">
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">اسم الفئة / الكرت</label><input class="inp" id="gcCatName" placeholder="كرت 500 — جائزة"></div>
+            <div><label class="fl">القيمة</label><input class="inp" type="number" id="gcCatValue" placeholder="500" style="max-width:140px"></div>
+          </div>
+          <div style="margin-bottom:12px"><label class="fl">رمز الكرت (فردي)</label><input class="inp" id="gcSingle" placeholder="GIFT-XXXX-XXXX" style="direction:ltr"></div>
+          <button class="b1" onclick="addGiftCard()" style="margin-left:8px">➕ إضافة فردي</button>
+          <div style="margin:14px 0;border-top:1px solid var(--brd);padding-top:12px">
+            <label class="fl">إضافة متعددة (كل رمز في سطر)</label>
+            <textarea class="inp ta" id="gcBulk" placeholder="GIFT-0001&#10;GIFT-0002&#10;GIFT-0003" style="min-height:80px;resize:vertical;direction:ltr"></textarea>
+            <button class="b2" onclick="addBulkGiftCards()" style="margin-top:8px">📋 إضافة الكل</button>
+          </div>
+        </div></div>
+        <div class="panel"><div class="ph"><h3>📦 الكروت المتاحة</h3><div id="gcStockBadge" style="margin-right:auto"></div></div>
+          <div class="pb"><div class="tw">
+            <table><thead><tr><th>#</th><th>الكرت</th><th>الفئة</th><th>القيمة</th><th>الحالة</th><th>حذف</th></tr></thead>
+            <tbody id="gcTable"></tbody></table>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- ───── تاب: نقاط الولاء ───── -->
+      <div id="cTabPoints" style="display:none">
+        <div class="panel"><div class="ph"><h3>⭐ إعدادات الاستبدال</h3></div><div class="pb">
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">كل X نقطة تساوي</label><input class="inp" type="number" id="ptsPer" placeholder="100" style="max-width:130px"></div>
+            <div><label class="fl">المبلغ بـ <span class="cur">ر.ي</span></label><input class="inp" type="number" id="ptsVal" placeholder="1" style="max-width:130px"></div>
+          </div>
+          <div style="margin-bottom:14px"><label class="fl">الحد الأدنى للاستبدال (نقاط)</label><input class="inp" type="number" id="ptsMin" placeholder="100" style="max-width:160px"></div>
+          <button class="b1" onclick="savePtsSettings()">💾 حفظ</button>
+        </div></div>
+        <div class="panel"><div class="ph"><h3>👥 نقاط المستخدمين</h3></div>
+          <div class="pb"><div class="tw">
+            <table><thead><tr><th>#</th><th>المستخدم</th><th>النقاط</th><th>إجراء</th></tr></thead>
+            <tbody id="ptsTable"></tbody></table>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- ───── تاب: النتائج ───── -->
+      <div id="cTabResults" style="display:none">
+        <div class="panel"><div class="ph"><h3>📊 سجل المشاركات والفوز</h3><button class="b5" onclick="loadContestResults()" style="margin-right:auto">🔄 تحديث</button></div>
+          <div class="pb"><div class="tw">
+            <table><thead><tr><th>#</th><th>المسابقة</th><th>المستخدم</th><th>النتيجة</th><th>الجائزة</th><th>التاريخ</th></tr></thead>
+            <tbody id="cResultsTable"></tbody></table>
+          </div></div>
+        </div>
+      </div>
+
+    </div><!-- end sec-contests -->
 
     </div><!-- admin-main -->
 </div><!-- adminPg -->
@@ -2730,6 +2990,7 @@ window.nav=function(s){
     ['trAdminFrom','trAdminTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts;});
   }
   if(s==='quiz') loadQuizAdmin();
+  if(s==='contests'){loadContestsAdmin();loadGiftCardsTable();loadPtsTable();}
 };
 function toggleAdminSB(){
   const sb=document.getElementById('sbEl'),dim=document.getElementById('sbDim');
@@ -3730,6 +3991,948 @@ async function delQuizQ(id){
     loadQuizAdmin();
   }catch(e){toast('خطأ: '+e.message,'err');}
 }
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
+     🏆 CONTESTS SYSTEM — نظام المسابقات الكامل
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- Modal: عجلة الحظ -->
+<div class="ov" id="spinModal">
+<div class="modal" style="max-width:420px;text-align:center">
+  <div id="spinStateLoad" style="padding:30px"><div class="spin" style="margin:0 auto 14px"></div><div style="font-size:13px;color:var(--t2)">جاري التحميل...</div></div>
+  <div id="spinStateMain" style="display:none">
+    <h3 style="margin-bottom:4px" id="spinContestName">🎡 عجلة الحظ</h3>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:16px" id="spinSpinsLeft"></p>
+    <div class="spin-wheel-wrap">
+      <div class="spin-pointer">▼</div>
+      <canvas id="spinCanvas" width="240" height="240" style="border-radius:50%;cursor:pointer"></canvas>
+      <div class="spin-btn" id="spinBtnCenter" onclick="doSpin()">🎡</div>
+    </div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:16px" id="spinPrizeInfo"></p>
+    <button class="mcancel" style="width:100%" onclick="closeOv('spinModal')">إغلاق</button>
+  </div>
+  <div id="spinStateResult" style="display:none;padding:10px">
+    <div style="font-size:60px;margin-bottom:10px" id="spinResIcon">🎉</div>
+    <h3 id="spinResTitle" style="margin-bottom:8px"></h3>
+    <p id="spinResBody" style="color:var(--t2);font-size:13px;margin-bottom:16px"></p>
+    <button class="mok" style="width:100%" onclick="closeOv('spinModal')">رائع! 👍</button>
+  </div>
+  <div id="spinStateNone" style="display:none;padding:24px;text-align:center">
+    <div style="font-size:48px;margin-bottom:12px">🎡</div>
+    <h3>لا توجد أدوار متاحة</h3>
+    <p style="color:var(--t2);font-size:13px;margin-top:8px">اشترِ أو اشحن للحصول على دوران!</p>
+    <button class="mok" style="width:100%;margin-top:16px" onclick="closeOv('spinModal')">حسناً</button>
+  </div>
+</div></div>
+
+<!-- Modal: الكود الخفي -->
+<div class="ov" id="codeModal">
+<div class="modal" style="max-width:400px">
+  <div id="codeStateMain">
+    <h3 style="margin-bottom:6px" id="codeContestName">🔑 الكود الخفي</h3>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:6px" id="codeHintTxt"></p>
+    <div style="background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--warn);margin-bottom:16px">
+      ⚠️ كل جهاز يستطيع الإدخال مرة واحدة فقط
+    </div>
+    <div class="code-input-wrap" style="margin-bottom:16px">
+      <input class="inp" id="codeInput" placeholder="أدخل الكود هنا" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()">
+      <button class="mok" style="flex-shrink:0;padding:0 18px" onclick="submitHiddenCode()">تحقق ✓</button>
+    </div>
+    <button class="mcancel" style="width:100%" onclick="closeOv('codeModal')">إغلاق</button>
+  </div>
+  <div id="codeStateResult" style="display:none;text-align:center;padding:10px">
+    <div style="font-size:56px;margin-bottom:10px" id="codeResIcon">🎉</div>
+    <h3 id="codeResTitle" style="margin-bottom:8px"></h3>
+    <p id="codeResBody" style="color:var(--t2);font-size:13px;margin-bottom:16px"></p>
+    <button class="mok" style="width:100%" onclick="closeOv('codeModal')">رائع! 👍</button>
+  </div>
+</div></div>
+
+<!-- Modal: متصدر (أكثر مشتري/شاحن) -->
+<div class="ov" id="lboardModal">
+<div class="modal" style="max-width:440px">
+  <h3 style="margin-bottom:4px" id="lboardTitle">🥇 المتصدرون</h3>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:16px" id="lboardSubtitle"></p>
+  <div id="lboardList"></div>
+  <div id="lboardMyPos" style="margin-top:12px;padding:10px 14px;background:rgba(0,114,255,.08);border:1px solid rgba(0,114,255,.2);border-radius:12px;font-size:13px;display:none"></div>
+  <button class="mcancel" style="width:100%;margin-top:14px" onclick="closeOv('lboardModal')">إغلاق</button>
+</div></div>
+
+<!-- Modal: الحظ اليومي -->
+<div class="ov" id="dailyModal">
+<div class="modal" style="max-width:380px;text-align:center">
+  <div id="dailyStateMain" style="padding:10px">
+    <div style="font-size:56px;margin-bottom:10px">🍀</div>
+    <h3 id="dailyContestName" style="margin-bottom:8px">الحظ اليومي</h3>
+    <p style="color:var(--t2);font-size:13px;margin-bottom:6px" id="dailyPrizeInfo"></p>
+    <div style="background:rgba(0,214,143,.08);border:1px solid rgba(0,214,143,.2);border-radius:10px;padding:10px;font-size:12px;color:var(--ok);margin-bottom:18px">
+      🎯 مرة واحدة يومياً — نتيجتك فورية!
+    </div>
+    <button class="mok" style="width:100%;padding:14px;font-size:15px" id="dailyBtn" onclick="doDailyLucky()">🍀 جرّب حظك!</button>
+    <button class="mcancel" style="width:100%;margin-top:10px" onclick="closeOv('dailyModal')">لاحقاً</button>
+  </div>
+  <div id="dailyStateResult" style="display:none;padding:10px">
+    <div style="font-size:60px;margin-bottom:10px" id="dailyResIcon">🎉</div>
+    <h3 id="dailyResTitle" style="margin-bottom:8px"></h3>
+    <p id="dailyResBody" style="color:var(--t2);font-size:13px;margin-bottom:16px"></p>
+    <button class="mok" style="width:100%" onclick="closeOv('dailyModal')">رائع! 👍</button>
+  </div>
+  <div id="dailyStateDone" style="display:none;padding:24px">
+    <div style="font-size:48px;margin-bottom:12px">✅</div>
+    <h3>شاركت اليوم!</h3>
+    <p style="color:var(--t2);font-size:13px;margin-top:8px" id="dailyDoneMsg">عد غداً لفرصة جديدة</p>
+    <button class="mok" style="width:100%;margin-top:16px" onclick="closeOv('dailyModal')">حسناً</button>
+  </div>
+</div></div>
+
+<!-- Modal: استبدال النقاط -->
+<div class="ov" id="redeemModal">
+<div class="modal" style="max-width:380px">
+  <h3 style="margin-bottom:4px">💱 استبدال نقاط الولاء</h3>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:14px" id="redeemRateInfo"></p>
+  <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px">
+    <div style="font-size:12px;color:var(--t2);margin-bottom:4px">رصيد نقاطك</div>
+    <div style="font-size:24px;font-weight:900;color:#c084fc"><span id="redeemMyPts">0</span> نقطة</div>
+  </div>
+  <div style="margin-bottom:12px">
+    <label class="fl">عدد النقاط للاستبدال</label>
+    <input class="inp" type="number" id="redeemAmt" placeholder="100" oninput="calcRedeemPreview()">
+    <div style="font-size:12px;color:var(--ok);margin-top:6px" id="redeemPreview"></div>
+  </div>
+  <div class="mrow">
+    <button class="mcancel" onclick="closeOv('redeemModal')">إلغاء</button>
+    <button class="mok" onclick="confirmRedeem()">استبدال ✓</button>
+  </div>
+</div></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// 🏆 CONTESTS ENGINE
+// ════════════════════════════════════════════════════════════
+
+var _ctType = 'quiz';
+var _ctPrizeType = 'balance';
+var _ctActiveContest = null;
+var _spinAngle = 0;
+var _spinning = false;
+var _spinCtx = null;
+var _codeCtx = null;
+var _dailyCtx = null;
+
+// ── Admin Tabs ──
+function cSwitchTab(t) {
+  ['create','list','gifts','points','results'].forEach(function(k) {
+    var n = document.getElementById('cTab'+ {'create':1,'list':2,'gifts':3,'points':4,'results':5}[k]);
+    var d = document.getElementById('cTab'+ k.charAt(0).toUpperCase()+k.slice(1));
+    if(n) n.className = k===t ? 'tab on' : 'tab';
+    if(d) d.style.display = k===t ? '' : 'none';
+  });
+  if(t==='list') loadContestsAdmin();
+  if(t==='gifts') loadGiftCardsTable();
+  if(t==='points') { loadPtsTable(); loadPtsSettings(); }
+  if(t==='results') loadContestResults();
+}
+
+// ── Select contest type ──
+function ctSelType(el, type) {
+  document.querySelectorAll('#ctTypeGrid .ot').forEach(function(x){ x.className='ot'; });
+  el.className = 'ot on';
+  _ctType = type;
+  ['Quiz','Top','Spin','Code','Daily'].forEach(function(k){ var e=document.getElementById('ctCfg'+k); if(e) e.style.display='none'; });
+  var map = {quiz:'Quiz', top_buyer:'Top', top_recharger:'Top', spin_wheel:'Spin', hidden_code:'Code', daily_lucky:'Daily'};
+  var show = document.getElementById('ctCfg'+(map[type]||'Quiz'));
+  if(show) show.style.display='';
+}
+
+// ── Select prize type ──
+function ctSelPrizeType(el, type) {
+  document.querySelectorAll('#ctPrizeTypeGrid .ot').forEach(function(x){ x.className='ot'; });
+  el.className = 'ot on';
+  _ctPrizeType = type;
+  document.getElementById('ctPrizeBalRow').style.display = type==='balance' ? '' : 'none';
+  document.getElementById('ctPrizePtsRow').style.display = type==='points' ? '' : 'none';
+  document.getElementById('ctPrizeGiftRow').style.display = type==='gift_card' ? '' : 'none';
+  // populate gift cats if needed
+  if(type==='gift_card') populateGiftCatSelect();
+}
+
+function populateGiftCatSelect() {
+  col('giftCards').where('used','==',false).get().then(function(snap) {
+    var cats = {};
+    snap.docs.forEach(function(d) { var c=d.data().category||'افتراضي'; cats[c]=(cats[c]||0)+1; });
+    var sel = document.getElementById('ctPrizeGiftCat');
+    if(!sel) return;
+    sel.innerHTML = '<option value="">— اختر فئة —</option>' +
+      Object.keys(cats).map(function(c){ return '<option value="'+c+'">'+c+' ('+cats[c]+' متاح)</option>'; }).join('');
+  }).catch(function(){});
+}
+
+// ── Create contest ──
+async function createContest() {
+  var name = document.getElementById('ctName').value.trim();
+  var season = document.getElementById('ctSeason').value.trim();
+  var start = document.getElementById('ctStart').value;
+  var end = document.getElementById('ctEnd').value;
+  var winMsg = document.getElementById('ctWinMsg').value.trim() || '🎉 تهانينا! لقد فزت بالجائزة';
+  if(!name){ toast('أدخل اسم المسابقة','err'); return; }
+  if(!start||!end){ toast('حدد تواريخ البداية والنهاية','err'); return; }
+
+  var cfg = { name, season, type:_ctType, prizeType:_ctPrizeType, startDate:start, endDate:end, winMessage:winMsg, active:true, createdAt:TS() };
+
+  // prize
+  if(_ctPrizeType==='balance') { cfg.prize = parseInt(document.getElementById('ctPrizeAmt').value)||0; if(!cfg.prize){toast('أدخل قيمة الجائزة','err');return;} }
+  if(_ctPrizeType==='points')  { cfg.prize = parseInt(document.getElementById('ctPrizePts').value)||0; if(!cfg.prize){toast('أدخل عدد النقاط','err');return;} }
+  if(_ctPrizeType==='gift_card'){ cfg.giftCategory = document.getElementById('ctPrizeGiftCat').value; if(!cfg.giftCategory){toast('اختر فئة كرت الهدية','err');return;} cfg.prize=0; }
+
+  // type-specific
+  if(_ctType==='quiz') {
+    var q=document.getElementById('ctQ').value.trim(), a=document.getElementById('ctA').value.trim(), b=document.getElementById('ctB').value.trim(), c=document.getElementById('ctC').value.trim(), d=document.getElementById('ctD').value.trim();
+    if(!q||!a||!b||!c||!d){toast('أكمل السؤال والخيارات','err');return;}
+    cfg.question=q; cfg.optA=a; cfg.optB=b; cfg.optC=c; cfg.optD=d;
+    cfg.correctAnswer = document.getElementById('ctCorrect').value;
+  }
+  if(_ctType==='spin_wheel') { cfg.winPercent = parseInt(document.getElementById('ctSpinWinPct').value)||20; }
+  if(_ctType==='hidden_code') {
+    var code=document.getElementById('ctHiddenCode').value.trim().toUpperCase();
+    var hint=document.getElementById('ctCodeHint').value.trim();
+    if(!code){toast('أدخل الكود الخفي','err');return;}
+    cfg.hiddenCode=code; cfg.hint=hint;
+  }
+
+  try {
+    await col('contests').add(cfg);
+    toast('✅ تم إنشاء المسابقة بنجاح!','ok');
+    // reset form
+    ['ctName','ctSeason','ctStart','ctEnd','ctWinMsg','ctQ','ctA','ctB','ctC','ctD','ctPrizeAmt','ctPrizePts','ctSpinWinPct','ctHiddenCode','ctCodeHint'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    cSwitchTab('list');
+  } catch(e) { toast('خطأ: '+e.message,'err'); }
+}
+
+// ── Load contests admin ──
+async function loadContestsAdmin() {
+  var list = document.getElementById('cAdminList');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t2)">⏳</div>';
+  try {
+    var snap = await col('contests').get().catch(function(){return{docs:[]};});
+    var contests = snap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());});
+    // stats
+    var partSnap = await col('contestEntries').get().catch(function(){return{docs:[]};});
+    var entries = partSnap.docs.map(function(d){return d.data();});
+    var sv = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    sv('cstTot', contests.length);
+    sv('cstPart', entries.length);
+
+    if(!contests.length){ list.innerHTML='<p style="color:var(--t3);text-align:center;padding:24px">لا توجد مسابقات — أنشئ واحدة!</p>'; return; }
+    var today = serverNow().toISOString().split('T')[0];
+    var typeIcons = {quiz:'🧠',top_buyer:'🛒',top_recharger:'💳',spin_wheel:'🎡',hidden_code:'🔑',daily_lucky:'🍀'};
+    var typeNames = {quiz:'أسئلة',top_buyer:'أكثر مشتري',top_recharger:'أكثر شاحن',spin_wheel:'عجلة الحظ',hidden_code:'كود خفي',daily_lucky:'حظ يومي'};
+    var prizeIcons = {balance:'💰',points:'⭐',gift_card:'🎫'};
+    var html = '';
+    contests.forEach(function(c) {
+      var isActive = c.active&&(!c.startDate||today>=c.startDate)&&(!c.endDate||today<=c.endDate);
+      var cEntries = entries.filter(function(e){return e.contestId===c.fbId;}).length;
+      var prizeDisp = c.prizeType==='gift_card'? ('كرت: '+c.giftCategory) : (c.prizeType==='points'?(c.prize+' نقطة'):(c.prize||0).toLocaleString()+' '+(S.cfg&&S.cfg.currency||'ر.ي'));
+      html += '<div class="panel" style="margin-bottom:12px"><div class="pb" style="padding:14px">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap">'
+        +'<div style="flex:1">'
+        +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
+        +'<span class="contest-badge '+(isActive?'cb-active':'cb-ended')+'">'+(isActive?'✅ نشطة':'⏸ منتهية')+'</span>'
+        +'<span class="contest-badge cb-type">'+(typeIcons[c.type]||'🏆')+' '+(typeNames[c.type]||c.type)+'</span>'
+        +'<span class="contest-badge" style="background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.25)">'+(prizeIcons[c.prizeType]||'🎁')+' '+prizeDisp+'</span>'
+        +'</div>'
+        +'<div style="font-size:15px;font-weight:700;margin-bottom:4px">'+(c.name||'مسابقة')+'</div>'
+        +(c.season?'<div style="font-size:11px;color:var(--p);margin-bottom:4px">📅 '+c.season+'</div>':'')
+        +'<div style="font-size:11px;color:var(--t2)">'+c.startDate+' ➜ '+c.endDate+' &nbsp;|&nbsp; '+cEntries+' مشارك</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+        +'<button class="b4" onclick="toggleContest(\''+c.fbId+'\','+(!c.active)+')">'+(c.active?'إيقاف':'تفعيل')+'</button>'
+        +'<button class="b3" onclick="deleteContest(\''+c.fbId+'\')">حذف</button>'
+        +'</div></div>'
+        +'</div></div>';
+    });
+    list.innerHTML = html;
+  } catch(e) { list.innerHTML='<p style="color:var(--err);text-align:center">خطأ: '+e.message+'</p>'; }
+}
+
+async function toggleContest(id, active) {
+  await col('contests').doc(id).update({active}).catch(function(){});
+  toast(active?'✅ تم تفعيل المسابقة':'⏸ تم إيقاف المسابقة','ok');
+  loadContestsAdmin();
+}
+async function deleteContest(id) {
+  if(!confirm('حذف المسابقة وكل بياناتها؟')) return;
+  try {
+    await col('contests').doc(id).delete();
+    var snap = await col('contestEntries').where('contestId','==',id).get().catch(function(){return{docs:[]};});
+    for(var i=0;i<snap.docs.length;i++) await snap.docs[i].ref.delete();
+    toast('✅ تم الحذف','ok'); loadContestsAdmin();
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ── Contest results ──
+async function loadContestResults() {
+  var tbl = document.getElementById('cResultsTable');
+  if(!tbl) return;
+  try {
+    var snap = await col('contestEntries').get().catch(function(){return{docs:[]};});
+    var cSnap = await col('contests').get().catch(function(){return{docs:[]};});
+    var contests = {};
+    cSnap.docs.forEach(function(d){ contests[d.id]=d.data(); });
+    var entries = snap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());});
+    entries.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+    if(!entries.length){ tbl.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد مشاركات بعد</td></tr>'; return; }
+    var prizeDisp = function(e) {
+      if(e.prizeType==='points') return '⭐ '+e.prizeAmt+' نقطة';
+      if(e.prizeType==='gift_card') return '🎫 '+e.giftCode;
+      return '💰 '+(e.prizeAmt||0).toLocaleString();
+    };
+    tbl.innerHTML = entries.map(function(e,i){
+      var cn = contests[e.contestId];
+      return '<tr>'
+        +'<td>'+(i+1)+'</td>'
+        +'<td style="font-size:12px">'+(cn?cn.name:'—')+'</td>'
+        +'<td style="font-weight:600">'+(e.username||'—')+'</td>'
+        +'<td><span class="badge '+(e.won?'bg':'br')+'">'+(e.won?'🏆 فاز':'😔 لم يفز')+'</span></td>'
+        +'<td style="color:'+(e.won?'var(--ok)':'var(--t3)')+'">'+(e.won?prizeDisp(e):'—')+'</td>'
+        +'<td style="font-size:11px;color:var(--t2)">'+(e.date||'')+'</td>'
+        +'</tr>';
+    }).join('');
+  } catch(e){ tbl.innerHTML='<tr><td colspan="6" style="color:var(--err);text-align:center">خطأ: '+e.message+'</td></tr>'; }
+}
+
+// ════════════════════════════════════════
+// 🎫 GIFT CARDS
+// ════════════════════════════════════════
+async function addGiftCard() {
+  var code = document.getElementById('gcSingle').value.trim();
+  var cat  = document.getElementById('gcCatName').value.trim();
+  var val  = parseInt(document.getElementById('gcCatValue').value)||0;
+  if(!code||!cat){ toast('أدخل الرمز والفئة','err'); return; }
+  try {
+    await col('giftCards').add({code,category:cat,value:val,used:false,createdAt:TS()});
+    document.getElementById('gcSingle').value='';
+    toast('✅ تمت الإضافة','ok'); loadGiftCardsTable();
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+async function addBulkGiftCards() {
+  var bulk = document.getElementById('gcBulk').value.trim();
+  var cat  = document.getElementById('gcCatName').value.trim();
+  var val  = parseInt(document.getElementById('gcCatValue').value)||0;
+  if(!bulk||!cat){ toast('أدخل الكروت والفئة','err'); return; }
+  var codes = bulk.split('\n').map(function(c){return c.trim();}).filter(Boolean);
+  if(!codes.length){ toast('لا توجد رموز','err'); return; }
+  var added = 0;
+  for(var i=0;i<codes.length;i++){
+    try{ await col('giftCards').add({code:codes[i],category:cat,value:val,used:false,createdAt:TS()}); added++; }
+    catch(e){}
+  }
+  document.getElementById('gcBulk').value='';
+  toast('✅ تمت إضافة '+added+' كرت','ok'); loadGiftCardsTable();
+}
+async function loadGiftCardsTable() {
+  var tbl = document.getElementById('gcTable');
+  var badge = document.getElementById('gcStockBadge');
+  if(!tbl) return;
+  try {
+    var snap = await col('giftCards').get().catch(function(){return{docs:[]};});
+    var cards = snap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());});
+    var avail = cards.filter(function(c){return !c.used;}).length;
+    if(badge) badge.innerHTML='<span class="badge bg">'+avail+' متاح</span> <span class="badge br">'+(cards.length-avail)+' مستخدم</span>';
+    var sv = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    sv('cstGift', avail);
+    if(!cards.length){ tbl.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد كروت</td></tr>'; return; }
+    tbl.innerHTML = cards.map(function(c,i){
+      return '<tr>'
+        +'<td>'+(i+1)+'</td>'
+        +'<td style="direction:ltr;letter-spacing:1px;font-weight:600">'+(c.code||'—')+'</td>'
+        +'<td>'+(c.category||'—')+'</td>'
+        +'<td style="color:var(--ok)">'+(c.value||0).toLocaleString()+'</td>'
+        +'<td><span class="badge '+(c.used?'br':'bg')+'">'+(c.used?('✅ '+c.usedBy):'متاح')+'</span></td>'
+        +'<td>'+(c.used?'':'<button class="b3" onclick="deleteGiftCard(\''+c.fbId+'\')">🗑️</button>')+'</td>'
+        +'</tr>';
+    }).join('');
+  } catch(e){}
+}
+async function deleteGiftCard(id) {
+  if(!confirm('حذف الكرت؟')) return;
+  try{ await col('giftCards').doc(id).delete(); toast('✅ تم','ok'); loadGiftCardsTable(); }
+  catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ════════════════════════════════════════
+// ⭐ LOYALTY POINTS
+// ════════════════════════════════════════
+async function savePtsSettings() {
+  var per = parseInt(document.getElementById('ptsPer').value)||100;
+  var val = parseFloat(document.getElementById('ptsVal').value)||1;
+  var min = parseInt(document.getElementById('ptsMin').value)||100;
+  try {
+    await doc('settings','main').set({ptsPerUnit:per,ptsUnitValue:val,ptsMinRedeem:min},{merge:true});
+    Object.assign(S.cfg,{ptsPerUnit:per,ptsUnitValue:val,ptsMinRedeem:min});
+    toast('✅ تم حفظ إعدادات النقاط','ok');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+async function loadPtsSettings() {
+  var per=S.cfg.ptsPerUnit||100, val=S.cfg.ptsUnitValue||1, min=S.cfg.ptsMinRedeem||100;
+  var e1=document.getElementById('ptsPer'),e2=document.getElementById('ptsVal'),e3=document.getElementById('ptsMin');
+  if(e1)e1.value=per; if(e2)e2.value=val; if(e3)e3.value=min;
+}
+async function loadPtsTable() {
+  var tbl = document.getElementById('ptsTable');
+  var totalPts = 0;
+  if(!tbl) return;
+  var users = S.users||[];
+  if(!users.length){ tbl.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--t3)">لا يوجد مستخدمون</td></tr>'; return; }
+  users.forEach(function(u){totalPts+=(u.loyaltyPoints||0);});
+  var sv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  sv('cstPts',totalPts.toLocaleString());
+  tbl.innerHTML = users.map(function(u,i){
+    var pts = u.loyaltyPoints||0;
+    return '<tr>'
+      +'<td>'+(i+1)+'</td>'
+      +'<td style="font-weight:600">'+(u.name||u.username||'—')+'</td>'
+      +'<td style="color:#c084fc;font-weight:700">⭐ '+pts.toLocaleString()+'</td>'
+      +'<td><button class="b4" onclick="adminAdjPts(\''+u.fbId+'\')">✏️ تعديل</button></td>'
+      +'</tr>';
+  }).join('');
+}
+async function adminAdjPts(uid) {
+  var u = (S.users||[]).find(function(x){return x.fbId===uid;});
+  if(!u) return;
+  var cur = u.loyaltyPoints||0;
+  var val = prompt('نقاط '+u.name+' الحالية: '+cur+'\nأدخل القيمة الجديدة:', cur);
+  if(val===null) return;
+  val = parseInt(val)||0;
+  try {
+    await col('users').doc(uid).update({loyaltyPoints:val});
+    u.loyaltyPoints=val; loadPtsTable();
+    toast('✅ تم تعديل النقاط','ok');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ════════════════════════════════════════
+// 🏆 USER SIDE — عرض المسابقات
+// ════════════════════════════════════════
+async function loadUserContests() {
+  var grid = document.getElementById('contestsGrid');
+  var loyaltyCard = document.getElementById('loyaltyCard');
+  if(!grid) return;
+
+  // نقاط الولاء
+  var myPts = S.user&&S.user.loyaltyPoints||0;
+  if(myPts > 0 && loyaltyCard) {
+    loyaltyCard.style.display='';
+    var disp=document.getElementById('userPointsDisp');
+    if(disp) disp.textContent=myPts.toLocaleString();
+  }
+
+  grid.innerHTML='<div style="text-align:center;color:var(--t3);padding:30px;font-size:13px">⏳ جاري التحميل...</div>';
+  try {
+    var snap = await col('contests').where('active','==',true).get().catch(function(){return{docs:[]};});
+    var today = serverNow().toISOString().split('T')[0];
+    var contests = snap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());})
+      .filter(function(c){ return (!c.startDate||today>=c.startDate)&&(!c.endDate||today<=c.endDate); });
+
+    if(!contests.length){
+      grid.innerHTML='<div style="text-align:center;color:var(--t3);padding:30px">'
+        +'<div style="font-size:36px;margin-bottom:8px">🏆</div>'
+        +'<div style="font-size:14px">لا توجد مسابقات نشطة الآن</div>'
+        +'<div style="font-size:12px;margin-top:6px">ترقّب مسابقاتنا القادمة!</div></div>';
+      return;
+    }
+
+    var typeIcons={quiz:'🧠',top_buyer:'🛒',top_recharger:'💳',spin_wheel:'🎡',hidden_code:'🔑',daily_lucky:'🍀'};
+    var typeNames={quiz:'أسئلة وأجوبة',top_buyer:'أكثر مشتري',top_recharger:'أكثر شاحن',spin_wheel:'عجلة الحظ',hidden_code:'الكود الخفي',daily_lucky:'الحظ اليومي'};
+    var typeGrads={quiz:'linear-gradient(90deg,#0072ff,#00c6ff)',top_buyer:'linear-gradient(90deg,#f59e0b,#fbbf24)',top_recharger:'linear-gradient(90deg,#10b981,#34d399)',spin_wheel:'linear-gradient(90deg,#8b5cf6,#c084fc)',hidden_code:'linear-gradient(90deg,#ef4444,#f97316)',daily_lucky:'linear-gradient(90deg,#22c55e,#4ade80)'};
+    var btns={quiz:'openQuizContest',top_buyer:'openLeaderboard',top_recharger:'openLeaderboard',spin_wheel:'openSpinWheel',hidden_code:'openHiddenCode',daily_lucky:'openDailyLucky'};
+    var btnLabels={quiz:'🧠 أجب الآن',top_buyer:'🥇 تحقق من مكانك',top_recharger:'🥇 تحقق من مكانك',spin_wheel:'🎡 ادور العجلة',hidden_code:'🔑 أدخل الكود',daily_lucky:'🍀 جرّب حظك'};
+    var prizeDisp=function(c){
+      if(c.prizeType==='gift_card') return '🎫 كرت هدية من '+c.giftCategory;
+      if(c.prizeType==='points') return '⭐ '+(c.prize||0)+' نقطة ولاء';
+      return '💰 '+(c.prize||0).toLocaleString()+' '+(S.cfg&&S.cfg.currency||'ر.ي');
+    };
+
+    var html = '';
+    contests.forEach(function(c) {
+      var icon = typeIcons[c.type]||'🏆';
+      var grad = typeGrads[c.type]||'linear-gradient(90deg,var(--pd),var(--p))';
+      var fn = btns[c.type]||'openQuizContest';
+      var lbl = btnLabels[c.type]||'شارك الآن';
+      html += '<div class="contest-card" style="--cgrad:'+grad+'">'
+        +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+        +'<div style="font-size:32px">'+icon+'</div>'
+        +'<div style="flex:1">'
+        +'<div style="font-size:15px;font-weight:700">'+(c.name||'مسابقة')+'</div>'
+        +(c.season?'<div style="font-size:11px;color:var(--p)">📅 '+c.season+'</div>':'')
+        +'<div style="font-size:11px;color:var(--t2);margin-top:2px">'+(typeNames[c.type]||c.type)+' | ينتهي '+c.endDate+'</div>'
+        +'</div>'
+        +'<div style="text-align:center;background:rgba(0,0,0,.3);border-radius:12px;padding:8px 12px">'
+        +'<div style="font-size:10px;color:var(--t2)">الجائزة</div>'
+        +'<div style="font-size:13px;font-weight:700;margin-top:2px">'+prizeDisp(c)+'</div>'
+        +'</div></div>'
+        +(c.type==='hidden_code'&&c.hint?'<div style="font-size:12px;color:var(--warn);background:rgba(255,170,0,.08);border-radius:8px;padding:6px 10px;margin-bottom:10px">💡 تلميح: '+c.hint+'</div>':'')
+        +'<button onclick="'+fn+'(\''+c.fbId+'\')" style="width:100%;background:'+grad+';border:none;border-radius:11px;color:#fff;padding:11px;font-size:13px;font-weight:700;font-family:var(--ff);cursor:pointer">'+lbl+'</button>'
+        +'</div>';
+    });
+    grid.innerHTML = html;
+  } catch(e){ grid.innerHTML='<div style="text-align:center;color:var(--err);padding:20px;font-size:13px">خطأ: '+e.message+'</div>'; }
+}
+
+// ── فتح مسابقة الأسئلة ──
+async function openQuizContest(contestId) {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+  _ctActiveContest = null;
+  _qzShowState('load'); openOv('quizModal');
+  try {
+    var fp = await getDeviceFingerprint();
+    var cSnap = await col('contests').doc(contestId).get();
+    if(!cSnap.exists){ _qzShowState('none'); return; }
+    var c = Object.assign({fbId:cSnap.id},cSnap.data());
+    _ctActiveContest = c;
+    _qzCurrentQ = c; // reuse quiz modal fields
+
+    // تحقق: أجاب بهذا الجهاز؟
+    var prevSnap = await col('contestEntries')
+      .where('contestId','==',contestId).where('deviceFp','==',fp).limit(1).get().catch(function(){return{docs:[]};});
+    if(!prevSnap.empty){ _qzShowAnswered(c, prevSnap.docs[0].data()); return; }
+
+    _qzRenderQuestion(c);
+    _qzShowState('question');
+  } catch(e){ closeOv('quizModal'); toast('خطأ: '+e.message,'err'); }
+}
+
+// Override submitQuizAnswer to use contest entries
+var _origSubmitQuiz = window.submitQuizAnswer;
+window.submitQuizAnswer = async function() {
+  if(_ctActiveContest) {
+    // Use new contest system
+    if(!_qzSelected||!_ctActiveContest||!S.user) return;
+    var btn=document.getElementById('qzSubmitBtn');
+    btn.disabled=true; btn.textContent='⏳';
+    var c=_ctActiveContest;
+    var isCorrect=_qzSelected===c.correctAnswer;
+    ['A','B','C','D'].forEach(function(k){
+      var el=document.getElementById('qzOpt'+k);
+      if(!el) return;
+      if(k===c.correctAnswer) el.className='qz-opt correct';
+      else if(k===_qzSelected&&!isCorrect) el.className='qz-opt wrong';
+    });
+    try {
+      var fp=await getDeviceFingerprint();
+      var prizeAmt = isCorrect?(c.prize||0):0;
+      var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:fp,type:c.type,selectedAnswer:_qzSelected,correctAnswer:c.correctAnswer,isCorrect,won:isCorrect,prizeType:c.prizeType,prizeAmt:isCorrect?prizeAmt:0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
+      await col('contestEntries').add(entry);
+      if(isCorrect) await _grantPrize(c, entry);
+      await new Promise(function(r){setTimeout(r,700);});
+      _qzShowResult(c,isCorrect,prizeAmt);
+    } catch(e){ btn.disabled=false; btn.textContent='تأكيد الإجابة ✓'; toast('خطأ: '+e.message,'err'); }
+  } else if(_origSubmitQuiz) {
+    return _origSubmitQuiz();
+  }
+};
+
+// ── منح الجائزة ──
+async function _grantPrize(contest, entry) {
+  if(!entry.won) return;
+  var uid = entry.userId;
+  if(contest.prizeType==='balance') {
+    var newBal=(S.user.balance||0)+(contest.prize||0);
+    await col('users').doc(uid).update({balance:newBal});
+    S.user.balance=newBal; updateBal();
+    await pushNotif(uid,'gift','🏆 فزت في مسابقة!',contest.winMessage||(contest.name+': ربحت '+(contest.prize||0).toLocaleString()+' '+(S.cfg.currency||'ر.ي')));
+  } else if(contest.prizeType==='points') {
+    var newPts=(S.user.loyaltyPoints||0)+(contest.prize||0);
+    await col('users').doc(uid).update({loyaltyPoints:newPts});
+    S.user.loyaltyPoints=newPts; updateLoyaltyDisp();
+    await pushNotif(uid,'gift','🏆 فزت في مسابقة!',contest.winMessage||(contest.name+': ربحت '+(contest.prize||0)+' نقطة ولاء'));
+  } else if(contest.prizeType==='gift_card') {
+    // سحب كرت هدية من المخزون
+    var gcSnap=await col('giftCards').where('category','==',contest.giftCategory).where('used','==',false).limit(1).get().catch(function(){return{docs:[]};});
+    if(!gcSnap.empty) {
+      var gc=gcSnap.docs[0];
+      await gc.ref.update({used:true,usedBy:uid,usedAt:serverDate()});
+      // تحديث الـ entry بالكود
+      await col('contestEntries').where('contestId','==',contest.fbId).where('userId','==',uid).limit(1).get()
+        .then(function(s){ if(!s.empty) return s.docs[0].ref.update({giftCode:gc.data().code}); }).catch(function(){});
+      await pushNotif(uid,'gift','🎫 كرت هدية!', contest.winMessage||(contest.name+': كرت الهدية: '+gc.data().code));
+    }
+  }
+}
+
+function updateLoyaltyDisp() {
+  var pts = S.user&&S.user.loyaltyPoints||0;
+  var disp=document.getElementById('userPointsDisp');
+  if(disp) disp.textContent=pts.toLocaleString();
+  var lc=document.getElementById('loyaltyCard');
+  if(lc) lc.style.display=pts>0?'':'none';
+}
+
+// ════════════════════════════════════════
+// 🎡 SPIN WHEEL
+// ════════════════════════════════════════
+async function openSpinWheel(contestId) {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+  _spinCtx=null; _spinAngle=0; _spinning=false;
+  _spinShowState('load'); openOv('spinModal');
+  try {
+    var fp=await getDeviceFingerprint();
+    var cSnap=await col('contests').doc(contestId).get();
+    if(!cSnap.exists){ closeOv('spinModal'); return; }
+    var c=Object.assign({fbId:cSnap.id},cSnap.data());
+    _ctActiveContest=c;
+
+    // عدد الأدوار المتاحة = عمليات الشراء والشحن - الأدوار المستهلكة
+    var buySnap=await col('cards').where('userId','==',S.user.fbId).get().catch(function(){return{docs:[]};});
+    var rcSnap=await col('rechargeRequests').where('userId','==',S.user.fbId).where('status','==','approved').get().catch(function(){return{docs:[]};});
+    var totalOps=buySnap.docs.length+rcSnap.docs.length;
+    var usedSnap=await col('contestEntries').where('contestId','==',contestId).where('userId','==',S.user.fbId).get().catch(function(){return{docs:[]};});
+    var spinsLeft=Math.max(0,totalOps-usedSnap.docs.length);
+
+    document.getElementById('spinContestName').textContent=c.name||'🎡 عجلة الحظ';
+    document.getElementById('spinSpinsLeft').textContent='أدوار متاحة: '+spinsLeft;
+    var cur=S.cfg&&S.cfg.currency||'ر.ي';
+    var prizeLabel = c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
+    document.getElementById('spinPrizeInfo').textContent='🎁 الجائزة عند الفوز: '+prizeLabel;
+
+    // رسم العجلة
+    var canvas=document.getElementById('spinCanvas');
+    var ctx=canvas.getContext('2d');
+    _spinCtx={ctx,canvas,c,fp,spinsLeft,winPct:c.winPercent||20};
+    drawSpinWheel(ctx,_spinAngle);
+
+    var sBtn=document.getElementById('spinBtnCenter');
+    if(sBtn) sBtn.style.opacity=spinsLeft>0?'1':'0.4';
+
+    _spinShowState(spinsLeft>0?'main':'none');
+  } catch(e){ closeOv('spinModal'); toast('خطأ: '+e.message,'err'); }
+}
+
+function drawSpinWheel(ctx, angleOffset) {
+  var segments=[
+    {label:'🎁 جائزة!',  color:'#0072ff'},
+    {label:'خسارة',      color:'#1a2540'},
+    {label:'🎁 جائزة!',  color:'#8b5cf6'},
+    {label:'خسارة',      color:'#111827'},
+    {label:'🎁 جائزة!',  color:'#0072ff'},
+    {label:'خسارة',      color:'#1a2540'},
+    {label:'🎁 جائزة!',  color:'#8b5cf6'},
+    {label:'خسارة',      color:'#111827'},
+  ];
+  var n=segments.length, arc=2*Math.PI/n, cx=120, cy=120, r=116;
+  ctx.clearRect(0,0,240,240);
+  for(var i=0;i<n;i++){
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angleOffset+i*arc,angleOffset+(i+1)*arc);
+    ctx.closePath();
+    ctx.fillStyle=segments[i].color;
+    ctx.fill();
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(angleOffset+(i+0.5)*arc);
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font='bold 11px Tajawal,sans-serif';
+    ctx.fillText(segments[i].label,r-8,4);
+    ctx.restore();
+  }
+  // border
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,2*Math.PI);
+  ctx.strokeStyle='rgba(255,255,255,.15)';
+  ctx.lineWidth=3;
+  ctx.stroke();
+}
+
+async function doSpin() {
+  if(_spinning||!_spinCtx) return;
+  if(_spinCtx.spinsLeft<=0){ toast('لا توجد أدوار متاحة','err'); return; }
+  _spinning=true;
+  var sBtn=document.getElementById('spinBtnCenter');
+  if(sBtn) sBtn.style.opacity='0.5';
+
+  // تحديد نتيجة الدوران مسبقاً
+  var won = Math.random()*100 < _spinCtx.winPct;
+  // زاوية الفوز = segment 0,2,4,6 (الجوائز) — زاوية الخسارة = 1,3,5,7
+  var winSegments=[0,2,4,6], loseSegments=[1,3,5,7];
+  var chosenSeg = won ? winSegments[Math.floor(Math.random()*4)] : loseSegments[Math.floor(Math.random()*4)];
+  var n=8, arc=2*Math.PI/n;
+  // نوقف العجلة بحيث السهم يشير للسيغمنت المختار
+  var targetAngle = -chosenSeg*arc - arc/2 - Math.PI/2;
+  var spins = 5 + Math.random()*3; // دورات كاملة
+  var finalAngle = targetAngle - spins*2*Math.PI;
+
+  // أنيميشن
+  var startAngle=_spinAngle, start=null, dur=4000;
+  function easeOut(t){return 1-Math.pow(1-t,4);}
+  function step(ts){
+    if(!start) start=ts;
+    var prog=Math.min((ts-start)/dur,1);
+    var current=startAngle+(finalAngle-startAngle)*easeOut(prog);
+    drawSpinWheel(_spinCtx.ctx,current);
+    if(prog<1){ requestAnimationFrame(step); }
+    else{
+      _spinAngle=finalAngle;
+      _spinning=false;
+      afterSpin(won);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+async function afterSpin(won) {
+  var c=_spinCtx.c;
+  try {
+    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_spinCtx.fp,type:'spin_wheel',won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
+    await col('contestEntries').add(entry);
+    _spinCtx.spinsLeft--;
+    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
+    var cur=S.cfg&&S.cfg.currency||'ر.ي';
+    var prizeLabel=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
+    document.getElementById('spinResIcon').textContent=won?'🎉':'😔';
+    document.getElementById('spinResTitle').textContent=won?'🎊 تهانينا! فزت!':'لم تحالفك الحظ هذه المرة';
+    document.getElementById('spinResBody').textContent=won?('🎁 جائزتك: '+prizeLabel+' تمت إضافتها لحسابك!'):'حظاً موفقاً في الدوران القادم!';
+    _spinShowState('result');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+function _spinShowState(s){
+  ['Load','Main','Result','None'].forEach(function(k){
+    var el=document.getElementById('spinState'+k);
+    if(el) el.style.display=(k.toLowerCase()===s?'':'none');
+  });
+}
+
+// ════════════════════════════════════════
+// 🔑 HIDDEN CODE
+// ════════════════════════════════════════
+async function openHiddenCode(contestId) {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+  try {
+    var cSnap=await col('contests').doc(contestId).get();
+    if(!cSnap.exists) return;
+    var c=Object.assign({fbId:cSnap.id},cSnap.data());
+    _ctActiveContest=c;
+    // تحقق: هذا الجهاز أدخل كود مسبقاً؟
+    var fp=await getDeviceFingerprint();
+    var prev=await col('contestEntries').where('contestId','==',contestId).where('deviceFp','==',fp).limit(1).get().catch(function(){return{docs:[]};});
+    if(!prev.empty){
+      var pd=prev.docs[0].data();
+      document.getElementById('codeResIcon').textContent=pd.won?'🏆':'📝';
+      document.getElementById('codeResTitle').textContent=pd.won?'فزت!':'جربت من قبل';
+      document.getElementById('codeResBody').textContent=pd.won?'كودك صحيح — تم استلام الجائزة':'جهازك أدخل الكود مسبقاً.';
+      document.getElementById('codeStateMain').style.display='none';
+      document.getElementById('codeStateResult').style.display='';
+    } else {
+      document.getElementById('codeStateMain').style.display='';
+      document.getElementById('codeStateResult').style.display='none';
+      document.getElementById('codeContestName').textContent=c.name||'🔑 الكود الخفي';
+      document.getElementById('codeHintTxt').textContent=c.hint?'💡 تلميح: '+c.hint:'';
+      document.getElementById('codeInput').value='';
+    }
+    _codeCtx={c,fp};
+    openOv('codeModal');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+async function submitHiddenCode() {
+  if(!_codeCtx) return;
+  var input=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(!input){ toast('أدخل الكود','err'); return; }
+  var c=_codeCtx.c;
+  var won=input===((c.hiddenCode||'').toUpperCase());
+  try {
+    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_codeCtx.fp,type:'hidden_code',enteredCode:input,won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
+    await col('contestEntries').add(entry);
+    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
+    var cur=S.cfg&&S.cfg.currency||'ر.ي';
+    var prizeLabel=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
+    document.getElementById('codeResIcon').textContent=won?'🎉':'❌';
+    document.getElementById('codeResTitle').textContent=won?'🎊 كود صحيح! تهانينا!':'كود خاطئ';
+    document.getElementById('codeResBody').textContent=won?'جائزتك: '+prizeLabel+' تمت إضافتها!':'الكود الذي أدخلته غير صحيح.';
+    document.getElementById('codeStateMain').style.display='none';
+    document.getElementById('codeStateResult').style.display='';
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ════════════════════════════════════════
+// 🥇 LEADERBOARD
+// ════════════════════════════════════════
+async function openLeaderboard(contestId) {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+  openOv('lboardModal');
+  document.getElementById('lboardList').innerHTML='<div style="text-align:center;padding:20px;color:var(--t2)">⏳ جاري التحميل...</div>';
+  document.getElementById('lboardMyPos').style.display='none';
+  try {
+    var cSnap=await col('contests').doc(contestId).get();
+    if(!cSnap.exists){ closeOv('lboardModal'); return; }
+    var c=Object.assign({fbId:cSnap.id},cSnap.data());
+    document.getElementById('lboardTitle').textContent=(c.type==='top_buyer'?'🛒 متصدر المشترين':'💳 متصدر الشاحنين');
+    document.getElementById('lboardSubtitle').textContent=c.name+' | '+c.startDate+' ➜ '+c.endDate;
+
+    // جلب بيانات كل المستخدمين خلال الفترة
+    var scores={};
+    if(c.type==='top_buyer'){
+      // نحسب من cards collection
+      var snap=await col('cards').get().catch(function(){return{docs:[]};});
+      snap.docs.forEach(function(d){
+        var data=d.data();
+        if(data.purchasedAt&&data.purchasedAt>=c.startDate&&data.purchasedAt<=c.endDate){
+          scores[data.userId]=(scores[data.userId]||0)+1;
+        }
+      });
+    } else {
+      var snap2=await col('rechargeRequests').where('status','==','approved').get().catch(function(){return{docs:[]};});
+      snap2.docs.forEach(function(d){
+        var data=d.data();
+        if(data.date&&data.date>=c.startDate&&data.date<=c.endDate){
+          scores[data.userId]=(scores[data.userId]||0)+(data.amount||0);
+        }
+      });
+    }
+    var users=S.users||[];
+    var ranked=Object.keys(scores).map(function(uid){
+      var u=users.find(function(x){return x.fbId===uid;})||{name:'مستخدم'};
+      return{uid,name:u.name||u.username||'مستخدم',score:scores[uid]};
+    }).sort(function(a,b){return b.score-a.score;}).slice(0,10);
+
+    if(!ranked.length){
+      document.getElementById('lboardList').innerHTML='<div style="text-align:center;color:var(--t3);padding:20px">لا توجد مشاركات حتى الآن</div>';
+      return;
+    }
+    var unit=c.type==='top_buyer'?'عملية':'ر.ي';
+    var rankClass=['rank-1','rank-2','rank-3'];
+    var html='';
+    ranked.forEach(function(r,i){
+      var rcls=i<3?rankClass[i]:'rank-other';
+      html+='<div class="lboard-item">'
+        +'<div class="lboard-rank '+rcls+'">'+(i+1)+'</div>'
+        +'<div style="flex:1;font-weight:600;font-size:14px">'+(r.name)+'</div>'
+        +'<div style="font-size:13px;color:var(--ok);font-weight:700">'+r.score.toLocaleString()+' '+unit+'</div>'
+        +(i===0&&c.prizeType!='gift_card'?'<div style="font-size:18px;margin-right:6px">🏆</div>':'')
+        +'</div>';
+    });
+    document.getElementById('lboardList').innerHTML=html;
+
+    // مكانة المستخدم الحالي
+    var myRank=ranked.findIndex(function(r){return r.uid===S.user.fbId;});
+    var myEl=document.getElementById('lboardMyPos');
+    if(myRank>=0){
+      myEl.style.display='';
+      myEl.innerHTML='📍 مكانتك: <b>#'+(myRank+1)+'</b> — '+ranked[myRank].score.toLocaleString()+' '+unit;
+    } else {
+      myEl.style.display='';
+      myEl.innerHTML='📍 أنت لم تشارك بعد في هذه الفترة';
+    }
+  } catch(e){ document.getElementById('lboardList').innerHTML='<div style="color:var(--err);text-align:center">خطأ: '+e.message+'</div>'; }
+}
+
+// ════════════════════════════════════════
+// 🍀 DAILY LUCKY
+// ════════════════════════════════════════
+async function openDailyLucky(contestId) {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+  _dailyCtx=null;
+  document.getElementById('dailyStateMain').style.display='';
+  document.getElementById('dailyStateResult').style.display='none';
+  document.getElementById('dailyStateDone').style.display='none';
+  openOv('dailyModal');
+  try {
+    var fp=await getDeviceFingerprint();
+    var cSnap=await col('contests').doc(contestId).get();
+    if(!cSnap.exists){ closeOv('dailyModal'); return; }
+    var c=Object.assign({fbId:cSnap.id},cSnap.data());
+    _ctActiveContest=c;
+    _dailyCtx={c,fp};
+
+    var today=serverDate();
+    var prev=await col('contestEntries').where('contestId','==',contestId).where('userId','==',S.user.fbId).where('date','==',today).limit(1).get().catch(function(){return{docs:[]};});
+    if(!prev.empty){
+      var pd=prev.docs[0].data();
+      var cur=S.cfg&&S.cfg.currency||'ر.ي';
+      document.getElementById('dailyDoneMsg').textContent=pd.won?'فزت اليوم بـ '+(pd.prizeType==='points'?pd.prizeAmt+' نقطة':pd.prizeAmt.toLocaleString()+' '+cur)+'! عد غداً لفرصة جديدة':'لم يحالفك الحظ اليوم — عد غداً!';
+      document.getElementById('dailyStateMain').style.display='none';
+      document.getElementById('dailyStateDone').style.display='';
+      return;
+    }
+    document.getElementById('dailyContestName').textContent=c.name||'الحظ اليومي';
+    var cur2=S.cfg&&S.cfg.currency||'ر.ي';
+    var pl=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur2);
+    document.getElementById('dailyPrizeInfo').textContent='الجائزة عند الفوز: '+pl;
+    document.getElementById('dailyStateMain').style.display='';
+  } catch(e){ closeOv('dailyModal'); toast('خطأ: '+e.message,'err'); }
+}
+
+async function doDailyLucky() {
+  if(!_dailyCtx) return;
+  var btn=document.getElementById('dailyBtn');
+  btn.disabled=true; btn.textContent='⏳ جاري...';
+  var c=_dailyCtx.c;
+  var won=Math.random()*100<(c.winPercent||30);
+  try {
+    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_dailyCtx.fp,type:'daily_lucky',won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
+    await col('contestEntries').add(entry);
+    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
+    var cur=S.cfg&&S.cfg.currency||'ر.ي';
+    var pl=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
+    document.getElementById('dailyResIcon').textContent=won?'🎉':'😔';
+    document.getElementById('dailyResTitle').textContent=won?'تهانينا! فزت اليوم!':'لم يحالفك الحظ اليوم';
+    document.getElementById('dailyResBody').textContent=won?'🎁 جائزتك: '+pl+' تمت إضافتها!':'عد غداً لفرصة جديدة — الحظ معك!';
+    document.getElementById('dailyStateMain').style.display='none';
+    document.getElementById('dailyStateResult').style.display='';
+  } catch(e){ btn.disabled=false; btn.textContent='🍀 جرّب حظك!'; toast('خطأ: '+e.message,'err'); }
+}
+
+// ════════════════════════════════════════
+// 💱 REDEEM POINTS
+// ════════════════════════════════════════
+function openRedeemPoints() {
+  var myPts=S.user&&S.user.loyaltyPoints||0;
+  var per=S.cfg&&S.cfg.ptsPerUnit||100;
+  var val=S.cfg&&S.cfg.ptsUnitValue||1;
+  var cur=S.cfg&&S.cfg.currency||'ر.ي';
+  document.getElementById('redeemMyPts').textContent=myPts.toLocaleString();
+  document.getElementById('redeemRateInfo').textContent='كل '+per+' نقطة = '+val+' '+cur;
+  document.getElementById('redeemAmt').value='';
+  document.getElementById('redeemPreview').textContent='';
+  openOv('redeemModal');
+}
+function calcRedeemPreview() {
+  var amt=parseInt(document.getElementById('redeemAmt').value)||0;
+  var per=S.cfg&&S.cfg.ptsPerUnit||100;
+  var val=S.cfg&&S.cfg.ptsUnitValue||1;
+  var cur=S.cfg&&S.cfg.currency||'ر.ي';
+  var result=Math.floor(amt/per)*val;
+  document.getElementById('redeemPreview').textContent=amt>0?('= '+result.toFixed(2)+' '+cur+' رصيد'):'';
+}
+async function confirmRedeem() {
+  var amt=parseInt(document.getElementById('redeemAmt').value)||0;
+  var per=S.cfg&&S.cfg.ptsPerUnit||100;
+  var val=S.cfg&&S.cfg.ptsUnitValue||1;
+  var minR=S.cfg&&S.cfg.ptsMinRedeem||100;
+  var myPts=S.user&&S.user.loyaltyPoints||0;
+  if(amt<minR){ toast('الحد الأدنى للاستبدال '+minR+' نقطة','err'); return; }
+  if(amt>myPts){ toast('نقاطك غير كافية','err'); return; }
+  var earned=Math.floor(amt/per)*val;
+  try {
+    var newPts=myPts-amt;
+    var newBal=(S.user.balance||0)+earned;
+    await col('users').doc(S.user.fbId).update({loyaltyPoints:newPts,balance:newBal});
+    S.user.loyaltyPoints=newPts; S.user.balance=newBal;
+    updateBal(); updateLoyaltyDisp();
+    closeOv('redeemModal');
+    toast('✅ تم استبدال '+amt+' نقطة بـ '+earned.toFixed(2)+' '+(S.cfg.currency||'ر.ي'),'ok');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ── تحميل المسابقات عند فتح صفحة المستخدم ──
+var _origInitUser=window.initUser;
+window.initUser=function(){
+  if(_origInitUser) _origInitUser();
+  setTimeout(function(){ loadUserContests(); updateLoyaltyDisp(); },800);
+};
 </script>
 
 </body>
