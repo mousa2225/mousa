@@ -2064,6 +2064,7 @@ function renderUsersTable(){
   </tr>`).join('');
   popSelects();
   setTimeout(addAvatarsToTable, 50);
+}
 async function addBal(){
   const uid=$('addBalUser').value,amt=parseInt($('addBalAmt').value);
   if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
@@ -3601,86 +3602,113 @@ async function addQuizQuestion() {
 }
 
 async function loadQuizAdmin() {
-  const list=$('qzAdminList');
-  const tbl=$('qzAnswersTable');
+  var list=$('qzAdminList');
+  var tbl=$('qzAnswersTable');
   if(!list)return;
-  list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px">⏳</div>';
+  list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px">\u23F3</div>';
 
   try {
-    // جلب الأسئلة
-    const qSnap = await col('quizQuestions').get().catch(()=>({docs:[]}));
-    const questions = qSnap.docs.map(d=>({fbId:d.id,...d.data()}));
+    var qSnap = await col('quizQuestions').get().catch(function(){return{docs:[]};});
+    var questions = qSnap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());});
 
-    // جلب الإجابات
-    const aSnap = await col('quizAnswers').get().catch(()=>({docs:[]}));
-    const answers = aSnap.docs.map(d=>({fbId:d.id,...d.data()}));
+    var aSnap = await col('quizAnswers').get().catch(function(){return{docs:[]};});
+    var answers = aSnap.docs.map(function(d){return Object.assign({fbId:d.id},d.data());});
 
-    // إحصائيات
-    const sv=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+    var sv=function(id,v){var e=$(id);if(e)e.textContent=v;};
     sv('qzStQ', questions.length);
-    sv('qzStA', answers.filter(a=>a.isCorrect).length);
-    sv('qzStW', [...new Set(answers.filter(a=>a.isCorrect).map(a=>a.userId))].length);
+    sv('qzStA', answers.filter(function(a){return a.isCorrect;}).length);
+    var winnerIds=[]; answers.filter(function(a){return a.isCorrect;}).forEach(function(a){if(winnerIds.indexOf(a.userId)<0)winnerIds.push(a.userId);});
+    sv('qzStW', winnerIds.length);
+
+    var labelsMap={A:'\u0623',B:'\u0628',C:'\u062C',D:'\u062F'};
 
     if(!questions.length){
-      list.innerHTML='<p style="color:var(--t3);text-align:center;padding:20px">لا توجد أسئلة بعد</p>';
+      list.innerHTML='<p style="color:var(--t3);text-align:center;padding:20px">\u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0633\u0626\u0644\u0629 \u0628\u0639\u062F</p>';
     } else {
-      const today=serverNow().toISOString().split('T')[0];
-      const labels={A:'أ',B:'ب',C:'ج',D:'د'};
-      const optKey=(q,k)=>q['opt'+k]||'';
-      list.innerHTML = questions.map(q=>{
-        const qAnswers=answers.filter(a=>a.questionId===q.fbId);
-        const correct=qAnswers.filter(a=>a.isCorrect).length;
-        const isActive=q.active&&(!q.startDate||today>=q.startDate)&&(!q.endDate||today<=q.endDate);
-        return`<div style="background:var(--bg2);border:1px solid ${isActive?'rgba(0,214,143,.3)':'var(--brd)'};border-radius:12px;padding:14px;margin-bottom:10px">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
-            <div style="flex:1">
-              <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
-                <span class="badge ${isActive?'bg':'br'}">${isActive?'✅ نشط':'⏸ موقوف'}</span>
-                <span class="badge bb">🎁 ${(q.prize||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}</span>
-                <span class="badge ${correct?'bg':'bw'}">${correct} إجابة صحيحة / ${qAnswers.length} مشارك</span>
-              </div>
-              <div style="font-size:14px;font-weight:700;margin-bottom:8px">${q.question}</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:12px">
-                ${['A','B','C','D'].map(k=>`<div style="padding:5px 8px;border-radius:7px;background:${k===q.correctAnswer?'rgba(0,214,143,.15)':'var(--bg3)'};border:1px solid ${k===q.correctAnswer?'rgba(0,214,143,.3)':'var(--brd)'}">
-                  <b style="color:var(--p)">${labels[k]}</b> ${optKey(q,k)} ${k===q.correctAnswer?'✓':''}
-                </div>`).join('')}
-              </div>
-              ${q.startDate||q.endDate?`<div style="font-size:11px;color:var(--t3);margin-top:6px">📅 ${q.startDate||''}  ➜  ${q.endDate||''}</div>`:''}
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-              <button class="b4" onclick="toggleQuizQ('${q.fbId}',${!q.active})">${q.active?'إيقاف':'تفعيل'}</button>
-              <button class="b3" onclick="delQuizQ('${q.fbId}')">حذف</button>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
+      var today=serverNow().toISOString().split('T')[0];
+      var html='';
+      questions.forEach(function(q){
+        var qAnswers=answers.filter(function(a){return a.questionId===q.fbId;});
+        var correct=qAnswers.filter(function(a){return a.isCorrect;}).length;
+        var isActive=q.active&&(!q.startDate||today>=q.startDate)&&(!q.endDate||today<=q.endDate);
+        var borderClr=isActive?'rgba(0,214,143,.3)':'var(--brd)';
+        var statusBadge=isActive?'bg':'br';
+        var statusTxt=isActive?'\u2705 \u0646\u0634\u0637':'\u23F8 \u0645\u0648\u0642\u0648\u0641';
+        var prize=(q.prize||0).toLocaleString();
+        var cur=S.cfg&&S.cfg.currency||'\u0631.\u064A';
+        var toggleTxt=q.active?'\u0625\u064A\u0642\u0627\u0641':'\u062A\u0641\u0639\u064A\u0644';
+
+        // build options HTML without nested template literals
+        var optsHtml='';
+        ['A','B','C','D'].forEach(function(k){
+          var isCorr=k===q.correctAnswer;
+          var bg=isCorr?'rgba(0,214,143,.15)':'var(--bg3)';
+          var brd=isCorr?'rgba(0,214,143,.3)':'var(--brd)';
+          var tick=isCorr?' \u2713':'';
+          var lbl=labelsMap[k]||k;
+          var optVal=q['opt'+k]||'';
+          optsHtml+='<div style="padding:5px 8px;border-radius:7px;background:'+bg+';border:1px solid '+brd+'">'
+            +'<b style="color:var(--p)">'+lbl+'</b> '+optVal+tick+'</div>';
+        });
+
+        var dateHtml='';
+        if(q.startDate||q.endDate){
+          dateHtml='<div style="font-size:11px;color:var(--t3);margin-top:6px">\uD83D\uDCC5 '+(q.startDate||'')+' \u279C '+(q.endDate||'')+'</div>';
+        }
+
+        html+='<div style="background:var(--bg2);border:1px solid '+borderClr+';border-radius:12px;padding:14px;margin-bottom:10px">'
+          +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+          +'<div style="flex:1">'
+          +'<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">'
+          +'<span class="badge '+statusBadge+'">'+statusTxt+'</span>'
+          +'<span class="badge bb">\uD83C\uDF81 '+prize+' '+cur+'</span>'
+          +'<span class="badge '+(correct?'bg':'bw')+'">'+correct+' \u0625\u062C\u0627\u0628\u0629 \u0635\u062D\u064A\u062D\u0629 / '+qAnswers.length+' \u0645\u0634\u0627\u0631\u0643</span>'
+          +'</div>'
+          +'<div style="font-size:14px;font-weight:700;margin-bottom:8px">'+q.question+'</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:12px">'+optsHtml+'</div>'
+          +dateHtml
+          +'</div>'
+          +'<div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">'
+          +'<button class="b4" onclick="toggleQuizQ(\''+q.fbId+'\','+(!q.active)+')">'+toggleTxt+'</button>'
+          +'<button class="b3" onclick="delQuizQ(\''+q.fbId+'\')">\u062D\u0630\u0641</button>'
+          +'</div></div></div>';
+      });
+      list.innerHTML=html;
     }
 
-    // عرض الإجابات
     if(tbl){
       if(!answers.length){
-        tbl.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t3)">لا توجد إجابات بعد</td></tr>';
+        tbl.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t3)">\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u062C\u0627\u0628\u0627\u062A \u0628\u0639\u062F</td></tr>';
       } else {
-        const sorted=[...answers].sort((a,b)=>(b.ts||0)-(a.ts||0));
-        tbl.innerHTML=sorted.map((a,i)=>{
-          const q=questions.find(x=>x.fbId===a.questionId);
-          const labels2={A:'أ',B:'ب',C:'ج',D:'د'};
-          return`<tr>
-            <td>${i+1}</td>
-            <td style="font-weight:600">${a.username||'—'}</td>
-            <td style="font-size:11px;color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q?.question?.slice(0,40)||'—'}...</td>
-            <td><b style="color:var(--p)">${labels2[a.selectedAnswer]||'؟'}</b></td>
-            <td><span class="badge ${a.isCorrect?'bg':'br'}">${a.isCorrect?'✅ صحيحة':'❌ خاطئة'}</span></td>
-            <td style="color:${a.isCorrect?'var(--ok)':'var(--t3)'}">+${(a.prize||0).toLocaleString()}</td>
-            <td style="font-size:10px;color:var(--t3);direction:ltr">${(a.deviceFp||'').slice(0,8)}...</td>
-            <td style="font-size:11px;color:var(--t2)">${a.date||''}</td>
-          </tr>`;
-        }).join('');
+        var sorted=answers.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+        var labelsMap2={A:'\u0623',B:'\u0628',C:'\u062C',D:'\u062F'};
+        var rows='';
+        sorted.forEach(function(a,i){
+          var q2=null; for(var qi=0;qi<questions.length;qi++){if(questions[qi].fbId===a.questionId){q2=questions[qi];break;}}
+          var qText=q2&&q2.question?q2.question.slice(0,40)+'...':'\u2014';
+          var selLbl=labelsMap2[a.selectedAnswer]||'?';
+          var resultBadge=a.isCorrect?'bg':'br';
+          var resultTxt=a.isCorrect?'\u2705 \u0635\u062D\u064A\u062D\u0629':'\u274C \u062E\u0627\u0637\u0626\u0629';
+          var prizeAmt='+'+(a.prize||0).toLocaleString();
+          var prizeClr=a.isCorrect?'var(--ok)':'var(--t3)';
+          var fpShort=(a.deviceFp||'').slice(0,8)+'...';
+          rows+='<tr>'
+            +'<td>'+(i+1)+'</td>'
+            +'<td style="font-weight:600">'+(a.username||'\u2014')+'</td>'
+            +'<td style="font-size:11px;color:var(--t2)">'+qText+'</td>'
+            +'<td><b style="color:var(--p)">'+selLbl+'</b></td>'
+            +'<td><span class="badge '+resultBadge+'">'+resultTxt+'</span></td>'
+            +'<td style="color:'+prizeClr+'">'+prizeAmt+'</td>'
+            +'<td style="font-size:10px;color:var(--t3);direction:ltr">'+fpShort+'</td>'
+            +'<td style="font-size:11px;color:var(--t2)">'+(a.date||'')+'</td>'
+            +'</tr>';
+        });
+        tbl.innerHTML=rows;
       }
     }
 
   } catch(e){
-    list.innerHTML=`<p style="color:var(--err);text-align:center">خطأ: ${e.message}</p>`;
+    list.innerHTML='<p style="color:var(--err);text-align:center">\u062E\u0637\u0623: '+e.message+'</p>';
   }
 }
 
