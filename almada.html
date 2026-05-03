@@ -11,8 +11,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="المدى نت">
 <link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#070b14">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
@@ -200,7 +198,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .modal{background:var(--card);border:1px solid var(--brd);border-radius:22px;padding:28px;width:100%;max-width:400px;animation:fadeUp .3s ease;box-shadow:0 8px 40px rgba(0,0,0,.5)}
 .modal h3{font-size:17px;font-weight:700;margin-bottom:18px;text-align:center}
 .mrow{display:flex;gap:9px;margin-top:4px}
-.mcancel{flex:1;padding:11px;background:var(--bg2);border:1px solid var(--brd);border-radius:9px;color:var(--t2);font-size:13px;font-family:var(--ff);cursor:pointer}
+.mcancel,.mbtn-cancel{flex:1;padding:11px;background:var(--bg2);border:1px solid var(--brd);border-radius:9px;color:var(--t2);font-size:13px;font-family:var(--ff);cursor:pointer}
 .mok{flex:2;padding:11px;background:linear-gradient(135deg,var(--pd),var(--p));border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;font-family:var(--ff);cursor:pointer}
 .bank-box{background:var(--bg2);border-radius:11px;padding:14px;margin-bottom:14px}
 .brow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--brd)}.brow:last-child{border:none}
@@ -316,6 +314,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="bal-row">
         <button class="rc-btn" onclick="openRcModal()" id="btnRC">+ شحن رصيد</button>
         <button class="rc-btn" onclick="$('histSec').scrollIntoView({behavior:'smooth'});switchHistTab('sales')" id="btnHist">📋 سجل العمليات</button>
+        <button class="rc-btn" onclick="openQuizModal()" id="btnQuiz" style="background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(139,92,246,.3));border-color:rgba(168,85,247,.4)">🧠 المسابقة</button>
       </div>
     </div>
     <div class="sec-ttl" id="lblCards">اختر فئة الكرت</div>
@@ -359,7 +358,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="nav-item" onclick="nav('sup')">💬 الدعم <span class="nb" id="nbSup">0</span></button>
       <button class="nav-item" onclick="nav('ads')">📢 الإعلانات</button>
       <button class="nav-item" onclick="nav('set')">⚙️ الإعدادات</button>
-      <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>    </nav>
+      <button class="nav-item" onclick="nav('transfers')">💸 التحويلات</button>
+      <button class="nav-item" onclick="nav('quiz')">🧠 المسابقة</button>    </nav>
     <div style="padding:12px 10px;border-top:1px solid var(--brd)">
       <div style="display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px">
         <div style="width:30px;height:30px;background:linear-gradient(135deg,var(--acc),#e05500);border-radius:8px;display:flex;align-items:center;justify-content:center">👨‍💼</div>
@@ -712,6 +712,52 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
       </div>
     </div><!-- end sec-transfers -->
+
+    <!-- ══ QUIZ SECTION ══ -->
+    <div class="adm-sec" id="sec-quiz">
+      <div class="adm-hdr"><h2>🧠 المسابقة</h2><p>إدارة أسئلة المسابقة — كل جهاز يجيب مرة واحدة فقط</p></div>
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="sc b"><div style="font-size:22px">❓</div><div class="sv" id="qzStQ">0</div><div class="sl">إجمالي الأسئلة</div></div>
+        <div class="sc g"><div style="font-size:22px">✅</div><div class="sv" id="qzStA">0</div><div class="sl">إجابات صحيحة</div></div>
+        <div class="sc o"><div style="font-size:22px">🏆</div><div class="sv" id="qzStW">0</div><div class="sl">مشتركون فازوا</div></div>
+      </div>
+      <div class="panel"><div class="ph" style="background:rgba(0,114,255,.05)"><h3>➕ إضافة سؤال جديد</h3></div><div class="pb">
+        <div style="margin-bottom:12px"><label class="fl">نص السؤال</label><input class="inp" id="qzQuestion" placeholder="ما هو عاصمة اليمن؟"></div>
+        <div class="fr" style="margin-bottom:10px">
+          <div><label class="fl">الخيار أ</label><input class="inp" id="qzOptA" placeholder="صنعاء"></div>
+          <div><label class="fl">الخيار ب</label><input class="inp" id="qzOptB" placeholder="عدن"></div>
+        </div>
+        <div class="fr" style="margin-bottom:10px">
+          <div><label class="fl">الخيار ج</label><input class="inp" id="qzOptC" placeholder="تعز"></div>
+          <div><label class="fl">الخيار د</label><input class="inp" id="qzOptD" placeholder="إب"></div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div>
+            <label class="fl">الإجابة الصحيحة</label>
+            <select class="sel" id="qzCorrect">
+              <option value="A">أ</option><option value="B">ب</option>
+              <option value="C">ج</option><option value="D">د</option>
+            </select>
+          </div>
+          <div><label class="fl">🎁 جائزة الفوز (<span class="cur">ر.ي</span>)</label><input class="inp" type="number" id="qzPrize" placeholder="500" style="max-width:160px"></div>
+        </div>
+        <div class="fr" style="margin-bottom:12px">
+          <div><label class="fl">تاريخ البداية</label><input class="inp" type="date" id="qzStart"></div>
+          <div><label class="fl">تاريخ النهاية</label><input class="inp" type="date" id="qzEnd"></div>
+        </div>
+        <div style="margin-bottom:14px"><label class="fl">رسالة للفائز (اختياري)</label><input class="inp" id="qzWinMsg" placeholder="🎉 تهانينا! أجبت إجابة صحيحة وربحت الجائزة"></div>
+        <button class="b2" onclick="addQuizQuestion()">➕ إضافة السؤال</button>
+      </div></div>
+      <div class="panel"><div class="ph"><h3>📋 الأسئلة الحالية</h3><button class="b5" onclick="loadQuizAdmin()" style="margin-right:auto">🔄 تحديث</button></div>
+        <div class="pb" id="qzAdminList"><p style="color:var(--t3);text-align:center;padding:20px">اضغط تحديث لعرض الأسئلة</p></div>
+      </div>
+      <div class="panel"><div class="ph"><h3>👥 سجل الإجابات</h3></div>
+        <div class="pb"><div class="tw">
+          <table><thead><tr><th>#</th><th>المستخدم</th><th>السؤال</th><th>إجابته</th><th>النتيجة</th><th>الجائزة</th><th>معرّف الجهاز</th><th>التاريخ</th></tr></thead>
+          <tbody id="qzAnswersTable"></tbody></table>
+        </div></div>
+      </div>
+    </div><!-- end sec-quiz -->
 
     </div><!-- admin-main -->
 </div><!-- adminPg -->
@@ -1132,20 +1178,10 @@ au.onAuthStateChanged(async fbUser=>{
         }catch(e){console.log('pendingPass apply:',e.message);}
       }
       S.user={fbId:fbUser.uid,...snap.data(),cards:snap.data().cards||[]};
-      // Apply pending password change from admin if any
-      if(snap.data().pendingPass){
-        try{
-          await fbUser.updatePassword(snap.data().pendingPass);
-          await col('users').doc(fbUser.uid).update({
-            pendingPass:firebase.firestore.FieldValue.delete(),
-            pendingPassAt:firebase.firestore.FieldValue.delete()
-          });
-        }catch(e){console.warn('pendingPass:',e);}
-      }
       await loadPublic();
       await loadUserChats(fbUser.uid);
       ld(false);showPg('user');
-      setTimeout(()=>{checkDot();checkPopAds();},1500);
+      setTimeout(()=>{checkDot();checkPopAds();loadNotifs();initUserAvatar();},1500);
     }else{ld(false);}
   }catch(e){ld(false);console.error(e);}
 });
@@ -1971,6 +2007,7 @@ function renderRcList(){
         ${r.receiptImg?`<button class="b1" onclick="viewReceipt('${r.fbId}')">🖼️ إيصال</button>`:""}
       </div>
     </div>`).join('');
+  setTimeout(addAvatarsToRcList, 50);
 }
 function viewReceipt(id){const r=S.reqs.find(x=>x.fbId===id);if(!r?.receiptImg){toast('لا يوجد إيصال','err');return;}$('rcViewImg').src=r.receiptImg;openOv('rcViewModal');}
 async function approveRc(id){
@@ -2022,7 +2059,7 @@ function renderUsersTable(){
     </td>
   </tr>`).join('');
   popSelects();
-}
+  setTimeout(addAvatarsToTable, 50);
 async function addBal(){
   const uid=$('addBalUser').value,amt=parseInt($('addBalAmt').value);
   if(!uid||!amt){toast('اختر مستخدماً وأدخل مبلغاً','err');return;}
@@ -2672,20 +2709,23 @@ function searchUserSel(searchId,selectId,q){
 }
 
 // Load transfers when nav to section
-const _origNavX=window.nav;
 window.nav=function(s){
-  if(_origNavX)_origNavX.call(this,s);
-  const m=document.querySelector('.adm-main');
-  if(m)m.scrollTop=0;
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  if(event&&event.currentTarget)event.currentTarget.classList.add('on');
+  document.querySelectorAll('.adm-sec').forEach(x=>x.classList.remove('on'));
+  $('sec-'+s)?.classList.add('on');
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  const m=document.querySelector('.adm-main');if(m)m.scrollTop=0;
   closeAdminSB();
-  if(s==='comp'){
-    loadDeviceFingerprints();
-  }
+  if(s==='comp') loadDeviceFingerprints();
   if(s==='transfers'){
     loadTransfersAdmin();
     const opts='<option value="">— اختر —</option>'+(S.users||[]).map(u=>`<option value="${u.fbId}">${u.name||u.username} (${(u.balance||0).toLocaleString()})</option>`).join('');
     ['trAdminFrom','trAdminTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=opts;});
   }
+  if(s==='quiz') loadQuizAdmin();
 };
 function toggleAdminSB(){
   const sb=document.getElementById('sbEl'),dim=document.getElementById('sbDim');
@@ -2760,17 +2800,8 @@ function filterSelectUser(searchId, selectId){
     }).map(u=>`<option value="${u.fbId}">${u.name||u.username||u.email} (${(u.balance||0).toLocaleString()})</option>`).join('');
 }
 
-// ── صور البروفايل ──
-// Override renderUsersTable لإضافة صور
-const _origRUT = window.renderUsersTable;
-if(_origRUT){
-  window.renderUsersTable = function(){
-    _origRUT();
-    // أضف الصور بعد الرندر
-    setTimeout(addAvatarsToTable, 50);
-  };
-}
-
+// ── صور البروفايل في جدول المستخدمين ──
+// يتم استدعاؤها مباشرة من داخل renderUsersTable بدلاً من override
 function addAvatarsToTable(){
   const tb=document.getElementById('usersTable');
   if(!tb||!window.S?.users)return;
@@ -2786,15 +2817,6 @@ function addAvatarsToTable(){
       :`<span style="font-size:18px;margin-left:6px;vertical-align:middle">👤</span>`;
     nameTd.innerHTML=`<div style="display:flex;align-items:center">${nameText}<div style="display:flex;align-items:center;margin-right:auto">${av}</div></div>`;
   });
-}
-
-// Override renderRcList لإضافة صور في طلبات الشحن
-const _origRRL = window.renderRcList;
-if(_origRRL){
-  window.renderRcList = function(){
-    _origRRL();
-    setTimeout(addAvatarsToRcList, 50);
-  };
 }
 
 function addAvatarsToRcList(){
@@ -3010,6 +3032,13 @@ async function changePassProfile(){
   }catch(e){if(e.code==='auth/wrong-password')toast('كلمة المرور الحالية خاطئة','err');else toast('خطأ: '+e.message,'err');}
 }
 
+function initUserAvatar(){
+  const u=S.user;if(!u)return;
+  const hImg=document.getElementById('uAvatarH'),hEm=document.getElementById('uAvatarE');
+  if(u.avatarImg){if(hImg){hImg.src=u.avatarImg;hImg.style.display='block';}if(hEm)hEm.style.display='none';}
+  else{if(hImg)hImg.style.display='none';if(hEm){hEm.textContent='👤';hEm.style.display='';}}
+}
+
 // ══ TRANSFER ══
 let _trTarget=null;
 function openTransferModal(){
@@ -3092,7 +3121,7 @@ async function renderTrHist(){
 
 // ══ PATCH approveRc to notify ══
 const _origApproveRc=window.approveRc;
-if(_origApproveRc){window.approveRc=async function(id){
+if(typeof _origApproveRc==='function'){window.approveRc=async function(id){
   await _origApproveRc(id);
   const req=S.reqs?.find(r=>r.fbId===id);
   if(req)await pushNotif(req.userId,'recharge','💳 تم قبول طلب الشحن',`تم شحن ${(req.amount||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'} لحسابك`);
@@ -3271,6 +3300,403 @@ async function setFpStatus(fpId, action){
     const msgs={block:'✅ تم حظر الجهاز',unblock:'✅ تم فك الحظر',allow:'✅ تم إتاحة حسابات متعددة',restrict:'✅ تم تقييد الجهاز لحساب واحد'};
     toast(msgs[action]||'✅ تم','ok');
     loadDeviceFingerprints();
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     🧠 QUIZ USER MODAL
+     ══════════════════════════════════════════════════════ -->
+<div class="ov" id="quizModal">
+<div class="modal" style="max-width:480px">
+  <div id="qzStateLoad" style="text-align:center;padding:30px">
+    <div class="spin" style="margin:0 auto 14px"></div>
+    <div style="font-size:13px;color:var(--t2)">جاري التحميل...</div>
+  </div>
+  <div id="qzStateNone" style="display:none;text-align:center;padding:30px">
+    <div style="font-size:48px;margin-bottom:12px">🧠</div>
+    <h3>لا توجد مسابقة الآن</h3>
+    <p style="color:var(--t2);font-size:13px;margin-top:8px">ترقّب المسابقة القادمة!</p>
+    <button class="mok" style="width:100%;margin-top:20px" onclick="closeOv('quizModal')">إغلاق</button>
+  </div>
+  <div id="qzStateAnswered" style="display:none;text-align:center;padding:24px">
+    <div style="font-size:48px;margin-bottom:12px" id="qzAnsIcon">✅</div>
+    <h3 id="qzAnsTitle">شاركت في المسابقة</h3>
+    <p style="color:var(--t2);font-size:13px;margin:10px 0" id="qzAnsBody">لقد أجبت مسبقاً على هذا السؤال.</p>
+    <div id="qzAnsResult" style="background:var(--bg2);border-radius:11px;padding:12px;margin:12px 0;font-size:13px"></div>
+    <button class="mok" style="width:100%;margin-top:10px" onclick="closeOv('quizModal')">إغلاق</button>
+  </div>
+  <div id="qzStateQuestion" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h3 style="margin:0;font-size:16px">🧠 مسابقة الأسئلة</h3>
+      <div id="qzPrizeBadge" style="background:linear-gradient(135deg,var(--pd),var(--p));color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700"></div>
+    </div>
+    <div id="qzDateRange" style="font-size:11px;color:var(--t3);margin-bottom:16px"></div>
+    <div style="background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:18px">
+      <div style="font-size:15px;font-weight:600;line-height:1.6" id="qzQText"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px" id="qzOptions"></div>
+    <div class="mrow" style="margin-top:0">
+      <button class="mcancel" onclick="closeOv('quizModal')">إلغاء</button>
+      <button class="mok" id="qzSubmitBtn" onclick="submitQuizAnswer()" disabled>تأكيد الإجابة ✓</button>
+    </div>
+  </div>
+  <div id="qzStateResult" style="display:none;text-align:center;padding:10px">
+    <div style="font-size:60px;margin-bottom:10px" id="qzResIcon">🎉</div>
+    <h3 id="qzResTitle" style="font-size:18px;margin-bottom:8px"></h3>
+    <p id="qzResBody" style="color:var(--t2);font-size:13px;line-height:1.7;margin-bottom:16px"></p>
+    <div id="qzResCorrect" style="background:var(--bg2);border-radius:11px;padding:12px;margin-bottom:14px;font-size:13px;text-align:right"></div>
+    <button class="mok" style="width:100%" onclick="closeOv('quizModal')">رائع! 👍</button>
+  </div>
+</div></div>
+
+<style>
+.qz-opt{background:var(--bg2);border:2px solid var(--brd);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:13px;font-weight:500;text-align:center;transition:all .2s;font-family:var(--ff);color:var(--txt);width:100%}
+.qz-opt:hover{border-color:var(--p);background:rgba(0,114,255,.08)}
+.qz-opt.selected{border-color:var(--p);background:rgba(0,114,255,.15);color:var(--p)}
+.qz-opt.correct{border-color:var(--ok)!important;background:rgba(0,214,143,.15)!important;color:var(--ok)!important}
+.qz-opt.wrong{border-color:var(--err)!important;background:rgba(255,61,113,.1)!important;color:var(--err)!important}
+</style>
+
+<script>
+// ════════════════════════════════════════════════════════
+// 🧠 QUIZ SYSTEM — مسابقة الأسئلة
+// الحماية: Device Fingerprint — كل جهاز يجيب مرة واحدة فقط
+// حتى لو أنشأ حسابات متعددة
+// ════════════════════════════════════════════════════════
+
+let _qzCurrentQ = null;  // السؤال الحالي
+let _qzSelected = null;  // الإجابة المختارة
+let _qzFp = null;        // بصمة الجهاز
+
+// ── فتح المسابقة ──
+async function openQuizModal() {
+  if(!S.user){ toast('سجّل دخولك أولاً','err'); return; }
+
+  // إعادة تعيين الحالات
+  _qzSelected = null;
+  _qzCurrentQ = null;
+
+  // إظهار حالة التحميل
+  _qzShowState('load');
+  openOv('quizModal');
+
+  try {
+    // جلب بصمة الجهاز
+    _qzFp = await getDeviceFingerprint();
+
+    // جلب السؤال النشط
+    const today = serverNow().toISOString().split('T')[0];
+    const snap = await col('quizQuestions')
+      .where('active','==',true)
+      .get().catch(()=>({docs:[]}));
+
+    // فلترة حسب التاريخ
+    const active = snap.docs
+      .map(d=>({fbId:d.id,...d.data()}))
+      .filter(q=>{
+        if(q.startDate && today < q.startDate) return false;
+        if(q.endDate   && today > q.endDate)   return false;
+        return true;
+      });
+
+    if(!active.length){ _qzShowState('none'); return; }
+
+    // خذ أول سؤال نشط
+    const q = active[0];
+    _qzCurrentQ = q;
+
+    // تحقق: هل هذا الجهاز أجاب على هذا السؤال؟
+    const fpAnsSnap = await col('quizAnswers')
+      .where('questionId','==', q.fbId)
+      .where('deviceFp','==', _qzFp)
+      .limit(1)
+      .get().catch(()=>({docs:[]}));
+
+    if(!fpAnsSnap.empty) {
+      // الجهاز أجاب مسبقاً
+      const prev = fpAnsSnap.docs[0].data();
+      _qzShowAnswered(q, prev);
+      return;
+    }
+
+    // عرض السؤال
+    _qzRenderQuestion(q);
+    _qzShowState('question');
+
+  } catch(e) {
+    toast('خطأ في تحميل المسابقة: '+e.message,'err');
+    closeOv('quizModal');
+  }
+}
+
+// ── عرض السؤال ──
+function _qzRenderQuestion(q) {
+  document.getElementById('qzQText').textContent = q.question || '';
+  const prize = (q.prize||0).toLocaleString();
+  document.getElementById('qzPrizeBadge').textContent = `🎁 ${prize} ${S.cfg?.currency||'ر.ي'}`;
+  const dr = document.getElementById('qzDateRange');
+  if(q.startDate||q.endDate) dr.textContent=`📅 ${q.startDate||''}  ➜  ${q.endDate||''}`;
+  else dr.textContent='';
+
+  const opts = document.getElementById('qzOptions');
+  const labels=['أ','ب','ج','د'];
+  const keys=['A','B','C','D'];
+  const options=[q.optA,q.optB,q.optC,q.optD];
+  opts.innerHTML = keys.map((k,i)=>`
+    <button class="qz-opt" id="qzOpt${k}" onclick="qzSelectOpt('${k}')">
+      <span style="font-weight:700;color:var(--p)">${labels[i]} —</span> ${options[i]||''}
+    </button>`).join('');
+
+  _qzSelected = null;
+  document.getElementById('qzSubmitBtn').disabled = true;
+}
+
+// ── اختيار إجابة ──
+function qzSelectOpt(key) {
+  _qzSelected = key;
+  ['A','B','C','D'].forEach(k=>{
+    const el=document.getElementById('qzOpt'+k);
+    if(el){ el.className='qz-opt'+(k===key?' selected':''); }
+  });
+  document.getElementById('qzSubmitBtn').disabled = false;
+}
+
+// ── إرسال الإجابة ──
+async function submitQuizAnswer() {
+  if(!_qzSelected || !_qzCurrentQ || !S.user) return;
+
+  const btn = document.getElementById('qzSubmitBtn');
+  btn.disabled = true; btn.textContent = '⏳ جاري الإرسال...';
+
+  const q = _qzCurrentQ;
+  const isCorrect = _qzSelected === q.correctAnswer;
+  const prize = isCorrect ? (q.prize||0) : 0;
+
+  // تأثير بصري على الأزرار
+  ['A','B','C','D'].forEach(k=>{
+    const el=document.getElementById('qzOpt'+k);
+    if(!el)return;
+    if(k===q.correctAnswer) el.className='qz-opt correct';
+    else if(k===_qzSelected && !isCorrect) el.className='qz-opt wrong';
+  });
+
+  try {
+    // حفظ الإجابة في Firebase مع بصمة الجهاز
+    await col('quizAnswers').add({
+      questionId: q.fbId,
+      userId: S.user.fbId,
+      username: S.user.name||S.user.username||'',
+      deviceFp: _qzFp,
+      selectedAnswer: _qzSelected,
+      correctAnswer: q.correctAnswer,
+      isCorrect,
+      prize,
+      date: serverDate(),
+      ts: serverNow().getTime(),
+      createdAt: TS()
+    });
+
+    // إضافة الجائزة للرصيد
+    if(isCorrect && prize > 0) {
+      const newBal = (S.user.balance||0) + prize;
+      await col('users').doc(S.user.fbId).update({ balance: newBal });
+      S.user.balance = newBal;
+      updateBal();
+      // إشعار
+      await pushNotif(S.user.fbId,'gift','🧠 فزت في المسابقة!',
+        `إجابة صحيحة! ربحت ${prize.toLocaleString()} ${S.cfg?.currency||'ر.ي'}`);
+    }
+
+    // انتظار ثانية للتأثير البصري ثم عرض النتيجة
+    await new Promise(r=>setTimeout(r,900));
+    _qzShowResult(q, isCorrect, prize);
+
+  } catch(e) {
+    btn.disabled=false; btn.textContent='تأكيد الإجابة ✓';
+    toast('خطأ: '+e.message,'err');
+  }
+}
+
+// ── عرض النتيجة ──
+function _qzShowResult(q, isCorrect, prize) {
+  const labels=['أ','ب','ج','د'];
+  const keys=['A','B','C','D'];
+  const options=[q.optA,q.optB,q.optC,q.optD];
+  const correctIdx = keys.indexOf(q.correctAnswer);
+  const correctText = options[correctIdx];
+  const correctLabel = labels[correctIdx];
+
+  document.getElementById('qzResIcon').textContent = isCorrect?'🎉':'😔';
+  document.getElementById('qzResTitle').textContent = isCorrect
+    ? (q.winMessage||'🎉 إجابة صحيحة! تهانينا!')
+    : '😔 إجابة خاطئة';
+  document.getElementById('qzResBody').textContent = isCorrect
+    ? `ربحت ${prize.toLocaleString()} ${S.cfg?.currency||'ر.ي'} تمت إضافتها لرصيدك فوراً!`
+    : 'حظ أوفر المرة القادمة — راجع الإجابة الصحيحة أدناه.';
+  document.getElementById('qzResCorrect').innerHTML=
+    `<div style="font-size:11px;color:var(--t2);margin-bottom:5px">الإجابة الصحيحة:</div>
+     <div style="font-weight:700;color:var(--ok)">${correctLabel} — ${correctText}</div>`;
+  _qzShowState('result');
+}
+
+// ── عرض حالة: أجاب مسبقاً ──
+function _qzShowAnswered(q, prev) {
+  const labels=['أ','ب','ج','د'];
+  const keys=['A','B','C','D'];
+  const options=[q.optA,q.optB,q.optC,q.optD];
+  const selIdx = keys.indexOf(prev.selectedAnswer);
+  const corrIdx = keys.indexOf(q.correctAnswer);
+
+  document.getElementById('qzAnsIcon').textContent = prev.isCorrect?'🏆':'📝';
+  document.getElementById('qzAnsTitle').textContent = 'شاركت في هذه المسابقة';
+  document.getElementById('qzAnsBody').textContent = 'جهازك أجاب مسبقاً — لا يمكن الإجابة مرتين.';
+  document.getElementById('qzAnsResult').innerHTML=
+    `<div style="margin-bottom:6px"><b>إجابتك:</b> <span style="color:${prev.isCorrect?'var(--ok)':'var(--err)'}">${labels[selIdx]||'؟'} — ${options[selIdx]||''}</span></div>
+     <div><b>الصحيحة:</b> <span style="color:var(--ok)">${labels[corrIdx]||'؟'} — ${options[corrIdx]||''}</span></div>
+     ${prev.isCorrect?`<div style="color:var(--ok);margin-top:8px;font-weight:700">🎁 فزت بـ ${(prev.prize||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}</div>`:''}`;
+  _qzShowState('answered');
+}
+
+// ── إظهار حالة معينة ──
+function _qzShowState(state) {
+  ['load','none','answered','question','result'].forEach(s=>{
+    const el=document.getElementById('qzState'+s.charAt(0).toUpperCase()+s.slice(1));
+    if(el) el.style.display = s===state?'block':'none';
+  });
+}
+
+// ════════════════════════════════════════════════════
+// 🧠 QUIZ ADMIN FUNCTIONS
+// ════════════════════════════════════════════════════
+
+async function addQuizQuestion() {
+  const q=$('qzQuestion')?.value.trim();
+  const a=$('qzOptA')?.value.trim(), b=$('qzOptB')?.value.trim();
+  const c=$('qzOptC')?.value.trim(), d=$('qzOptD')?.value.trim();
+  const correct=$('qzCorrect')?.value;
+  const prize=parseInt($('qzPrize')?.value)||0;
+  const startDate=$('qzStart')?.value||'';
+  const endDate=$('qzEnd')?.value||'';
+  const winMsg=$('qzWinMsg')?.value.trim()||'';
+
+  if(!q||!a||!b||!c||!d){toast('أكمل السؤال والخيارات الأربعة','err');return;}
+  if(!prize){toast('أدخل قيمة الجائزة','err');return;}
+
+  try {
+    await col('quizQuestions').add({
+      question:q, optA:a, optB:b, optC:c, optD:d,
+      correctAnswer:correct, prize, startDate, endDate,
+      winMessage:winMsg, active:true, createdAt:TS()
+    });
+    toast('✅ تمت إضافة السؤال','ok');
+    // مسح الحقول
+    ['qzQuestion','qzOptA','qzOptB','qzOptC','qzOptD','qzPrize','qzStart','qzEnd','qzWinMsg']
+      .forEach(id=>{const e=$(id);if(e)e.value='';});
+    loadQuizAdmin();
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+async function loadQuizAdmin() {
+  const list=$('qzAdminList');
+  const tbl=$('qzAnswersTable');
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;color:var(--t2);padding:20px">⏳</div>';
+
+  try {
+    // جلب الأسئلة
+    const qSnap = await col('quizQuestions').get().catch(()=>({docs:[]}));
+    const questions = qSnap.docs.map(d=>({fbId:d.id,...d.data()}));
+
+    // جلب الإجابات
+    const aSnap = await col('quizAnswers').get().catch(()=>({docs:[]}));
+    const answers = aSnap.docs.map(d=>({fbId:d.id,...d.data()}));
+
+    // إحصائيات
+    const sv=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+    sv('qzStQ', questions.length);
+    sv('qzStA', answers.filter(a=>a.isCorrect).length);
+    sv('qzStW', [...new Set(answers.filter(a=>a.isCorrect).map(a=>a.userId))].length);
+
+    if(!questions.length){
+      list.innerHTML='<p style="color:var(--t3);text-align:center;padding:20px">لا توجد أسئلة بعد</p>';
+    } else {
+      const today=serverNow().toISOString().split('T')[0];
+      const labels={A:'أ',B:'ب',C:'ج',D:'د'};
+      const optKey=(q,k)=>q['opt'+k]||'';
+      list.innerHTML = questions.map(q=>{
+        const qAnswers=answers.filter(a=>a.questionId===q.fbId);
+        const correct=qAnswers.filter(a=>a.isCorrect).length;
+        const isActive=q.active&&(!q.startDate||today>=q.startDate)&&(!q.endDate||today<=q.endDate);
+        return`<div style="background:var(--bg2);border:1px solid ${isActive?'rgba(0,214,143,.3)':'var(--brd)'};border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div style="flex:1">
+              <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+                <span class="badge ${isActive?'bg':'br'}">${isActive?'✅ نشط':'⏸ موقوف'}</span>
+                <span class="badge bb">🎁 ${(q.prize||0).toLocaleString()} ${S.cfg?.currency||'ر.ي'}</span>
+                <span class="badge ${correct?'bg':'bw'}">${correct} إجابة صحيحة / ${qAnswers.length} مشارك</span>
+              </div>
+              <div style="font-size:14px;font-weight:700;margin-bottom:8px">${q.question}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:12px">
+                ${['A','B','C','D'].map(k=>`<div style="padding:5px 8px;border-radius:7px;background:${k===q.correctAnswer?'rgba(0,214,143,.15)':'var(--bg3)'};border:1px solid ${k===q.correctAnswer?'rgba(0,214,143,.3)':'var(--brd)'}">
+                  <b style="color:var(--p)">${labels[k]}</b> ${optKey(q,k)} ${k===q.correctAnswer?'✓':''}
+                </div>`).join('')}
+              </div>
+              ${q.startDate||q.endDate?`<div style="font-size:11px;color:var(--t3);margin-top:6px">📅 ${q.startDate||''}  ➜  ${q.endDate||''}</div>`:''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+              <button class="b4" onclick="toggleQuizQ('${q.fbId}',${!q.active})">${q.active?'إيقاف':'تفعيل'}</button>
+              <button class="b3" onclick="delQuizQ('${q.fbId}')">حذف</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // عرض الإجابات
+    if(tbl){
+      if(!answers.length){
+        tbl.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t3)">لا توجد إجابات بعد</td></tr>';
+      } else {
+        const sorted=[...answers].sort((a,b)=>(b.ts||0)-(a.ts||0));
+        tbl.innerHTML=sorted.map((a,i)=>{
+          const q=questions.find(x=>x.fbId===a.questionId);
+          const labels2={A:'أ',B:'ب',C:'ج',D:'د'};
+          return`<tr>
+            <td>${i+1}</td>
+            <td style="font-weight:600">${a.username||'—'}</td>
+            <td style="font-size:11px;color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q?.question?.slice(0,40)||'—'}...</td>
+            <td><b style="color:var(--p)">${labels2[a.selectedAnswer]||'؟'}</b></td>
+            <td><span class="badge ${a.isCorrect?'bg':'br'}">${a.isCorrect?'✅ صحيحة':'❌ خاطئة'}</span></td>
+            <td style="color:${a.isCorrect?'var(--ok)':'var(--t3)'}">+${(a.prize||0).toLocaleString()}</td>
+            <td style="font-size:10px;color:var(--t3);direction:ltr">${(a.deviceFp||'').slice(0,8)}...</td>
+            <td style="font-size:11px;color:var(--t2)">${a.date||''}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+  } catch(e){
+    list.innerHTML=`<p style="color:var(--err);text-align:center">خطأ: ${e.message}</p>`;
+  }
+}
+
+async function toggleQuizQ(id, active){
+  try{
+    await col('quizQuestions').doc(id).update({active});
+    toast(active?'✅ تم تفعيل السؤال':'⏸ تم إيقاف السؤال', active?'ok':'ok');
+    loadQuizAdmin();
+  }catch(e){toast('خطأ: '+e.message,'err');}
+}
+async function delQuizQ(id){
+  if(!confirm('هل تريد حذف هذا السؤال وكل إجاباته؟'))return;
+  try{
+    await col('quizQuestions').doc(id).delete();
+    // حذف الإجابات المرتبطة
+    const aSnap=await col('quizAnswers').where('questionId','==',id).get().catch(()=>({docs:[]}));
+    for(const d of aSnap.docs) await d.ref.delete();
+    toast('✅ تم الحذف','ok');
+    loadQuizAdmin();
   }catch(e){toast('خطأ: '+e.message,'err');}
 }
 </script>
