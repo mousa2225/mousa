@@ -991,14 +991,66 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
       <!-- ───── تاب: نقاط الولاء ───── -->
       <div id="cTabPoints" style="display:none">
-        <div class="panel"><div class="ph"><h3>⭐ إعدادات الاستبدال</h3></div><div class="pb">
+
+        <!-- إعدادات الاستبدال -->
+        <div class="panel"><div class="ph"><h3>💱 إعدادات استبدال النقاط</h3></div><div class="pb">
           <div class="fr" style="margin-bottom:12px">
             <div><label class="fl">كل X نقطة تساوي</label><input class="inp" type="number" id="ptsPer" placeholder="100" style="max-width:130px"></div>
             <div><label class="fl">المبلغ بـ <span class="cur">ر.ي</span></label><input class="inp" type="number" id="ptsVal" placeholder="1" style="max-width:130px"></div>
           </div>
           <div style="margin-bottom:14px"><label class="fl">الحد الأدنى للاستبدال (نقاط)</label><input class="inp" type="number" id="ptsMin" placeholder="100" style="max-width:160px"></div>
-          <button class="b1" onclick="savePtsSettings()">💾 حفظ</button>
+          <button class="b1" onclick="savePtsSettings()">💾 حفظ إعدادات الاستبدال</button>
         </div></div>
+
+        <!-- ⭐ قواعد كسب النقاط من الشحن -->
+        <div class="panel"><div class="ph" style="background:rgba(0,214,143,.05)"><h3>💳 كسب نقاط من الشحن</h3></div><div class="pb">
+          <div style="background:rgba(0,198,255,.07);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--t2);margin-bottom:14px">
+            💡 المستخدم يكسب X نقطة عن كل شحن بمبلغ معين أو أكثر. اترك الحقل فارغاً للتعطيل.
+          </div>
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">عند شحن ≥ مبلغ (<span class="cur">ر.ي</span>)</label><input class="inp" type="number" id="ptsRcMin" placeholder="1000"></div>
+            <div><label class="fl">يحصل على نقاط</label><input class="inp" type="number" id="ptsRcAward" placeholder="10"></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="ptsRcRatio">
+              <span style="font-size:13px">احتساب تناسبي (مثلاً: شحن 5000 = 50 نقطة بدلاً من 10)</span>
+            </label>
+          </div>
+          <button class="b1" onclick="savePtsRcSettings()">💾 حفظ إعدادات الشحن</button>
+        </div></div>
+
+        <!-- 🛒 قواعد كسب النقاط من الشراء -->
+        <div class="panel"><div class="ph" style="background:rgba(255,107,53,.05)"><h3>🛒 كسب نقاط من الشراء</h3></div><div class="pb">
+          <div style="background:rgba(0,198,255,.07);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--t2);margin-bottom:14px">
+            💡 يمكنك تطبيق القاعدة على جميع الكروت أو فئات محددة فقط.
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="fl">يطبّق على</label>
+            <select class="sel" id="ptsBuyScope" onchange="document.getElementById('ptsBuyCatRow').style.display=this.value==='cats'?'':'none'">
+              <option value="all">جميع الكروت</option>
+              <option value="cats">فئات محددة فقط</option>
+              <option value="off">معطّل</option>
+            </select>
+          </div>
+          <div id="ptsBuyCatRow" style="display:none;margin-bottom:12px">
+            <label class="fl">اختر الفئات (يمكن اختيار أكثر من فئة)</label>
+            <div id="ptsBuyCatList" style="display:flex;flex-direction:column;gap:6px;background:var(--bg2);border-radius:10px;padding:10px;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div class="fr" style="margin-bottom:12px">
+            <div><label class="fl">عن كل شراء بقيمة ≥</label><input class="inp" type="number" id="ptsBuyMin" placeholder="500"></div>
+            <div><label class="fl">يحصل على نقاط</label><input class="inp" type="number" id="ptsBuyAward" placeholder="5"></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="ptsBuyRatio">
+              <span style="font-size:13px">احتساب تناسبي حسب سعر الكرت</span>
+            </label>
+          </div>
+          <button class="b1" onclick="savePtsBuySettings()">💾 حفظ إعدادات الشراء</button>
+        </div></div>
+
+        <!-- جدول نقاط المستخدمين -->
         <div class="panel"><div class="ph"><h3>👥 نقاط المستخدمين</h3></div>
           <div class="pb"><div class="tw">
             <table><thead><tr><th>#</th><th>المستخدم</th><th>النقاط</th><th>إجراء</th></tr></thead>
@@ -4343,13 +4395,28 @@ async function loadGiftCardsTable() {
     var sv = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
     sv('cstGift', avail);
     if(!cards.length){ tbl.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--t3)">لا توجد كروت</td></tr>'; return; }
+    var users = S.users || [];
+    var nameOf = function(uid){
+      var u = users.find(function(x){return x.fbId===uid;});
+      return u ? (u.name || u.username || 'مستخدم') : 'مستخدم';
+    };
+    // sort: used cards last
+    cards.sort(function(a,b){return (a.used?1:0) - (b.used?1:0);});
     tbl.innerHTML = cards.map(function(c,i){
+      var statusBadge;
+      if(c.used){
+        var uname = c.usedBy ? nameOf(c.usedBy) : 'مستخدم';
+        var dt = c.usedAt || '';
+        statusBadge = '<span class="badge br" title="'+dt+'">✅ '+uname+(dt?' — '+dt:'')+'</span>';
+      } else {
+        statusBadge = '<span class="badge bg">متاح</span>';
+      }
       return '<tr>'
         +'<td>'+(i+1)+'</td>'
         +'<td style="direction:ltr;letter-spacing:1px;font-weight:600">'+(c.code||'—')+'</td>'
         +'<td>'+(c.category||'—')+'</td>'
         +'<td style="color:var(--ok)">'+(c.value||0).toLocaleString()+'</td>'
-        +'<td><span class="badge '+(c.used?'br':'bg')+'">'+(c.used?('✅ '+c.usedBy):'متاح')+'</span></td>'
+        +'<td>'+statusBadge+'</td>'
         +'<td>'+(c.used?'':'<button class="b3" onclick="deleteGiftCard(\''+c.fbId+'\')">🗑️</button>')+'</td>'
         +'</tr>';
     }).join('');
@@ -4378,6 +4445,146 @@ async function loadPtsSettings() {
   var per=S.cfg.ptsPerUnit||100, val=S.cfg.ptsUnitValue||1, min=S.cfg.ptsMinRedeem||100;
   var e1=document.getElementById('ptsPer'),e2=document.getElementById('ptsVal'),e3=document.getElementById('ptsMin');
   if(e1)e1.value=per; if(e2)e2.value=val; if(e3)e3.value=min;
+  // قواعد الشحن
+  var rcMin = document.getElementById('ptsRcMin'); if(rcMin) rcMin.value = S.cfg.ptsRcMin||'';
+  var rcAw  = document.getElementById('ptsRcAward'); if(rcAw) rcAw.value = S.cfg.ptsRcAward||'';
+  var rcRt  = document.getElementById('ptsRcRatio'); if(rcRt) rcRt.checked = !!S.cfg.ptsRcRatio;
+  // قواعد الشراء
+  var buyScope = document.getElementById('ptsBuyScope'); if(buyScope) buyScope.value = S.cfg.ptsBuyScope||'all';
+  var buyMin   = document.getElementById('ptsBuyMin');   if(buyMin)   buyMin.value   = S.cfg.ptsBuyMin||'';
+  var buyAw    = document.getElementById('ptsBuyAward'); if(buyAw)    buyAw.value    = S.cfg.ptsBuyAward||'';
+  var buyRt    = document.getElementById('ptsBuyRatio'); if(buyRt)    buyRt.checked  = !!S.cfg.ptsBuyRatio;
+  // قائمة الفئات
+  renderPtsBuyCats();
+  if(buyScope && buyScope.value === 'cats'){
+    var row = document.getElementById('ptsBuyCatRow');
+    if(row) row.style.display = '';
+  }
+}
+
+function renderPtsBuyCats(){
+  var list = document.getElementById('ptsBuyCatList');
+  if(!list) return;
+  var cats = S.cats || [];
+  var selectedCats = S.cfg.ptsBuyCats || [];
+  if(!cats.length){ list.innerHTML='<div style="color:var(--t3);font-size:12px;text-align:center;padding:6px">لا توجد فئات</div>'; return; }
+  list.innerHTML = cats.map(function(c){
+    var checked = selectedCats.indexOf(c.fbId) >= 0 ? 'checked' : '';
+    return '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:4px">'
+      +'<input type="checkbox" data-cat="'+c.fbId+'" '+checked+' class="ptsBuyCatCb">'
+      +'<span>'+(c.name||'فئة')+' — '+(c.price||0).toLocaleString()+'</span></label>';
+  }).join('');
+}
+
+async function savePtsRcSettings(){
+  var rcMin = parseInt(document.getElementById('ptsRcMin').value);
+  var rcAw  = parseInt(document.getElementById('ptsRcAward').value);
+  var rcRt  = document.getElementById('ptsRcRatio').checked;
+  var data = {};
+  if(!isNaN(rcMin) && !isNaN(rcAw) && rcMin>0 && rcAw>0){
+    data.ptsRcMin = rcMin; data.ptsRcAward = rcAw; data.ptsRcRatio = rcRt;
+  } else {
+    data.ptsRcMin = 0; data.ptsRcAward = 0; data.ptsRcRatio = false;
+  }
+  try {
+    await doc('settings','main').set(data, {merge:true});
+    Object.assign(S.cfg, data);
+    toast('✅ تم حفظ إعدادات الشحن','ok');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+async function savePtsBuySettings(){
+  var scope = document.getElementById('ptsBuyScope').value;
+  var buyMin = parseInt(document.getElementById('ptsBuyMin').value)||0;
+  var buyAw  = parseInt(document.getElementById('ptsBuyAward').value)||0;
+  var buyRt  = document.getElementById('ptsBuyRatio').checked;
+  var selCats = [];
+  document.querySelectorAll('.ptsBuyCatCb').forEach(function(cb){
+    if(cb.checked) selCats.push(cb.getAttribute('data-cat'));
+  });
+  var data = {
+    ptsBuyScope: scope,
+    ptsBuyMin: buyMin,
+    ptsBuyAward: buyAw,
+    ptsBuyRatio: buyRt,
+    ptsBuyCats: selCats
+  };
+  try {
+    await doc('settings','main').set(data, {merge:true});
+    Object.assign(S.cfg, data);
+    toast('✅ تم حفظ إعدادات الشراء','ok');
+  } catch(e){ toast('خطأ: '+e.message,'err'); }
+}
+
+// ════════════════════════════════════════════
+// 🎯 دالة منح نقاط الولاء التلقائية
+// تُستدعى من approveRc و buyCard
+// ════════════════════════════════════════════
+async function _awardLoyaltyPoints(uid, source, amount, catId) {
+  if(!uid) return 0;
+  var cfg = S.cfg || {};
+
+  var earned = 0;
+
+  if(source === 'recharge') {
+    var rcMin = parseInt(cfg.ptsRcMin)||0;
+    var rcAw  = parseInt(cfg.ptsRcAward)||0;
+    if(rcMin > 0 && rcAw > 0 && amount >= rcMin) {
+      if(cfg.ptsRcRatio){
+        // تناسبي: لو رقم الحد 1000 وعدد النقاط 10 → كل 1000 = 10
+        earned = Math.floor(amount / rcMin) * rcAw;
+      } else {
+        earned = rcAw;
+      }
+    }
+  }
+
+  if(source === 'purchase') {
+    if(cfg.ptsBuyScope === 'off') return 0;
+    var buyMin = parseInt(cfg.ptsBuyMin)||0;
+    var buyAw  = parseInt(cfg.ptsBuyAward)||0;
+    if(buyMin <= 0 || buyAw <= 0) return 0;
+    // فلترة الفئات
+    if(cfg.ptsBuyScope === 'cats') {
+      var selCats = cfg.ptsBuyCats || [];
+      if(selCats.indexOf(catId) < 0) return 0;
+    }
+    if(amount >= buyMin) {
+      if(cfg.ptsBuyRatio){
+        earned = Math.floor(amount / buyMin) * buyAw;
+      } else {
+        earned = buyAw;
+      }
+    }
+  }
+
+  if(earned <= 0) return 0;
+
+  try {
+    var uRef = col('users').doc(uid);
+    var uSnap = await uRef.get();
+    if(!uSnap.exists) return 0;
+    var prevPts = uSnap.data().loyaltyPoints || 0;
+    var newPts = prevPts + earned;
+    await uRef.update({ loyaltyPoints: newPts });
+    // تحديث الـ state المحلي
+    if(S.user && S.user.fbId === uid) {
+      S.user.loyaltyPoints = newPts;
+      if(typeof updateLoyaltyDisp === 'function') updateLoyaltyDisp();
+    }
+    var lu = (S.users||[]).find(function(x){return x.fbId===uid;});
+    if(lu) lu.loyaltyPoints = newPts;
+    // إشعار
+    if(typeof pushNotif === 'function') {
+      var srcLabel = source === 'recharge' ? 'الشحن' : 'الشراء';
+      await pushNotif(uid, 'gift', '⭐ نقاط ولاء جديدة!',
+        'حصلت على ' + earned + ' نقطة من ' + srcLabel + ' — رصيد نقاطك الآن: ' + newPts);
+    }
+    return earned;
+  } catch(e) {
+    console.error('award points:', e);
+    return 0;
+  }
 }
 async function loadPtsTable() {
   var tbl = document.getElementById('ptsTable');
@@ -4420,9 +4627,10 @@ async function loadUserContests() {
   var loyaltyCard = document.getElementById('loyaltyCard');
   if(!grid) return;
 
-  // نقاط الولاء
-  var myPts = S.user&&S.user.loyaltyPoints||0;
-  if(myPts > 0 && loyaltyCard) {
+  // نقاط الولاء — أظهر دائماً إذا كان النظام مفعّلاً
+  var myPts = (S.user && S.user.loyaltyPoints) || 0;
+  var ptsEnabled = !!(S.cfg && (S.cfg.ptsRcAward > 0 || S.cfg.ptsBuyAward > 0 || S.cfg.ptsPerUnit));
+  if((myPts > 0 || ptsEnabled) && loyaltyCard) {
     loyaltyCard.style.display='';
     var disp=document.getElementById('userPointsDisp');
     if(disp) disp.textContent=myPts.toLocaleString();
@@ -4507,7 +4715,6 @@ async function openQuizContest(contestId) {
 var _origSubmitQuiz = window.submitQuizAnswer;
 window.submitQuizAnswer = async function() {
   if(_ctActiveContest) {
-    // Use new contest system
     if(!_qzSelected||!_ctActiveContest||!S.user) return;
     var btn=document.getElementById('qzSubmitBtn');
     btn.disabled=true; btn.textContent='⏳';
@@ -4521,52 +4728,219 @@ window.submitQuizAnswer = async function() {
     });
     try {
       var fp=await getDeviceFingerprint();
-      var prizeAmt = isCorrect?(c.prize||0):0;
-      var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:fp,type:c.type,selectedAnswer:_qzSelected,correctAnswer:c.correctAnswer,isCorrect,won:isCorrect,prizeType:c.prizeType,prizeAmt:isCorrect?prizeAmt:0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
-      await col('contestEntries').add(entry);
-      if(isCorrect) await _grantPrize(c, entry);
+      var entry={
+        contestId:c.fbId, userId:S.user.fbId,
+        username:S.user.name||S.user.username||'',
+        deviceFp:fp, type:c.type,
+        selectedAnswer:_qzSelected, correctAnswer:c.correctAnswer,
+        isCorrect, won:isCorrect,
+        prizeType:c.prizeType,
+        prizeAmt: 0,
+        date:serverDate(), ts:serverNow().getTime(), createdAt:TS()
+      };
+      var entryRef = await col('contestEntries').add(entry);
+      var grant = { success:false };
+      if(isCorrect){
+        grant = await _grantPrize(c, Object.assign({}, entry));
+        // تحديث الـ entry
+        var upd = {};
+        if(c.prizeType==='balance' && grant.success) upd.prizeAmt = grant.prizeAmt;
+        if(c.prizeType==='points'  && grant.success) upd.prizeAmt = grant.prizePoints;
+        if(c.prizeType==='gift_card' && grant.success){ upd.giftCode = grant.giftCode; upd.giftValue = grant.giftValue; }
+        if(c.prizeType==='gift_card' && !grant.success) upd.giftDeliveryFailed = true;
+        if(Object.keys(upd).length) await entryRef.update(upd);
+      }
       await new Promise(function(r){setTimeout(r,700);});
-      _qzShowResult(c,isCorrect,prizeAmt);
+      _qzShowResultRich(c, isCorrect, grant);
     } catch(e){ btn.disabled=false; btn.textContent='تأكيد الإجابة ✓'; toast('خطأ: '+e.message,'err'); }
   } else if(_origSubmitQuiz) {
     return _origSubmitQuiz();
   }
 };
 
-// ── منح الجائزة ──
-async function _grantPrize(contest, entry) {
-  if(!entry.won) return;
-  var uid = entry.userId;
-  if(contest.prizeType==='balance') {
-    var newBal=(S.user.balance||0)+(contest.prize||0);
-    await col('users').doc(uid).update({balance:newBal});
-    S.user.balance=newBal; updateBal();
-    await pushNotif(uid,'gift','🏆 فزت في مسابقة!',contest.winMessage||(contest.name+': ربحت '+(contest.prize||0).toLocaleString()+' '+(S.cfg.currency||'ر.ي')));
-  } else if(contest.prizeType==='points') {
-    var newPts=(S.user.loyaltyPoints||0)+(contest.prize||0);
-    await col('users').doc(uid).update({loyaltyPoints:newPts});
-    S.user.loyaltyPoints=newPts; updateLoyaltyDisp();
-    await pushNotif(uid,'gift','🏆 فزت في مسابقة!',contest.winMessage||(contest.name+': ربحت '+(contest.prize||0)+' نقطة ولاء'));
-  } else if(contest.prizeType==='gift_card') {
-    // سحب كرت هدية من المخزون
-    var gcSnap=await col('giftCards').where('category','==',contest.giftCategory).where('used','==',false).limit(1).get().catch(function(){return{docs:[]};});
-    if(!gcSnap.empty) {
-      var gc=gcSnap.docs[0];
-      await gc.ref.update({used:true,usedBy:uid,usedAt:serverDate()});
-      // تحديث الـ entry بالكود
-      await col('contestEntries').where('contestId','==',contest.fbId).where('userId','==',uid).limit(1).get()
-        .then(function(s){ if(!s.empty) return s.docs[0].ref.update({giftCode:gc.data().code}); }).catch(function(){});
-      await pushNotif(uid,'gift','🎫 كرت هدية!', contest.winMessage||(contest.name+': كرت الهدية: '+gc.data().code));
+// ── عرض نتيجة غنية تعرض كرت الهدية إن وجد ──
+function _qzShowResultRich(c, isCorrect, grant){
+  var labels=['أ','ب','ج','د'], keys=['A','B','C','D'];
+  var options=[c.optA,c.optB,c.optC,c.optD];
+  var corrIdx=keys.indexOf(c.correctAnswer);
+  var cur=(S.cfg && S.cfg.currency)||'ر.ي';
+
+  document.getElementById('qzResIcon').textContent = isCorrect?'🎉':'😔';
+  document.getElementById('qzResTitle').textContent = isCorrect
+    ? (c.winMessage||'🎉 إجابة صحيحة! تهانينا!')
+    : '😔 إجابة خاطئة';
+
+  var bodyTxt = '';
+  var corrHtml = '<div style="font-size:11px;color:var(--t2);margin-bottom:5px">الإجابة الصحيحة:</div>'
+    +'<div style="font-weight:700;color:var(--ok)">'+labels[corrIdx]+' — '+options[corrIdx]+'</div>';
+
+  if(isCorrect){
+    if(c.prizeType==='balance' && grant.success){
+      bodyTxt = 'ربحت ' + grant.prizeAmt.toLocaleString() + ' ' + cur + ' — تمت إضافتها لرصيدك فوراً!';
+    } else if(c.prizeType==='points' && grant.success){
+      bodyTxt = 'ربحت ⭐ ' + grant.prizePoints.toLocaleString() + ' نقطة ولاء — يمكنك استبدالها برصيد!';
+    } else if(c.prizeType==='gift_card' && grant.success){
+      bodyTxt = '🎫 ربحت كرت هدية!';
+      corrHtml += '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--brd)">'
+        +'<div style="font-size:11px;color:var(--t2);margin-bottom:4px">🎫 كرت الهدية:</div>'
+        +'<div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--p);direction:ltr;letter-spacing:2px;background:var(--bg2);padding:8px;border-radius:8px;cursor:pointer" onclick="copyText(\''+grant.giftCode+'\')">'+grant.giftCode+'</div>'
+        +'<div style="font-size:11px;color:var(--t3);margin-top:4px">اضغط للنسخ — موجود في سجل المشتريات أيضاً</div>'
+        +'</div>';
+    } else if(c.prizeType==='gift_card' && !grant.success){
+      bodyTxt = '⚠️ فزت بكرت هدية لكن المخزون نفد — سيتم التواصل معك من الإدارة قريباً.';
+    } else {
+      bodyTxt = 'إجابة صحيحة! 🎉';
     }
+  } else {
+    bodyTxt = 'حظ أوفر المرة القادمة — راجع الإجابة الصحيحة أدناه.';
   }
+  document.getElementById('qzResBody').textContent = bodyTxt;
+  document.getElementById('qzResCorrect').innerHTML = corrHtml;
+  _qzShowState('result');
+}
+
+// ── منح الجائزة بشكل آمن وموثوق ──
+// returns: { success: bool, giftCode?, message? }
+async function _grantPrize(contest, entry) {
+  if(!entry || !entry.won) return { success:false };
+  var uid = entry.userId;
+  if(!uid) return { success:false };
+
+  var cur = (S.cfg && S.cfg.currency) || 'ر.ي';
+
+  try {
+    if(contest.prizeType === 'balance') {
+      var amt = parseInt(contest.prize) || 0;
+      if(amt <= 0) return { success:false };
+      // Read latest user, write atomically
+      var uRef = col('users').doc(uid);
+      var uSnap = await uRef.get();
+      if(!uSnap.exists) return { success:false };
+      var uData = uSnap.data();
+      var prevBal = uData.balance || 0;
+      var newBal = prevBal + amt;
+      var prevRcs = uData.manualRecharges || [];
+      // أضف عملية الجائزة لسجل الشحن
+      var rcEntry = {
+        amount: amt,
+        date: serverDate(),
+        note: '🏆 جائزة مسابقة: ' + (contest.name || ''),
+        type: 'add',
+        contestId: contest.fbId,
+        ts: serverNow().getTime()
+      };
+      await uRef.update({
+        balance: newBal,
+        manualRecharges: prevRcs.concat([rcEntry])
+      });
+      // تحديث الـ state المحلي
+      if(S.user && S.user.fbId === uid) {
+        S.user.balance = newBal;
+        S.user.manualRecharges = (S.user.manualRecharges||[]).concat([rcEntry]);
+        if(typeof updateBal === 'function') updateBal();
+      }
+      var lu = (S.users||[]).find(function(x){return x.fbId===uid;});
+      if(lu){ lu.balance = newBal; lu.manualRecharges = prevRcs.concat([rcEntry]); }
+      // إشعار
+      if(typeof pushNotif === 'function') {
+        await pushNotif(uid,'gift','🏆 ' + (contest.name||'فزت في مسابقة!'),
+          (contest.winMessage || ('ربحت ' + amt.toLocaleString() + ' ' + cur + ' — تمت إضافة المبلغ لرصيدك')));
+      }
+      return { success:true, prizeAmt:amt };
+    }
+
+    if(contest.prizeType === 'points') {
+      var pts = parseInt(contest.prize) || 0;
+      if(pts <= 0) return { success:false };
+      var uRef2 = col('users').doc(uid);
+      var uSnap2 = await uRef2.get();
+      if(!uSnap2.exists) return { success:false };
+      var prevPts = uSnap2.data().loyaltyPoints || 0;
+      var newPts = prevPts + pts;
+      await uRef2.update({ loyaltyPoints: newPts });
+      if(S.user && S.user.fbId === uid) {
+        S.user.loyaltyPoints = newPts;
+        updateLoyaltyDisp();
+      }
+      var lu2 = (S.users||[]).find(function(x){return x.fbId===uid;});
+      if(lu2) lu2.loyaltyPoints = newPts;
+      if(typeof pushNotif === 'function') {
+        await pushNotif(uid,'gift','⭐ ' + (contest.name||'فزت بنقاط ولاء!'),
+          (contest.winMessage || ('ربحت ' + pts.toLocaleString() + ' نقطة ولاء')));
+      }
+      return { success:true, prizePoints:pts };
+    }
+
+    if(contest.prizeType === 'gift_card') {
+      // ابحث عن كرت متاح في الفئة المحددة
+      var gcSnap = await col('giftCards')
+        .where('category','==', contest.giftCategory||'')
+        .where('used','==', false)
+        .limit(1).get();
+      if(gcSnap.empty) {
+        // ما في كرت متاح — أرسل إشعار للأدمن وللمستخدم
+        if(typeof pushNotif === 'function') {
+          await pushNotif(uid,'gift','⚠️ '+(contest.name||'فزت في مسابقة!'),
+            'فزت بكرت هدية لكن المخزون نفد حالياً — سيتم التواصل معك قريباً من الإدارة.');
+        }
+        return { success:false, message:'مخزون كروت الهدايا نفد' };
+      }
+      var gcDoc = gcSnap.docs[0];
+      var gcData = gcDoc.data();
+      // علّم الكرت كمستخدم
+      await gcDoc.ref.update({
+        used: true,
+        usedBy: uid,
+        usedAt: serverDate(),
+        usedTs: serverNow().getTime(),
+        contestId: contest.fbId
+      });
+      // أضف الكرت لكروت المستخدم (يطلع في سجل الشراء)
+      var uRef3 = col('users').doc(uid);
+      var uSnap3 = await uRef3.get();
+      if(uSnap3.exists){
+        var prevCards = uSnap3.data().cards || [];
+        var newCard = {
+          code: gcData.code,
+          cat: 'gift_card',
+          catName: '🎁 ' + (gcData.category||'كرت هدية') + ' — جائزة',
+          price: 0,
+          date: serverDate(),
+          offerNote: '🏆 جائزة مسابقة: ' + (contest.name || ''),
+          isFree: true,
+          isPrize: true,
+          contestId: contest.fbId,
+          giftValue: gcData.value || 0
+        };
+        await uRef3.update({ cards: prevCards.concat([newCard]) });
+        if(S.user && S.user.fbId === uid) {
+          S.user.cards = (S.user.cards||[]).concat([newCard]);
+          if(typeof renderHist === 'function') renderHist();
+        }
+      }
+      if(typeof pushNotif === 'function') {
+        await pushNotif(uid,'gift','🎫 ' + (contest.name||'فزت بكرت هدية!'),
+          (contest.winMessage || 'كرت الهدية: ' + gcData.code));
+      }
+      return { success:true, giftCode: gcData.code, giftCategory: gcData.category, giftValue: gcData.value };
+    }
+
+  } catch(e) {
+    console.error('grantPrize error:', e);
+    return { success:false, message: e.message };
+  }
+  return { success:false };
 }
 
 function updateLoyaltyDisp() {
-  var pts = S.user&&S.user.loyaltyPoints||0;
+  var pts = (S.user && S.user.loyaltyPoints) || 0;
   var disp=document.getElementById('userPointsDisp');
   if(disp) disp.textContent=pts.toLocaleString();
   var lc=document.getElementById('loyaltyCard');
-  if(lc) lc.style.display=pts>0?'':'none';
+  // أظهر البطاقة دائماً لو في إعدادات نقاط مفعّلة، أو إذا كان للمستخدم نقاط
+  var hasPoints = pts > 0;
+  var ptsEnabled = !!(S.cfg && (S.cfg.ptsRcAward > 0 || S.cfg.ptsBuyAward > 0 || S.cfg.ptsPerUnit));
+  if(lc) lc.style.display = (hasPoints || ptsEnabled) ? '' : 'none';
 }
 
 // ════════════════════════════════════════
@@ -4685,15 +5059,57 @@ async function doSpin() {
 async function afterSpin(won) {
   var c=_spinCtx.c;
   try {
-    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_spinCtx.fp,type:'spin_wheel',won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
-    await col('contestEntries').add(entry);
+    var entry={
+      contestId:c.fbId, userId:S.user.fbId,
+      username:S.user.name||S.user.username||'',
+      deviceFp:_spinCtx.fp, type:'spin_wheel',
+      won, prizeType:c.prizeType,
+      prizeAmt:0, date:serverDate(),
+      ts:serverNow().getTime(), createdAt:TS()
+    };
+    var entryRef = await col('contestEntries').add(entry);
     _spinCtx.spinsLeft--;
-    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
-    var cur=S.cfg&&S.cfg.currency||'ر.ي';
-    var prizeLabel=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
-    document.getElementById('spinResIcon').textContent=won?'🎉':'😔';
-    document.getElementById('spinResTitle').textContent=won?'🎊 تهانينا! فزت!':'لم تحالفك الحظ هذه المرة';
-    document.getElementById('spinResBody').textContent=won?('🎁 جائزتك: '+prizeLabel+' تمت إضافتها لحسابك!'):'حظاً موفقاً في الدوران القادم!';
+    var grant = { success:false };
+    if(won){
+      grant = await _grantPrize(c, Object.assign({}, entry));
+      var upd = {};
+      if(c.prizeType==='balance' && grant.success) upd.prizeAmt = grant.prizeAmt;
+      if(c.prizeType==='points'  && grant.success) upd.prizeAmt = grant.prizePoints;
+      if(c.prizeType==='gift_card' && grant.success){ upd.giftCode = grant.giftCode; upd.giftValue = grant.giftValue; }
+      if(c.prizeType==='gift_card' && !grant.success) upd.giftDeliveryFailed = true;
+      if(Object.keys(upd).length) await entryRef.update(upd);
+    }
+    var cur=(S.cfg && S.cfg.currency)||'ر.ي';
+    var icon = document.getElementById('spinResIcon');
+    var title = document.getElementById('spinResTitle');
+    var body = document.getElementById('spinResBody');
+    if(won){
+      if(c.prizeType==='balance' && grant.success){
+        icon.textContent = '🎉';
+        title.textContent = '🎊 تهانينا! فزت!';
+        body.innerHTML = '🎁 ربحت <b style="color:var(--ok)">'+grant.prizeAmt.toLocaleString()+' '+cur+'</b> — تمت إضافتها لرصيدك!';
+      } else if(c.prizeType==='points' && grant.success){
+        icon.textContent = '⭐';
+        title.textContent = '🎊 ربحت نقاط!';
+        body.innerHTML = 'ربحت <b style="color:#c084fc">'+grant.prizePoints.toLocaleString()+' نقطة ولاء</b>';
+      } else if(c.prizeType==='gift_card' && grant.success){
+        icon.textContent = '🎫';
+        title.textContent = '🎊 ربحت كرت هدية!';
+        body.innerHTML = '<div style="margin-bottom:8px">🎁 كرت الهدية:</div>'
+          +'<div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--p);direction:ltr;letter-spacing:2px;background:var(--bg2);padding:10px;border-radius:8px;cursor:pointer" onclick="copyText(\''+grant.giftCode+'\')">'+grant.giftCode+'</div>'
+          +'<div style="font-size:11px;color:var(--t3);margin-top:6px">اضغط للنسخ — موجود في سجل المشتريات</div>';
+      } else if(c.prizeType==='gift_card' && !grant.success){
+        icon.textContent = '⚠️';
+        title.textContent = 'فزت!';
+        body.textContent = 'فزت بكرت هدية لكن المخزون نفد — سيتم التواصل معك قريباً';
+      } else {
+        icon.textContent = '🎉'; title.textContent = 'فزت!'; body.textContent = 'تم استلام الجائزة';
+      }
+    } else {
+      icon.textContent = '😔';
+      title.textContent = 'لم تحالفك الحظ هذه المرة';
+      body.textContent = 'حظاً موفقاً في الدوران القادم!';
+    }
     _spinShowState('result');
   } catch(e){ toast('خطأ: '+e.message,'err'); }
 }
@@ -4744,14 +5160,49 @@ async function submitHiddenCode() {
   var c=_codeCtx.c;
   var won=input===((c.hiddenCode||'').toUpperCase());
   try {
-    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_codeCtx.fp,type:'hidden_code',enteredCode:input,won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
-    await col('contestEntries').add(entry);
-    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
-    var cur=S.cfg&&S.cfg.currency||'ر.ي';
-    var prizeLabel=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
-    document.getElementById('codeResIcon').textContent=won?'🎉':'❌';
-    document.getElementById('codeResTitle').textContent=won?'🎊 كود صحيح! تهانينا!':'كود خاطئ';
-    document.getElementById('codeResBody').textContent=won?'جائزتك: '+prizeLabel+' تمت إضافتها!':'الكود الذي أدخلته غير صحيح.';
+    var entry={
+      contestId:c.fbId, userId:S.user.fbId,
+      username:S.user.name||S.user.username||'',
+      deviceFp:_codeCtx.fp, type:'hidden_code',
+      enteredCode:input, won, prizeType:c.prizeType,
+      prizeAmt:0, date:serverDate(),
+      ts:serverNow().getTime(), createdAt:TS()
+    };
+    var entryRef = await col('contestEntries').add(entry);
+    var grant = { success:false };
+    if(won){
+      grant = await _grantPrize(c, Object.assign({}, entry));
+      var upd = {};
+      if(c.prizeType==='balance' && grant.success) upd.prizeAmt = grant.prizeAmt;
+      if(c.prizeType==='points'  && grant.success) upd.prizeAmt = grant.prizePoints;
+      if(c.prizeType==='gift_card' && grant.success){ upd.giftCode = grant.giftCode; upd.giftValue = grant.giftValue; }
+      if(c.prizeType==='gift_card' && !grant.success) upd.giftDeliveryFailed = true;
+      if(Object.keys(upd).length) await entryRef.update(upd);
+    }
+    var cur=(S.cfg && S.cfg.currency)||'ر.ي';
+    var icon = document.getElementById('codeResIcon');
+    var title = document.getElementById('codeResTitle');
+    var body = document.getElementById('codeResBody');
+    if(won){
+      if(c.prizeType==='balance' && grant.success){
+        icon.textContent='🎉'; title.textContent='🎊 كود صحيح! فزت!';
+        body.innerHTML = '🎁 ربحت <b style="color:var(--ok)">'+grant.prizeAmt.toLocaleString()+' '+cur+'</b> — تمت إضافتها لرصيدك!';
+      } else if(c.prizeType==='points' && grant.success){
+        icon.textContent='⭐'; title.textContent='🎊 ربحت نقاط!';
+        body.innerHTML = 'ربحت <b style="color:#c084fc">'+grant.prizePoints.toLocaleString()+' نقطة ولاء</b>';
+      } else if(c.prizeType==='gift_card' && grant.success){
+        icon.textContent='🎫'; title.textContent='🎊 ربحت كرت هدية!';
+        body.innerHTML = '<div style="margin-bottom:8px">🎁 كرت الهدية:</div>'
+          +'<div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--p);direction:ltr;letter-spacing:2px;background:var(--bg2);padding:10px;border-radius:8px;cursor:pointer" onclick="copyText(\''+grant.giftCode+'\')">'+grant.giftCode+'</div>'
+          +'<div style="font-size:11px;color:var(--t3);margin-top:6px">اضغط للنسخ — موجود في سجل المشتريات</div>';
+      } else if(c.prizeType==='gift_card' && !grant.success){
+        icon.textContent='⚠️'; title.textContent='فزت!';
+        body.textContent='فزت بكرت هدية لكن المخزون نفد — سيتم التواصل معك قريباً';
+      }
+    } else {
+      icon.textContent='❌'; title.textContent='كود خاطئ';
+      body.textContent='الكود الذي أدخلته غير صحيح.';
+    }
     document.getElementById('codeStateMain').style.display='none';
     document.getElementById('codeStateResult').style.display='';
   } catch(e){ toast('خطأ: '+e.message,'err'); }
@@ -4872,14 +5323,50 @@ async function doDailyLucky() {
   var c=_dailyCtx.c;
   var won=Math.random()*100<(c.winPercent||30);
   try {
-    var entry={contestId:c.fbId,userId:S.user.fbId,username:S.user.name||S.user.username||'',deviceFp:_dailyCtx.fp,type:'daily_lucky',won,prizeType:c.prizeType,prizeAmt:won?(c.prize||0):0,date:serverDate(),ts:serverNow().getTime(),createdAt:TS()};
-    await col('contestEntries').add(entry);
-    if(won) await _grantPrize(c,Object.assign({userId:S.user.fbId},entry));
-    var cur=S.cfg&&S.cfg.currency||'ر.ي';
-    var pl=c.prizeType==='points'?(c.prize+' نقطة'): c.prizeType==='gift_card'?'كرت هدية':((c.prize||0).toLocaleString()+' '+cur);
-    document.getElementById('dailyResIcon').textContent=won?'🎉':'😔';
-    document.getElementById('dailyResTitle').textContent=won?'تهانينا! فزت اليوم!':'لم يحالفك الحظ اليوم';
-    document.getElementById('dailyResBody').textContent=won?'🎁 جائزتك: '+pl+' تمت إضافتها!':'عد غداً لفرصة جديدة — الحظ معك!';
+    var entry={
+      contestId:c.fbId, userId:S.user.fbId,
+      username:S.user.name||S.user.username||'',
+      deviceFp:_dailyCtx.fp, type:'daily_lucky',
+      won, prizeType:c.prizeType, prizeAmt:0,
+      date:serverDate(), ts:serverNow().getTime(), createdAt:TS()
+    };
+    var entryRef = await col('contestEntries').add(entry);
+    var grant = { success:false };
+    if(won){
+      grant = await _grantPrize(c, Object.assign({}, entry));
+      var upd = {};
+      if(c.prizeType==='balance' && grant.success) upd.prizeAmt = grant.prizeAmt;
+      if(c.prizeType==='points'  && grant.success) upd.prizeAmt = grant.prizePoints;
+      if(c.prizeType==='gift_card' && grant.success){ upd.giftCode = grant.giftCode; upd.giftValue = grant.giftValue; }
+      if(c.prizeType==='gift_card' && !grant.success) upd.giftDeliveryFailed = true;
+      if(Object.keys(upd).length) await entryRef.update(upd);
+    }
+    var cur=(S.cfg && S.cfg.currency)||'ر.ي';
+    var icon = document.getElementById('dailyResIcon');
+    var title = document.getElementById('dailyResTitle');
+    var body = document.getElementById('dailyResBody');
+    if(won){
+      if(c.prizeType==='balance' && grant.success){
+        icon.textContent='🎉'; title.textContent='تهانينا! فزت اليوم!';
+        body.innerHTML = '🎁 ربحت <b style="color:var(--ok)">'+grant.prizeAmt.toLocaleString()+' '+cur+'</b> — تمت إضافتها لرصيدك!';
+      } else if(c.prizeType==='points' && grant.success){
+        icon.textContent='⭐'; title.textContent='فزت بنقاط!';
+        body.innerHTML = 'ربحت <b style="color:#c084fc">'+grant.prizePoints.toLocaleString()+' نقطة ولاء</b>';
+      } else if(c.prizeType==='gift_card' && grant.success){
+        icon.textContent='🎫'; title.textContent='فزت بكرت هدية!';
+        body.innerHTML = '<div style="margin-bottom:8px">🎁 كرت الهدية:</div>'
+          +'<div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--p);direction:ltr;letter-spacing:2px;background:var(--bg2);padding:10px;border-radius:8px;cursor:pointer" onclick="copyText(\''+grant.giftCode+'\')">'+grant.giftCode+'</div>'
+          +'<div style="font-size:11px;color:var(--t3);margin-top:6px">اضغط للنسخ — موجود في سجل المشتريات</div>';
+      } else if(c.prizeType==='gift_card' && !grant.success){
+        icon.textContent='⚠️'; title.textContent='فزت!';
+        body.textContent='فزت بكرت هدية لكن المخزون نفد — سيتم التواصل معك قريباً';
+      } else {
+        icon.textContent='🎉'; title.textContent='فزت!'; body.textContent='تم استلام الجائزة';
+      }
+    } else {
+      icon.textContent='😔'; title.textContent='لم يحالفك الحظ اليوم';
+      body.textContent='عد غداً لفرصة جديدة — الحظ معك!';
+    }
     document.getElementById('dailyStateMain').style.display='none';
     document.getElementById('dailyStateResult').style.display='';
   } catch(e){ btn.disabled=false; btn.textContent='🍀 جرّب حظك!'; toast('خطأ: '+e.message,'err'); }
@@ -4927,12 +5414,88 @@ async function confirmRedeem() {
   } catch(e){ toast('خطأ: '+e.message,'err'); }
 }
 
+// ── PATCH approveRc to award loyalty points ──
+var _origApproveRcPts = window.approveRc;
+if(typeof _origApproveRcPts === 'function'){
+  window.approveRc = async function(id){
+    var req = (S.reqs||[]).find(function(r){return r.fbId===id;});
+    var amt = req && req.amount || 0;
+    var uid = req && req.userId;
+    await _origApproveRcPts(id);
+    if(uid && amt > 0){
+      var earned = await _awardLoyaltyPoints(uid, 'recharge', amt);
+      if(earned > 0 && S.user && S.user.fbId === uid && typeof updateLoyaltyDisp === 'function'){
+        updateLoyaltyDisp();
+      }
+    }
+  };
+}
+
+// ── PATCH buyCard to award loyalty points ──
+var _origBuyCard = window.buyCard;
+if(typeof _origBuyCard === 'function'){
+  window.buyCard = async function(){
+    var catId = S.selCat;
+    var cat = (S.cats||[]).find(function(c){return c.fbId===catId;});
+    var price = cat && cat.price || 0;
+    await _origBuyCard.apply(this, arguments);
+    if(S.user && catId && price > 0){
+      var earned = await _awardLoyaltyPoints(S.user.fbId, 'purchase', price, catId);
+      if(earned > 0 && typeof updateLoyaltyDisp === 'function') updateLoyaltyDisp();
+    }
+  };
+}
+
 // ── تحميل المسابقات عند فتح صفحة المستخدم ──
 var _origInitUser=window.initUser;
 window.initUser=function(){
   if(_origInitUser) _origInitUser();
   setTimeout(function(){ loadUserContests(); updateLoyaltyDisp(); },800);
 };
+</script>
+
+<!-- ══ AUTH SUPPORT MODAL — for login page ══ -->
+<div class="ov" id="authSupModal">
+<div class="modal" style="max-width:380px">
+  <div style="text-align:center;margin-bottom:14px">
+    <div style="font-size:38px">💬</div>
+    <h3 style="margin-top:6px">تواصل مع الدعم</h3>
+    <p style="font-size:12px;color:var(--t2);margin-top:4px">اختر طريقة التواصل المناسبة</p>
+  </div>
+  <div id="authSupBody" style="display:flex;flex-direction:column;gap:10px"></div>
+  <button class="mcancel" style="width:100%;margin-top:14px" onclick="closeOv('authSupModal')">إغلاق</button>
+</div></div>
+
+<script>
+function openAuthSupport(){
+  var box = document.getElementById('authSupBody');
+  var phone = (S.cfg && S.cfg.sitePhone) || '';
+  var wa    = (S.cfg && S.cfg.supportWhatsapp) || '';
+  var tg    = (S.cfg && S.cfg.supportTelegram) || '';
+  var showPhone = !!(S.cfg && S.cfg.showPhoneInSupport);
+
+  var html = '';
+  if(wa){
+    html += '<a href="https://wa.me/'+wa+'" target="_blank" style="text-decoration:none;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;color:#fff">'
+      +'<div style="font-size:24px">💚</div>'
+      +'<div><div style="font-weight:700">واتساب</div><div style="font-size:11px;opacity:.85">تواصل مباشر</div></div></a>';
+  }
+  if(tg){
+    html += '<a href="https://t.me/'+tg+'" target="_blank" style="text-decoration:none;background:linear-gradient(135deg,#0088cc,#005f8a);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;color:#fff">'
+      +'<div style="font-size:24px">✈️</div>'
+      +'<div><div style="font-weight:700">تيليجرام</div><div style="font-size:11px;opacity:.85">@'+tg+'</div></div></a>';
+  }
+  if(showPhone && phone){
+    html += '<a href="tel:'+phone+'" style="text-decoration:none;background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;color:var(--txt)">'
+      +'<div style="font-size:24px">📞</div>'
+      +'<div><div style="font-weight:700">اتصل بنا</div><div style="font-size:12px;color:var(--p);direction:ltr">'+phone+'</div></div></a>';
+  }
+  if(!html){
+    html = '<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">لم يتم إعداد قنوات الدعم بعد. يرجى التواصل لاحقاً.</div>';
+  }
+  box.innerHTML = html;
+  openOv('authSupModal');
+}
 </script>
 
 </body>
